@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@elevationai/elevation-core-ts - Complete Documentation</title>
+    <meta name="description" content="Complete documentation for @elevationai/elevation-core-ts - TypeScript SDK for Elevated Platform Services">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-bg: #0f0f1e;
+            --secondary-bg: #1a1a2e;
+            --accent-teal: #64ffda;
+            --accent-blue: #48cae4;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666;
+            --card-bg: rgba(26, 26, 46, 0.8);
+            --border-color: rgba(100, 255, 218, 0.2);
+            --code-bg: #0a0a18;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 15, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--accent-teal), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-teal);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 6rem;
+            padding-bottom: 3rem;
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .doc-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--accent-teal), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .doc-header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Sidebar Navigation */
+        .doc-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 6rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            color: var(--accent-teal);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--accent-teal);
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        /* Content Sections */
+        .doc-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-teal);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        .section h4 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--accent-blue);
+        }
+
+        .section p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .section ul, .section ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .section li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #ff6b9d; }
+        .string { color: #95e1d3; }
+        .comment { color: var(--text-muted); }
+        .function { color: var(--accent-blue); }
+        .variable { color: var(--accent-teal); }
+        .number { color: #ffc947; }
+
+        /* Feature highlights */
+        .feature-highlight {
+            background: rgba(100, 255, 218, 0.1);
+            border-left: 4px solid var(--accent-teal);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .feature-highlight p {
+            margin-bottom: 0;
+            color: var(--text-primary);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: var(--code-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: rgba(100, 255, 218, 0.1);
+            color: var(--accent-teal);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .doc-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .sidebar {
+                position: relative;
+                top: auto;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .doc-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Emoji styling */
+        .emoji-header {
+            font-size: 1.2em;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">@elevationai/elevation-core-ts</a>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="#overview">Overview</a>
+                <a href="#installation">Installation</a>
+                <a href="https://www.blndspt.com/reach-out/">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="doc-header">
+                <h1>Complete Documentation</h1>
+                <p class="subtitle">Comprehensive guide to all modules and features</p>
+            </div>
+
+            <div class="doc-layout">
+                <!-- Sidebar Navigation -->
+                <nav class="sidebar">
+                    <h3>Table of Contents</h3>
+                    <ul>
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="#core-communication">Core Communication</a></li>
+                        <li><a href="#logging">Logging</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="#iot">IOT</a></li>
+                        <li><a href="#enrollment">Device Enrollment</a></li>
+                        <li><a href="#configmgmt">Configuration Management</a></li>
+                        <li><a href="#cms">Content Management</a></li>
+                        <li><a href="#touchpoint">TouchPoint</a></li>
+                        <li><a href="#api-docs">API Documentation</a></li>
+                        <li><a href="#examples">Examples</a></li>
+                        <li><a href="#development">Development</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Main Documentation Content -->
+                <div class="doc-content">
+                    <section id="overview" class="section">
+                        <h2>Overview</h2>
+                        
+                        <div class="emoji-header">🏢 <strong>Admin Dashboard Interface</strong></div>
+                        
+                        <p>The <strong>@elevationai/elevation-core-ts</strong> library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. In order to interact with the library, developers must acquire an organization token and a service endpoint. For more information, please contact Elevation Software at <a href="https://www.blndspt.com/reach-out/">blndspt.com</a>.</p>
+
+                        <h3>Key Capabilities</h3>
+                        <ul>
+                            <li><strong>🔄 Real-time Communication</strong>: Bidirectional socket connections for instant device control</li>
+                            <li><strong>📊 Event Tracking</strong>: Comprehensive event system with 200+ predefined event codes</li>
+                            <li><strong>📝 Centralized Logging</strong>: Remote log aggregation with multiple severity levels</li>
+                            <li><strong>🔐 Device Enrollment</strong>: Secure device registration and authentication</li>
+                            <li><strong>⚙️ Configuration Management</strong>: Dynamic configuration updates with location/device overrides</li>
+                            <li><strong>🎯 Debouncing</strong>: Built-in event and log debouncing to prevent flooding</li>
+                        </ul>
+
+                        <h3>Features</h3>
+                        <p>Within the core library exists 6 different sub-libraries created to provide access and assist with the communication of the core Elevated Platform Services (EPS):</p>
+                        <ul>
+                            <li><strong>Logging</strong> - Centralized log aggregation and monitoring</li>
+                            <li><strong>Events</strong> - Event tracking and analytics</li>
+                            <li><strong>IOT</strong> - Real-time bidirectional communication</li>
+                            <li><strong>Device Enrollment</strong> - Device registration and configuration</li>
+                            <li><strong>Configuration Management</strong> - Dynamic configuration with overrides</li>
+                            <li><strong>Content Management System</strong> - Multi-language content support</li>
+                            <li><strong>TouchPoint</strong> - Device information and service state management</li>
+                        </ul>
+                    </section>
+
+                    <section id="installation" class="section">
+                        <h2>Installation</h2>
+                        
+                        <p>In order to install the @elevationai/elevation-core-ts you are going to need npm access. If you have all the required configuration files, just run the installation command from the working directory.</p>
+
+                        <h3>NPM</h3>
+                        <pre><code>npm install @elevationai/elevation-core-ts</code></pre>
+
+                        <h3>Yarn</h3>
+                        <pre><code>yarn add @elevationai/elevation-core-ts</code></pre>
+                    </section>
+
+                    <section id="core-communication" class="section">
+                        <h2>Core Communication</h2>
+                        
+                        <p>Every sub-library requires specific information needed to communicate with EPS. Each EPS tenant would have a unique access token and endpoint service which are going to be used during the instantiation of each core sub-library. The interface for the core communication is called CoreInfo.</p>
+
+                        <pre><code><span class="keyword">interface</span> <span class="variable">CoreInfo</span> {
+    <span class="variable">token</span>: <span class="keyword">string</span>;
+    <span class="variable">serviceEndpoint</span>: <span class="keyword">string</span>;
+    <span class="variable">iotEndpoint</span>?: <span class="keyword">string</span>;       <span class="comment">// Required for IOT</span>
+    <span class="variable">fingerPrint</span>?: <span class="keyword">string</span>;        <span class="comment">// Required for IOT/Enrollment</span>
+    <span class="variable">secondary</span>?: <span class="keyword">boolean</span>;         <span class="comment">// Optional for secondary apps</span>
+}</code></pre>
+
+                        <h3>Defining CoreInfo in code</h3>
+                        <pre><code><span class="keyword">import</span> { <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span> <span class="comment">// Test Endpoint</span>
+};</code></pre>
+                    </section>
+
+                    <section id="logging" class="section">
+                        <h2>Logging</h2>
+                        
+                        <div class="emoji-header">📊 <strong>Centralized Logging Dashboard</strong></div>
+                        
+                        <p>EPS provides the facility to centralize all the device's logs within the Administration Panel Interface. Users can access individual device logs through a widget located in the device details page. Logs are displayed in chronological order and can be filtered based on the available log levels.</p>
+
+                        <h3>Content</h3>
+                        <ul>
+                            <li>Configuration</li>
+                            <li>Singleton Instance</li>
+                            <li>Class Instantiation</li>
+                            <li>Sending Logs</li>
+                            <li>Log Schema</li>
+                            <li>Log Levels</li>
+                            <li>Setting logs defaults</li>
+                            <li>Log Helpers</li>
+                            <li>Log Debounce</li>
+                        </ul>
+
+                        <h3>Configuring logs</h3>
+                        <p>In order to start interacting with the library, you first need to configure the core information data, using a singleton instance of the library or an instantiated instance from the main class.</p>
+
+                        <h4>Log Singleton Instance</h4>
+                        <p>The singleton instance is the most common way a developer will interact with the library.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span> <span class="comment">// Test Endpoint</span>
+};
+
+<span class="comment">// passing connection data to the library before calling any method</span>
+<span class="variable">elogs</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);</code></pre>
+
+                        <h4>Log Class Instantiation</h4>
+                        <p>In rare occasions, a developer could have multiple services endpoints and they will want the facility to simultaneously send logs to all available environments. For that particular case, you can instantiate multiple instances of the log library.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">ElevatedLogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo1</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span> <span class="comment">// Test Endpoint</span>
+};
+
+<span class="keyword">const</span> <span class="variable">coreInfo2</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://&lt;prod-url&gt;'</span> <span class="comment">// Prod Endpoint</span>
+};
+
+<span class="comment">// passing connection data to the library before calling any method</span>
+<span class="keyword">const</span> <span class="variable">elogs1</span> = <span class="keyword">new</span> <span class="variable">ElevatedLogs</span>(<span class="variable">coreInfo1</span>);
+<span class="keyword">const</span> <span class="variable">elogs2</span> = <span class="keyword">new</span> <span class="variable">ElevatedLogs</span>(<span class="variable">coreInfo2</span>);</code></pre>
+
+                        <h3>Sending logs</h3>
+                        <p>After having an understanding of how to configure the log library, now you are ready to send log information to EPS. Each log request should be associated to a unique touchpoint or device, therefore, the use of a deviceID is required in order to send log messages to EPS.</p>
+
+                        <h4>Log Schema</h4>
+                        <pre><code><span class="keyword">export interface</span> <span class="variable">LogData</span> {
+    <span class="variable">applicationName</span>?: <span class="keyword">string</span>;
+    <span class="variable">level</span>?: <span class="variable">LogLevel</span>;
+    <span class="variable">message</span>: <span class="keyword">string</span>;
+    <span class="variable">deviceId</span>: <span class="keyword">string</span>;
+    <span class="variable">url</span>?: <span class="keyword">string</span>;
+    <span class="variable">body</span>?: <span class="keyword">string</span>;
+    <span class="variable">statusCode</span>?: <span class="keyword">number</span>;
+}</code></pre>
+
+                        <p>Now in order to send logs, you just use the message function.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span> <span class="comment">// Test Endpoint</span>
+};
+
+<span class="comment">// passing connection data to the library before calling any method</span>
+<span class="variable">elogs</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
+
+<span class="variable">elogs</span>.<span class="function">message</span>({
+    <span class="variable">applicationName</span>: <span class="string">'MyAwesomeApp'</span>,
+    <span class="variable">level</span>: <span class="variable">LogLevel</span>.<span class="variable">INFO</span>,
+    <span class="variable">message</span>: <span class="string">'Application started'</span>,
+    <span class="variable">deviceId</span>: <span class="string">'&lt;Device-GUID&gt;'</span>,
+    <span class="variable">url</span>: <span class="string">'Your App url'</span>, <span class="comment">// optional</span>
+    <span class="variable">body</span>: <span class="string">'Request Body'</span>, <span class="comment">// optional</span>
+    <span class="variable">statusCode</span>: <span class="number">0</span> <span class="comment">// optional</span>
+})
+.<span class="function">then</span>(() => <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Log message sent'</span>));</code></pre>
+
+                        <h4>Log Levels</h4>
+                        <p>Currently the library supports 4 different log levels, but if you required an extra level of separation between different events within your application lifecycle, you should make use of the statusCode, from which you can assign any proprietary number definition.</p>
+
+                        <pre><code><span class="keyword">export enum</span> <span class="variable">LogLevel</span> {
+    <span class="variable">INFO</span> = <span class="number">0</span>,
+    <span class="variable">DELAYED</span> = <span class="number">1</span>,
+    <span class="variable">ERROR</span> = <span class="number">2</span>,
+    <span class="variable">CRITICAL</span> = <span class="number">3</span>
+}</code></pre>
+
+                        <h4>Setting logs defaults</h4>
+                        <p>In order to improve productivity during the development process, you can set the value of properties that don't change often when you are sending log messages to EPS. For that particular case, you can make use of the setDefaults function.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span>, <span class="variable">LogOptions</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">logDefaults</span>: <span class="variable">LogOptions</span> = {
+    <span class="variable">debounce</span>: <span class="number">1000</span> * <span class="number">10</span>, <span class="comment">// 10 seconds debounce time</span>
+    <span class="variable">deviceId</span>: <span class="string">'&lt;Device-GUID&gt;'</span>, <span class="comment">// Optional</span>
+    <span class="variable">applicationName</span>: <span class="string">'MyAwesomeApp'</span>, <span class="comment">// Optional</span>
+    <span class="variable">statusCode</span>: <span class="number">0</span> <span class="comment">// Optional</span>
+};
+
+<span class="variable">elogs</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
+<span class="variable">elogs</span>.<span class="function">setDefaults</span>(<span class="variable">logDefaults</span>);
+
+<span class="comment">// now only pass the information that is not part of the defaults</span>
+<span class="variable">elogs</span>.<span class="function">message</span>({
+    <span class="variable">level</span>: <span class="variable">LogLevel</span>.<span class="variable">INFO</span>,
+    <span class="variable">message</span>: <span class="string">'Application started'</span>,
+})
+.<span class="function">then</span>(() => <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Log message sent'</span>));</code></pre>
+
+                        <h4>Log helpers</h4>
+                        <p>In order to improve productivity even more, we provide log helpers to make the logging coding process self-explanatory. In conjunction with default values, the log helpers are incredibly useful during the development process.</p>
+
+                        <pre><code><span class="variable">elogs</span>.<span class="function">information</span>({ <span class="variable">message</span>: <span class="string">'Application started'</span> });
+
+<span class="variable">elogs</span>.<span class="function">delayed</span>({ 
+    <span class="variable">url</span>: <span class="string">'https://app_api/submit'</span>,
+    <span class="variable">message</span>: <span class="string">'Request took longer than default values'</span>
+});
+
+<span class="variable">elogs</span>.<span class="function">error</span>({ <span class="variable">message</span>: <span class="string">'Unable to submit request'</span> });
+
+<span class="variable">elogs</span>.<span class="function">critical</span>({ <span class="variable">message</span>: <span class="string">'Unable to connect to db'</span> });</code></pre>
+
+                        <h4>Log Debounce</h4>
+                        <p>In many occasions a particular situation would trigger the firing of a vast amount of logs to the EPS, making the process of searching a specific issue much more difficult. That is why you have the ability to define a debounce value in milliseconds.</p>
+
+                        <div class="feature-highlight">
+                            <p>By setting a debounce value, you will prevent the logs library from sending multiple log messages within the constraint of the debounce time chosen.</p>
+                        </div>
+                    </section>
+
+                    <section id="events" class="section">
+                        <h2>Events</h2>
+                        
+                        <div class="emoji-header">📈 <strong>Event Analytics Dashboard</strong></div>
+                        
+                        <p>Events are one of the most important elements of EPS, because it drives the information presented in the Administrator dashboard UI. There are some predefined events ready to use in a custom application, and can even be sent automatically within a CUSS deployment through the use of the elevated-analytics library.</p>
+
+                        <h3>Content</h3>
+                        <ul>
+                            <li>Configuring Events</li>
+                            <li>Events Singleton Instance</li>
+                            <li>Events Class Instantiation</li>
+                            <li>Sending Events</li>
+                            <li>Events Schema</li>
+                            <li>Event Codes</li>
+                            <li>Event Status Codes</li>
+                            <li>Setting Event Defaults</li>
+                            <li>Event Helpers</li>
+                            <li>Event Debounce</li>
+                        </ul>
+
+                        <h3>Configuring Events</h3>
+                        <p>In order to start interacting with the library, you first need to configure the core information data, using a singleton instance of the library or an instantiated instance from the main class.</p>
+
+                        <h4>Events Singleton Instance</h4>
+                        <p>The singleton instance is the most common way a developer will interact with the library.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">events</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span> <span class="comment">// Test Endpoint</span>
+};
+
+<span class="comment">// passing connection data to the library before calling any method</span>
+<span class="variable">events</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);</code></pre>
+
+                        <h3>Sending events</h3>
+                        <p>In order to send events to the EPS, you need to use the send function from the library passing the correct event data structure needed to create one.</p>
+
+                        <h4>Events schema</h4>
+                        <pre><code><span class="keyword">export interface</span> <span class="variable">EventData</span> {
+    <span class="variable">eventCode</span>?: <span class="variable">EventCode</span> | <span class="keyword">number</span>;
+    <span class="variable">eventType</span>?: <span class="variable">EventType</span>;
+    <span class="variable">eventMode</span>?: <span class="variable">EventMode</span>;
+    <span class="variable">eventData</span>: <span class="keyword">any</span>;
+    <span class="variable">ownerID</span>?: <span class="keyword">string</span>;
+    <span class="variable">statusCode</span>?: <span class="variable">StatusCode</span>;
+    <span class="variable">created</span>?: <span class="keyword">Date</span>;
+}</code></pre>
+
+                        <div class="emoji-header">⚙️ <strong>Custom Event Configuration</strong></div>
+
+                        <h4>Event Codes</h4>
+                        <p>There are over 200 predefined event codes within the library but that should not be a limitation on how developers can describe or capture activities in their applications. Through the Administrator UI settings, developers are able to create their own custom event codes, to better represent their application eventing system.</p>
+
+                        <h4>Event Status Codes</h4>
+                        <p>Each status code represents a way to filter events in the Administrator UI.</p>
+                        
+                        <pre><code><span class="keyword">export enum</span> <span class="variable">StatusCode</span> {
+    <span class="variable">SUCCESS</span> = <span class="number">200</span>,
+    <span class="variable">MODE_CHANGE</span> = <span class="number">300</span>,
+    <span class="variable">FAILURE</span> = <span class="number">400</span>,
+    <span class="variable">CRITICAL_FAILURE</span> = <span class="number">500</span>,
+    <span class="variable">INFRACTION</span> = <span class="number">501</span>,
+    <span class="variable">TIMEOUT</span> = <span class="number">502</span>
+}</code></pre>
+
+                        <h4>Event Helpers</h4>
+                        <p>To improve the development process the library provides a helper function for each statusCode type available.</p>
+
+                        <pre><code><span class="variable">events</span>.<span class="function">success</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">BAGTAG_PRINT</span> });
+<span class="variable">events</span>.<span class="function">failure</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">BAGTAG_PRINT</span> });
+<span class="variable">events</span>.<span class="function">error</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">OFFLINE</span> });
+<span class="variable">events</span>.<span class="function">critical</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">OUT_OF_SERVICE</span> });
+<span class="variable">events</span>.<span class="function">infraction</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">UPPER_DOOR_OPEN</span> });
+<span class="variable">events</span>.<span class="function">timeout</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">RESERVATION_NOT_FOUND</span> });</code></pre>
+
+                        <h4>Event Debounce</h4>
+                        <p>In many occasions a particular situation would trigger the firing of a vast amount of events to the EPS, making the process of reporting much more difficult and in some cases inaccurate. That is why you have the ability to define a debounce value in milliseconds on a per eventCode basis.</p>
+
+                        <div class="feature-highlight">
+                            <p>By setting a debounce value, you will prevent the event library from sending multiple events of the specified event-code within the constraint of the debounce time chosen.</p>
+                        </div>
+                    </section>
+
+                    <section id="iot" class="section">
+                        <h2>IOT</h2>
+                        
+                        <p>The internet of things, provided by EPS, enables applications running anywhere to establish a bidirectional channel of communication with the Administrator UI. This enables the end user to command the customer facing UI in real time.</p>
+
+                        <h3>Important notice</h3>
+                        <div class="feature-highlight">
+                            <p>Unlike the other libraries, IOT requires the iotEndpoint and a fingerPrint to be defined within the CoreInfo Object. Without it, the communication between the device and EPS won't be possible.</p>
+                        </div>
+
+                        <pre><code><span class="keyword">interface</span> <span class="variable">CoreInfo</span> {
+    <span class="variable">token</span>: <span class="keyword">string</span>;
+    <span class="variable">serviceEndpoint</span>: <span class="keyword">string</span>;
+    <span class="variable">iotEndpoint</span>?: <span class="keyword">string</span>;
+    <span class="variable">fingerPrint</span>?: <span class="keyword">string</span>;
+}</code></pre>
+
+                        <h3>FingerPrint</h3>
+                        <p>In order to associate events and logs to specific devices anywhere in the world, EPS requires a form of identification that must be unique per device. Many applications would take the MAC Address of a device as a good fingerprint value, or an auto generated GUID that gets saved to the operating system, and retrieved and sent to EPS every time the application establishes a bidirectional channel.</p>
+
+                        <p>There is a helper function in the core library that facilitates the creation of GUID, and it can be accessed directly.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="function">console</span>.<span class="function">log</span>(<span class="function">uuid</span>()); <span class="comment">// example response: e91f29b3-3559-491c-ab43-05c63ddc08f9</span></code></pre>
+
+                        <div class="emoji-header">🔧 <strong>Device Configuration Interface</strong></div>
+
+                        <h3>IOT event handling</h3>
+                        <p>There are 4 major events in the IOT lifecycle; and it is important to understand how to deal with each one accordingly.</p>
+
+                        <ul>
+                            <li><strong>onConnected</strong> - Triggered when successfully connected and configured</li>
+                            <li><strong>onDisconnected</strong> - Triggered when network connection is disrupted</li>
+                            <li><strong>onConfigRequired</strong> - Triggered when device needs configuration</li>
+                            <li><strong>onCommand</strong> - Handles incoming commands from Administrator UI</li>
+                        </ul>
+
+                        <div class="emoji-header">💻 <strong>Command Management Interface</strong></div>
+
+                        <h4>IOT onCommand</h4>
+                        <p>This rxjs subscription enables the communication between the developer's application and the EPS IOT services, by making available a customizable set of device configuration values. Such configurations can be sent down to the applications from either the Administrator UI or external API.</p>
+
+                        <pre><code><span class="keyword">import</span> { <span class="variable">iot</span>, <span class="variable">CoreInfo</span>, <span class="variable">IOTInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>: <span class="variable">Commands</span>) => {
+    <span class="keyword">if</span> (<span class="variable">command</span>.<span class="variable">showBagWaiver</span>) {
+        <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Display waiver to user'</span>);
+    }
+});</code></pre>
+
+                        <div class="emoji-header">📡 <strong>Real-time Command Dispatch</strong></div>
+
+                        <p>The commands can be manually sent through the device detail page on the Administrator UI.</p>
+                    </section>
+
+                    <section id="enrollment" class="section">
+                        <h2>Device Enrollment</h2>
+                        
+                        <p>In order to identify every single instance of applications/devices across the globe, developers must complete the enrollment process. This can be completed through the Administrator UI or just by simply providing the required information through the library.</p>
+
+                        <div class="emoji-header">🔐 <strong>Device Enrollment Setup</strong></div>
+
+                        <h3>Enrollment FingerPrint</h3>
+                        <p>Similar to the IOT library, in order to configure an instance of the enrollment service, developers must define a unique fingerprint that would identify a particular instance of an application or a physical device anywhere in the world. Many applications would take the MAC Address of a device as a good fingerprint value, or an auto generated GUID that gets saved to the operating system.</p>
+
+                        <p>The core library provides a helper function to generate GUIDs:</p>
+                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="function">console</span>.<span class="function">log</span>(<span class="function">uuid</span>()); <span class="comment">// example response: e91f29b3-3559-491c-ab43-05c63ddc08f9</span></code></pre>
+
+                        <h3>Starting Enrollment</h3>
+                        <p>To start the enrollment process, you will receive the current device object reference which you will use as a reference for the enrollment. Also, you are going to need to retrieve a reference of all available locations in the organization, terminal, and device specifications.</p>
+
+                        <pre><code><span class="keyword">import</span> { 
+    <span class="variable">enrollment</span>,
+    <span class="variable">CoreInfo</span>,
+    <span class="variable">DeviceUpdate</span>,
+    <span class="variable">DeviceLocation</span>,
+    <span class="variable">Specification</span>,
+    <span class="variable">DeviceInfo</span>
+} <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="variable">enrollment</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
+
+<span class="comment">// Starting enrollment process</span>
+<span class="variable">Promise</span>.<span class="function">all</span>([
+    <span class="variable">enrollment</span>.<span class="function">start</span>(),
+    <span class="variable">enrollment</span>.<span class="function">getLocations</span>(),
+    <span class="variable">enrollment</span>.<span class="function">getSpecification</span>()
+]).<span class="function">then</span>(<span class="keyword">async</span> ([
+    <span class="variable">device</span>: <span class="variable">DeviceUpdate</span>, 
+    <span class="variable">locations</span>: <span class="variable">DeviceLocation</span>[], 
+    <span class="variable">specs</span>: <span class="variable">Specification</span>[] 
+]) => {
+    <span class="keyword">const</span> <span class="variable">devObj</span>: <span class="variable">DeviceInfo</span> = {
+        <span class="variable">label</span>: <span class="string">'DENKIOSK001'</span>, <span class="comment">// a unique name</span>
+        <span class="variable">device</span>: <span class="variable">device</span>,
+        <span class="variable">location</span>: <span class="variable">locations</span>[<span class="number">0</span>],
+        <span class="variable">terminal</span>: <span class="variable">locations</span>[<span class="number">0</span>]?.<span class="variable">terminals</span>[<span class="number">0</span>],
+        <span class="variable">specification</span>: <span class="variable">specs</span>[<span class="number">0</span>]
+    };
+    
+    <span class="keyword">await</span> <span class="variable">enrollment</span>.<span class="function">enrollDevice</span>(<span class="variable">devObj</span>); <span class="comment">// Enrollment completed</span>
+});</code></pre>
+
+                        <h3>Checking for Unique labels</h3>
+                        <p>In order to avoid confusion in the Administrator UI, the library enforces that each enrolled device would have a unique name/label. To avoid errors during the enrollDevice call, the library provides a way to validate if the label or device name is available for use.</p>
+
+                        <pre><code><span class="variable">enrollment</span>.<span class="function">isLabelAvailable</span>(<span class="string">'DENKIOSK001'</span>)
+.<span class="function">then</span>((<span class="variable">isAvailable</span>: <span class="keyword">boolean</span>) => {
+    <span class="keyword">if</span> (<span class="variable">isAvailable</span>) {
+        <span class="function">console</span>.<span class="function">log</span>(<span class="string">'It is ok to use that label'</span>);
+    }
+});</code></pre>
+                    </section>
+
+                    <section id="configmgmt" class="section">
+                        <h2>Configuration Management</h2>
+                        
+                        <p>The configuration management module is a powerful tool that allows developers to create custom configurations for their applications. The configurations can be created through the Administrator UI and then be retrieved by the application through the use of the library. These configurations can be set up as global, location or device specific configurations through the optional use of overrides within the configuration UI.</p>
+
+                        <h3>Configuration Management Code</h3>
+                        <p>In order to start interacting with the library, you first need to configure the core information data and configuration management specific information, using a singleton instance of the library or an instantiated instance from the main class.</p>
+
+                        <h4>Configuration Singleton Instance</h4>
+                        <pre><code><span class="keyword">import</span> { <span class="variable">configMgmt</span>, <span class="variable">CoreInfo</span>, <span class="variable">ConfigMgmtInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api-kiosk-elevation.herokuapp.com'</span>, <span class="comment">// Test Endpoint</span>
+    <span class="variable">fingerPrint</span>: <span class="string">'&lt;App-GUID&gt;'</span> <span class="comment">// unique per touchpoint</span>
+};
+
+<span class="keyword">const</span> <span class="variable">configMgmtInfo</span>: <span class="variable">ConfigMgmtInfo</span> = {
+    <span class="variable">deviceId</span>: <span class="string">'&lt;Device-GUID&gt;'</span>,
+    <span class="variable">locationId</span>: <span class="string">'&lt;Location-GUID&gt;'</span>
+};
+
+<span class="variable">configMgmt</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>, <span class="variable">configMgmtInfo</span>);</code></pre>
+
+                        <h3>Retrieving Configurations</h3>
+                        <p>To retrieve configurations, you will need to provide the configuration key that you want to retrieve. The configurations can be set up as global, location or device specific configurations through the optional use of overrides within the configuration UI.</p>
+
+                        <pre><code><span class="comment">// Retrieve a single configuration</span>
+<span class="keyword">const</span> <span class="variable">config</span> = <span class="keyword">await</span> <span class="variable">configMgmt</span>.<span class="function">getConfig</span>(<span class="string">'config-key'</span>);
+
+<span class="comment">// Retrieve a list of configurations</span>
+<span class="keyword">const</span> <span class="variable">configs</span> = <span class="keyword">await</span> <span class="variable">configMgmt</span>.<span class="function">getConfigs</span>([<span class="string">'config-key-1'</span>, <span class="string">'config-key-2'</span>]);
+
+<span class="comment">// Retrieve all configurations</span>
+<span class="keyword">const</span> <span class="variable">allConfigs</span> = <span class="keyword">await</span> <span class="variable">configMgmt</span>.<span class="function">getAllConfigs</span>();</code></pre>
+
+                        <div class="feature-highlight">
+                            <p><strong>Hierarchical Configuration</strong>: Configurations are applied in order of precedence: global → location → device specific overrides.</p>
+                        </div>
+                    </section>
+
+                    <section id="cms" class="section">
+                        <h2>Content Management System</h2>
+                        
+                        <p>The CMS (Content Management System) module provides multi-language support with fallback to default language (en-US). It allows you to manage localized strings and configuration data that can be retrieved dynamically by your applications.</p>
+
+                        <h3>Basic Usage</h3>
+                        <pre><code><span class="keyword">import</span> { <span class="variable">cms</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api.example.com'</span>
+};
+
+<span class="variable">cms</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
+
+<span class="comment">// Get localized strings</span>
+<span class="keyword">const</span> <span class="variable">welcomeMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(<span class="string">'welcome_message'</span>, <span class="string">'en-US'</span>);
+<span class="keyword">const</span> <span class="variable">spanishMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(<span class="string">'welcome_message'</span>, <span class="string">'es-ES'</span>);
+
+<span class="comment">// Get configuration objects</span>
+<span class="keyword">const</span> <span class="variable">appConfig</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(
+    <span class="string">'app_theme_config'</span>, 
+    <span class="string">'en-US'</span>, 
+    <span class="keyword">true</span> <span class="comment">// parse as JSON</span>
+);</code></pre>
+
+                        <div class="feature-highlight">
+                            <p><strong>Language Fallback</strong>: If the requested language is not available, CMS automatically falls back to 'en-US' default language.</p>
+                        </div>
+                    </section>
+
+                    <section id="touchpoint" class="section">
+                        <h2>TouchPoint</h2>
+                        
+                        <p>TouchPoint class provides functionality for managing device/touchpoint information and service states. It allows you to retrieve device information and manage service status.</p>
+
+                        <h3>Basic Usage</h3>
+                        <pre><code><span class="keyword">import</span> { <span class="variable">touchPoint</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">const</span> <span class="variable">coreInfo</span> = {
+    <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
+    <span class="variable">serviceEndpoint</span>: <span class="string">'https://api.example.com'</span>,
+    <span class="variable">fingerPrint</span>: <span class="string">'unique-device-id'</span>
+};
+
+<span class="variable">touchPoint</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
+
+<span class="comment">// Get device information</span>
+<span class="keyword">const</span> <span class="variable">deviceInfo</span> = <span class="keyword">await</span> <span class="variable">touchPoint</span>.<span class="function">getInfo</span>();
+<span class="keyword">if</span> (<span class="variable">deviceInfo</span>) {
+    <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Device:'</span>, <span class="variable">deviceInfo</span>.<span class="variable">label</span>);
+    <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Location:'</span>, <span class="variable">deviceInfo</span>.<span class="variable">location</span>);
+}
+
+<span class="comment">// Update service state</span>
+<span class="keyword">await</span> <span class="variable">touchPoint</span>.<span class="function">inService</span>(<span class="keyword">true</span>, <span class="string">'Device operational'</span>);
+
+<span class="comment">// Take out of service</span>
+<span class="keyword">await</span> <span class="variable">touchPoint</span>.<span class="function">inService</span>(<span class="keyword">false</span>, <span class="string">'Maintenance required'</span>);</code></pre>
+
+                        <div class="feature-highlight">
+                            <p><strong>Automatic Caching</strong>: TouchPoint automatically caches the device ID after first retrieval for efficient service state operations.</p>
+                        </div>
+                    </section>
+
+                    <section id="api-docs" class="section">
+                        <h2>API Documentation</h2>
+                        
+                        <h3>Core Interfaces</h3>
+
+                        <h4>CoreInfo</h4>
+                        <pre><code><span class="keyword">interface</span> <span class="variable">CoreInfo</span> {
+  <span class="variable">token</span>: <span class="keyword">string</span>;              <span class="comment">// Tenant access token</span>
+  <span class="variable">serviceEndpoint</span>: <span class="keyword">string</span>;    <span class="comment">// API endpoint</span>
+  <span class="variable">iotEndpoint</span>?: <span class="keyword">string</span>;       <span class="comment">// IOT service endpoint</span>
+  <span class="variable">fingerPrint</span>?: <span class="keyword">string</span>;       <span class="comment">// Unique device identifier</span>
+  <span class="variable">secondary</span>?: <span class="keyword">boolean</span>;        <span class="comment">// Secondary app flag</span>
+}</code></pre>
+
+                        <h4>EventData</h4>
+                        <pre><code><span class="keyword">interface</span> <span class="variable">EventData</span> {
+  <span class="variable">eventCode</span>?: <span class="variable">EventCode</span> | <span class="keyword">number</span>;
+  <span class="variable">eventType</span>?: <span class="variable">EventType</span>;
+  <span class="variable">eventMode</span>?: <span class="variable">EventMode</span>;
+  <span class="variable">eventData</span>: <span class="keyword">any</span>;
+  <span class="variable">ownerID</span>?: <span class="keyword">string</span>;
+  <span class="variable">statusCode</span>?: <span class="variable">StatusCode</span>;
+  <span class="variable">created</span>?: <span class="keyword">Date</span>;
+  <span class="variable">metaData</span>?: <span class="keyword">any</span>;
+}</code></pre>
+
+                        <h4>LogData</h4>
+                        <pre><code><span class="keyword">interface</span> <span class="variable">LogData</span> {
+  <span class="variable">application</span>?: <span class="keyword">string</span>;
+  <span class="variable">level</span>?: <span class="variable">LogLevel</span>;
+  <span class="variable">message</span>: <span class="keyword">string</span>;
+  <span class="variable">deviceId</span>: <span class="keyword">string</span>;
+  <span class="variable">url</span>?: <span class="keyword">string</span>;
+  <span class="variable">body</span>?: <span class="keyword">string</span>;
+  <span class="variable">statusCode</span>?: <span class="keyword">number</span>;
+}</code></pre>
+
+                        <h4>IOTInfo</h4>
+                        <pre><code><span class="keyword">interface</span> <span class="variable">IOTInfo</span> {
+  <span class="variable">appName</span>: <span class="keyword">string</span>;
+  <span class="variable">appVersion</span>?: <span class="keyword">string</span>;
+}</code></pre>
+
+                        <h4>ConfigMgmtInfo</h4>
+                        <pre><code><span class="keyword">interface</span> <span class="variable">ConfigMgmtInfo</span> {
+  <span class="variable">deviceId</span>: <span class="keyword">string</span>;
+  <span class="variable">locationId</span>: <span class="keyword">string</span>;
+}</code></pre>
+                    </section>
+
+                    <section id="examples" class="section">
+                        <h2>Complete Integration Example</h2>
+                        
+                        <pre><code><span class="keyword">import</span> { 
+  <span class="variable">CoreInfo</span>, 
+  <span class="variable">events</span>, 
+  <span class="variable">elogs</span>, 
+  <span class="variable">iot</span>, 
+  <span class="variable">EventCode</span>, 
+  <span class="variable">EventType</span>, 
+  <span class="variable">EventMode</span> 
+} <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+
+<span class="keyword">class</span> <span class="variable">ElevatedService</span> {
+  <span class="keyword">private</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span>;
+
+  <span class="function">constructor</span>() {
+    <span class="keyword">this</span>.<span class="variable">coreInfo</span> = {
+      <span class="variable">token</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">ELEVATED_TOKEN</span>!,
+      <span class="variable">serviceEndpoint</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">ELEVATED_API</span>!,
+      <span class="variable">iotEndpoint</span>: <span class="variable">process</span>.<span class="variable">env</span>.<span class="variable">ELEVATED_IOT</span>!,
+      <span class="variable">fingerPrint</span>: <span class="keyword">this</span>.<span class="function">getDeviceId</span>()
+    };
+  }
+
+  <span class="keyword">async</span> <span class="function">initialize</span>() {
+    <span class="comment">// Configure all services</span>
+    <span class="variable">events</span>.<span class="function">config</span>(<span class="keyword">this</span>.<span class="variable">coreInfo</span>);
+    <span class="variable">elogs</span>.<span class="function">config</span>(<span class="keyword">this</span>.<span class="variable">coreInfo</span>);
+    <span class="variable">iot</span>.<span class="function">config</span>(<span class="keyword">this</span>.<span class="variable">coreInfo</span>, {
+      <span class="variable">appName</span>: <span class="string">'CheckinApp'</span>,
+      <span class="variable">appVersion</span>: <span class="string">'1.0.0'</span>
+    });
+
+    <span class="comment">// Set defaults</span>
+    <span class="variable">events</span>.<span class="function">setDefaults</span>({
+      <span class="variable">eventType</span>: <span class="variable">EventType</span>.<span class="variable">CHECKIN_KIOSK</span>,
+      <span class="variable">eventMode</span>: <span class="variable">EventMode</span>.<span class="variable">CUSS</span>,
+      <span class="variable">ownerID</span>: <span class="keyword">this</span>.<span class="variable">coreInfo</span>.<span class="variable">fingerPrint</span>
+    });
+
+    <span class="variable">elogs</span>.<span class="function">setDefaults</span>({
+      <span class="variable">deviceId</span>: <span class="keyword">this</span>.<span class="variable">coreInfo</span>.<span class="variable">fingerPrint</span>!,
+      <span class="variable">application</span>: <span class="string">'CheckinApp'</span>
+    });
+
+    <span class="comment">// Subscribe to IOT events</span>
+    <span class="keyword">this</span>.<span class="function">setupIOTListeners</span>();
+  }
+
+  <span class="keyword">private</span> <span class="function">setupIOTListeners</span>() {
+    <span class="variable">iot</span>.<span class="variable">onConnected</span>.<span class="function">subscribe</span>(() => {
+      <span class="variable">elogs</span>.<span class="function">information</span>({ <span class="variable">message</span>: <span class="string">'IOT Connected'</span> });
+      <span class="variable">events</span>.<span class="function">success</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">ONLINE</span> });
+    });
+
+    <span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>) => {
+      <span class="keyword">this</span>.<span class="function">handleCommand</span>(<span class="variable">command</span>);
+    });
+  }
+
+  <span class="keyword">private</span> <span class="function">getDeviceId</span>(): <span class="keyword">string</span> {
+    <span class="comment">// Implementation to get unique device ID</span>
+    <span class="keyword">return</span> <span class="string">'device-unique-id'</span>;
+  }
+
+  <span class="keyword">private</span> <span class="function">handleCommand</span>(<span class="variable">command</span>: <span class="keyword">any</span>) {
+    <span class="comment">// Handle incoming commands</span>
+  }
+}</code></pre>
+                    </section>
+
+                    <section id="development" class="section">
+                        <h2>Development</h2>
+                        
+                        <h3>Building the Library</h3>
+                        <pre><code>npm run build</code></pre>
+
+                        <h3>Generating Documentation</h3>
+                        <pre><code><span class="comment"># TypeDoc</span>
+npm run typedoc
+
+<span class="comment"># JSDoc</span>
+npm run doc
+
+<span class="comment"># Both</span>
+npm run docs</code></pre>
+
+                        <h3>Testing</h3>
+                        <pre><code>npm test</code></pre>
+
+                        <h3>Support</h3>
+                        <p>For support and questions:</p>
+                        <ul>
+                            <li>📧 Contact: <a href="https://www.blndspt.com/reach-out/">Elevation Software</a></li>
+                            <li>📖 Documentation: Complete API documentation available in TypeScript definitions</li>
+                        </ul>
+
+                        <h3>License</h3>
+                        <p>Proprietary - Elevation Software © 2024</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem 0; border-top: 1px solid var(--border-color); margin-top: 3rem;">
+        <div class="container">
+            <p style="color: var(--text-secondary);">Built with ❤️ by <a href="https://www.blndspt.com" style="color: var(--accent-teal);">Elevation Software</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in sidebar
+        const observerOptions = {
+            root: null,
+            rootMargin: '-100px 0px -50% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.id;
+                const navLink = document.querySelector(`a[href="#${id}"]`);
+                
+                if (entry.isIntersecting) {
+                    // Remove active from all links
+                    document.querySelectorAll('.sidebar a').forEach(link => {
+                        link.style.color = 'var(--text-secondary)';
+                        link.style.background = 'transparent';
+                    });
+                    
+                    // Add active to current link
+                    if (navLink) {
+                        navLink.style.color = 'var(--accent-teal)';
+                        navLink.style.background = 'rgba(100, 255, 218, 0.1)';
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
