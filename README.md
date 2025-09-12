@@ -1,4 +1,4 @@
-# Elevation Lib Core
+# Elevation Core
 
 <div align="center">
   <h3>🚀 Comprehensive TypeScript SDK for Elevated Platform Services</h3>
@@ -6,6 +6,7 @@
   
   [![npm version](https://img.shields.io/npm/v/@elevationai/elevation-core-ts.svg)](https://www.npmjs.com/package/@elevationai/elevation-core-ts)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+  [![Deno](https://img.shields.io/badge/Deno-1.40+-green)](https://deno.com/)
   [![License](https://img.shields.io/npm/l/@elevationai/elevation-core-ts.svg)](LICENSE)
 </div>
 
@@ -15,8 +16,9 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
+- [Installation & Quick Start](#installation--quick-start)
+  - [Node.js/NPM](#nodejs--npm)
+  - [Deno](#deno)
 - [Core Modules](#core-modules)
   - [Logging](#logging)
   - [Events](#events)
@@ -25,12 +27,14 @@
   - [Configuration Management](#configuration-management)
 - [API Documentation](#api-documentation)
 - [Examples](#examples)
-- [Change Log](#change-log)
+- [Development](#development)
 - [Support](#support)
 
 ## Overview
 
-The **Elevation Lib Core** library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. In order to interact with the library, developers must acquire an organization token and a service endpoint. For more information, please contact Elevation Software at [blndspt.com](https://www.blndspt.com/reach-out/).
+The **Elevation Core** library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. Available for both **Node.js/NPM** and **Deno** environments.
+
+To interact with the library, developers must acquire an organization token and service endpoint. For more information, please contact Elevation Software at [blndspt.com](https://www.blndspt.com/reach-out/).
 
 🏢 **Admin Dashboard Interface**
 
@@ -41,30 +45,100 @@ The **Elevation Lib Core** library provides comprehensive access to all Elevated
 - **📝 Centralized Logging**: Remote log aggregation with multiple severity levels
 - **🔐 Device Enrollment**: Secure device registration and authentication
 - **⚙️ Configuration Management**: Dynamic configuration updates with location/device overrides
-- **🎯 Debouncing**: Built-in event and log debouncing to prevent flooding
+- **🎯 Smart Debouncing**: Built-in event and log debouncing to prevent flooding
+- **🔄 Auto-retry Logic**: Automatic retry for failed requests
+- **💾 Intelligent Caching**: In-memory caching for configuration values
 
 ## Features
 
-Within the core library exists 5 different sub-libraries created to provide access and assist with the communication of the core Elevated Platform Services (EPS):
+The core library consists of 5 different modules providing comprehensive access to the Elevated Platform Services (EPS):
 
 - **[Logging](#logging)** - Centralized log aggregation and monitoring
-- **[Events](#events)** - Event tracking and analytics
+- **[Events](#events)** - Event tracking and analytics  
 - **[IOT](#iot)** - Real-time bidirectional communication
 - **[Device Enrollment](#device-enrollment)** - Device registration and configuration
 - **[Configuration Management](#configuration-management)** - Dynamic configuration with overrides
 
-## Installation
+## Installation & Quick Start
 
-In order to install the @elevationai/elevation-core-ts you are going to need npm access. If you have all the required configuration files, just run the installation command from the working directory.
+### Node.js / NPM
 
-### NPM
+#### Installation
 ```bash
+# NPM
 npm install @elevationai/elevation-core-ts
+
+# Yarn
+yarn add @elevationai/elevation-core-ts
 ```
 
-### Yarn
+#### Quick Start
+```typescript
+import { elogs, events, CoreInfo } from '@elevationai/elevation-core-ts';
+
+const coreInfo: CoreInfo = {
+    token: '<Tenant_Access_Token>',
+    serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com'
+};
+
+// Configure services
+elogs.config(coreInfo);
+events.config(coreInfo);
+
+// Send a log
+await elogs.information({ message: 'Application started' });
+
+// Send an event
+await events.success({ eventCode: EventCode.APP_START });
+```
+
+### Deno
+
+#### Quick Start
+```typescript
+import {
+  events,
+  elogs,
+  iot,
+  CoreInfo,
+  EventCode,
+  LogLevel
+} from './index.ts'; // Local development
+// or from published module: 'https://deno.land/x/elevation_core/index.ts'
+
+const coreInfo: CoreInfo = {
+  token: 'your-token',
+  serviceEndpoint: 'https://api-endpoint',
+  fingerPrint: 'device-id'
+};
+
+// Configure services
+events.config(coreInfo);
+elogs.config(coreInfo);
+
+// Send an event
+await events.success({
+  eventCode: EventCode.APP_START,
+  eventData: { version: '1.0.0' }
+});
+
+// Send a log
+await elogs.information({
+  message: 'Application started'
+});
+```
+
+#### Deno Development Tasks
 ```bash
-yarn add @elevationai/elevation-core-ts
+# Type check
+deno task check
+
+# Run example
+deno task example
+
+# Format & lint
+deno task fmt
+deno task lint
 ```
 
 ## Core Communication
@@ -1023,7 +1097,7 @@ interface ConfigMgmtInfo {
 
 ## Examples
 
-### Complete Integration Example
+### Node.js Complete Integration Example
 
 ```typescript
 import { 
@@ -1066,7 +1140,7 @@ class ElevatedService {
 
     elogs.setDefaults({
       deviceId: this.coreInfo.fingerPrint!,
-      application: 'CheckinApp'
+      applicationName: 'CheckinApp'
     });
 
     // Subscribe to IOT events
@@ -1095,17 +1169,146 @@ class ElevatedService {
 }
 ```
 
+### Deno Complete Integration Example
+
+```typescript
+import {
+  events,
+  elogs,
+  iot,
+  enrollment,
+  configMgmt,
+  CoreInfo,
+  EventCode,
+  EventType,
+  EventMode,
+  LogLevel,
+  IOTInfo,
+  ConfigMgmtInfo
+} from './index.ts';
+
+async function main() {
+  const coreInfo: CoreInfo = {
+    token: Deno.env.get('ELEVATION_TOKEN')!,
+    serviceEndpoint: Deno.env.get('ELEVATION_SERVICE_ENDPOINT')!,
+    iotEndpoint: Deno.env.get('ELEVATION_IOT_ENDPOINT'),
+    fingerPrint: Deno.env.get('ELEVATION_FINGERPRINT'),
+  };
+
+  // Configure all services
+  events.config(coreInfo);
+  elogs.config(coreInfo);
+  
+  // Set defaults
+  events.setDefaults({
+    eventType: EventType.CHECKIN_KIOSK,
+    eventMode: EventMode.NATIVE,
+    ownerID: coreInfo.fingerPrint
+  });
+
+  elogs.setDefaults({
+    deviceId: coreInfo.fingerPrint!,
+    applicationName: 'MyKioskApp'
+  });
+
+  // Configure IOT if available
+  if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
+    iot.config(coreInfo, {
+      appName: 'MyKioskApp',
+      appVersion: '1.0.0'
+    });
+
+    iot.onConnected.subscribe(() => {
+      console.log('IOT Connected');
+      events.success({ eventCode: EventCode.ONLINE });
+    });
+
+    iot.onCommand.subscribe((command) => {
+      console.log('Received command:', command);
+      if (command.refresh) {
+        // Handle refresh command
+        console.log('Refreshing application...');
+      }
+    });
+  }
+
+  // Send startup events and logs
+  await events.success({ 
+    eventCode: EventCode.APP_START,
+    eventData: { version: '1.0.0' }
+  });
+
+  await elogs.information({ 
+    message: 'Application started successfully' 
+  });
+
+  // Check enrollment
+  if (coreInfo.fingerPrint) {
+    enrollment.config(coreInfo);
+    const isEnrolled = await enrollment.isEnrolled();
+    
+    if (!isEnrolled) {
+      console.log('Device not enrolled');
+    }
+  }
+
+  console.log('Elevation library initialized successfully!');
+}
+
+// Run with error handling
+main().catch(console.error);
+```
+
+### Advanced Features Examples
+
+#### Event Debouncing
+```typescript
+// Both Node.js and Deno
+events.setDefaults({
+  debounceEvent: [
+    { eventCode: EventCode.PAPER_JAM, debounce: 60000 },
+    { eventCode: EventCode.NETWORK_ERROR, debounce: 30000 }
+  ],
+  debounceOnce: [
+    { eventCode: EventCode.IN_SERVICE, debounce: 60000 }
+  ]
+});
+```
+
+#### Configuration Management with Overrides
+```typescript
+// Deno example
+const config = await configMgmt.getConfig('theme_settings');
+const resolvedValue = configMgmt.getResolvedValue(config);
+// Resolves priority: device > location > global
+```
+
+#### Real-time Configuration Watching
+```typescript
+// Watch for configuration changes
+const stopWatching = configMgmt.watchConfig(
+  'feature_flags',
+  (value) => console.log('Feature flags updated:', value),
+  10000 // Poll every 10 seconds
+);
+
+// Stop watching later
+setTimeout(stopWatching, 60000);
+```
+
 ---
 
 
 ## Development
 
-### Building the Library
+### Node.js/NPM Development
+
+#### Building the Library
 ```bash
 npm run build
 ```
 
-### Generating Documentation
+#### Generating Documentation
 ```bash
 # TypeDoc
 npm run typedoc
@@ -1117,9 +1320,63 @@ npm run doc
 npm run docs
 ```
 
-### Testing
+#### Testing
 ```bash
 npm test
+```
+
+### Deno Development
+
+#### Project Structure
+```
+elevation-core-ts/
+├── lib/              # Core library modules
+│   ├── shared/       # Base classes & utilities
+│   ├── events/       # Event tracking
+│   ├── logs/         # Centralized logging
+│   ├── iot/          # WebSocket communication
+│   ├── enrollment/   # Device registration
+│   └── config/       # Configuration management
+├── types/            # TypeScript definitions & enums
+├── examples/         # Usage examples
+├── index.ts          # Main library exports
+└── deno.json         # Deno configuration
+```
+
+#### Development Tasks
+```bash
+# Type check
+deno task check
+
+# Run example
+deno task example
+
+# Format code
+deno task fmt
+
+# Lint code
+deno task lint
+
+# Run tests
+deno task test
+```
+
+#### Key Differences from Node.js
+
+1. **Native Fetch** - Uses Deno's built-in fetch instead of axios
+2. **WebSocket API** - Native WebSocket instead of Socket.IO  
+3. **UUID Generation** - Uses native `crypto.randomUUID()` instead of external library
+4. **Permissions** - Explicit permission flags required (`--allow-net`, `--allow-env`)
+5. **TypeScript** - Native TypeScript support without compilation
+6. **Import Maps** - Uses Deno import maps for dependencies
+
+#### Environment Setup
+Create a `.env` file for local development:
+```env
+ELEVATION_TOKEN=your_tenant_access_token
+ELEVATION_SERVICE_ENDPOINT=https://api-kiosk-elevation.herokuapp.com
+ELEVATION_IOT_ENDPOINT=wss://iot-elevation.herokuapp.com
+ELEVATION_FINGERPRINT=device-unique-id
 ```
 
 ---
