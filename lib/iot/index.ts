@@ -28,13 +28,6 @@ export class ElevatedIOT extends BaseService {
   private isConnected = false;
   private shouldReconnect = true;
 
-  constructor(coreInfo?: CoreInfo, iotInfo?: IOTInfo) {
-    super(coreInfo);
-    if (iotInfo) {
-      this.iotInfo = iotInfo;
-    }
-  }
-
   public override config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
     super.config(coreInfo);
     

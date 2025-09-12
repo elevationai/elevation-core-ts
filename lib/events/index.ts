@@ -1,5 +1,4 @@
 import { BaseService } from '../shared/base.ts';
-import { BatchProcessor } from '../shared/utils.ts';
 import type {
   CoreInfo,
   EventData,
@@ -15,18 +14,6 @@ import {
 export class ElevatedEvents extends BaseService {
   private defaults: EventOptions = {};
   private debouncedEvents = new Map<number, DebouncedEvent>();
-  private batchProcessor: BatchProcessor<EventData>;
-
-  constructor(coreInfo?: CoreInfo) {
-    super(coreInfo);
-    
-    // Initialize batch processor for event batching
-    this.batchProcessor = new BatchProcessor<EventData>(
-      async (batch) => await this.sendBatch(batch),
-      50, // Batch size
-      1000 // Batch delay in ms
-    );
-  }
 
   public setDefaults(options: EventOptions): void {
     this.defaults = { ...options };
@@ -80,7 +67,7 @@ export class ElevatedEvents extends BaseService {
     return false;
   }
 
-  public async send(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public async send(eventData: Partial<EventData>, kiosk: any = null): Promise<ApiResponse> {
     this.checkConfiguration();
 
     // Apply defaults
@@ -93,6 +80,23 @@ export class ElevatedEvents extends BaseService {
       eventData: eventData.eventData || {}
     };
 
+    // MetaData validation and auto-population (from reference library)
+    if (!fullEventData.metaData) {
+      const metaData: any = {};
+      if (fullEventData.eventCode) metaData.eventCode = fullEventData.eventCode;
+      if (fullEventData.eventData && fullEventData.eventData.airline) metaData.airline = fullEventData.eventData.airline;
+      if (fullEventData.eventData && fullEventData.eventData.countryCode) metaData.countryCode = fullEventData.eventData.countryCode;
+      if (fullEventData.ownerID) metaData.ownerID = fullEventData.ownerID;
+      
+      if (kiosk) {
+        metaData.tags = kiosk.tags || [];
+        metaData.location = kiosk.location || null;
+        metaData.testDevice = !!kiosk.metadata.testDevice;
+      }
+      
+      fullEventData.metaData = metaData;
+    }
+
     // Check debouncing
     if (fullEventData.eventCode && this.shouldDebounce(fullEventData.eventCode)) {
       return {
@@ -101,25 +105,19 @@ export class ElevatedEvents extends BaseService {
       };
     }
 
-    // Add to batch processor
-    this.batchProcessor.add(fullEventData);
-
-    return {
-      success: true,
-      message: 'Event queued for sending'
-    };
-  }
-
-  private async sendBatch(batch: EventData[]): Promise<void> {
-    if (batch.length === 0) return;
-
+    // Send event directly to /events endpoint
     try {
-      await this.post('/api/events/batch', { events: batch });
+      const response = await this.post('/events', fullEventData);
+      return response;
     } catch (error) {
-      console.error('Failed to send event batch:', error);
-      // Could implement retry logic here
+      console.error('Failed to send event:', error);
+      return {
+        success: false,
+        error: 'Failed to send event'
+      };
     }
   }
+
 
   // Helper methods for different status codes
   public async success(eventData: Partial<EventData>): Promise<ApiResponse> {
@@ -171,14 +169,29 @@ export class ElevatedEvents extends BaseService {
     });
   }
 
-  // Flush any pending events
-  public async flush(): Promise<void> {
-    await this.batchProcessor.flush();
+
+  // Add debounce settings (reference library compatibility)
+  public addDebounce(info: Array<{ eventCode: EventCode | number; debounce: number }>): void {
+    info.forEach(({ eventCode, debounce }) => {
+      this.debouncedEvents.set(eventCode, {
+        eventCode,
+        lastSent: 0,
+        debounceTime: debounce,
+        once: false
+      });
+    });
   }
 
-  // Get current queue size
-  public get queueSize(): number {
-    return this.batchProcessor.queueSize;
+  // Add debounce once settings (reference library compatibility)
+  public addDebounceOnce(info: Array<{ eventCode: EventCode | number; debounce: number }>): void {
+    info.forEach(({ eventCode, debounce }) => {
+      this.debouncedEvents.set(eventCode, {
+        eventCode,
+        lastSent: 0,
+        debounceTime: debounce,
+        once: true
+      });
+    });
   }
 
   // Clear all debounce settings

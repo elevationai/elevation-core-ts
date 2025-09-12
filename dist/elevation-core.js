@@ -20,11 +20,10 @@ var ElevationCore = (() => {
   // .temp/bundle-entry.js
   var bundle_entry_exports = {};
   __export(bundle_entry_exports, {
-    BaseService: () => BaseService,
-    BatchProcessor: () => BatchProcessor,
+    CMS: () => CMS,
     Cache: () => Cache,
-    ConfigMgmt: () => ConfigMgmt,
     Debouncer: () => Debouncer,
+    ElevatedConfigurations: () => ElevatedConfigurations,
     ElevatedEnrollment: () => ElevatedEnrollment,
     ElevatedEvents: () => ElevatedEvents,
     ElevatedIOT: () => ElevatedIOT,
@@ -35,13 +34,15 @@ var ElevationCore = (() => {
     EventMode: () => EventMode,
     EventType: () => EventType,
     LogLevel: () => LogLevel,
-    RetryHandler: () => RetryHandler,
     StatusCode: () => StatusCode,
-    configMgmt: () => configMgmt,
+    TouchPoint: () => TouchPoint,
+    cms: () => cms,
+    elevatedConfigurations: () => elevatedConfigurations,
     elogs: () => elogs,
     enrollment: () => enrollment,
     events: () => events,
     iot: () => iot,
+    touchPoint: () => touchPoint,
     uuid: () => uuid
   });
 
@@ -271,10 +272,10 @@ var ElevationCore = (() => {
 
   // types/index.ts
   var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
-    LogLevel2[LogLevel2["INFO"] = 0] = "INFO";
-    LogLevel2[LogLevel2["DELAYED"] = 1] = "DELAYED";
-    LogLevel2[LogLevel2["ERROR"] = 2] = "ERROR";
-    LogLevel2[LogLevel2["CRITICAL"] = 3] = "CRITICAL";
+    LogLevel2["INFO"] = "INFO";
+    LogLevel2["DELAYED"] = "DELAYED";
+    LogLevel2["ERROR"] = "ERROR";
+    LogLevel2["CRITICAL"] = "CRITICAL";
     return LogLevel2;
   })(LogLevel || {});
 
@@ -394,75 +395,12 @@ var ElevationCore = (() => {
   function formatDate(date = /* @__PURE__ */ new Date()) {
     return date.toISOString();
   }
-  var BatchProcessor = class {
-    queue = [];
-    processing = false;
-    batchSize;
-    batchDelay;
-    processor;
-    timeoutId = null;
-    constructor(processor, batchSize = 100, batchDelay = 1e3) {
-      this.processor = processor;
-      this.batchSize = batchSize;
-      this.batchDelay = batchDelay;
-    }
-    add(item) {
-      this.queue.push(item);
-      if (this.queue.length >= this.batchSize) {
-        this.processBatch();
-      } else {
-        this.scheduleProcessing();
-      }
-    }
-    scheduleProcessing() {
-      if (this.timeoutId) {
-        clearTimeout(this.timeoutId);
-      }
-      this.timeoutId = setTimeout(() => {
-        this.processBatch();
-      }, this.batchDelay);
-    }
-    async processBatch() {
-      if (this.processing || this.queue.length === 0) {
-        return;
-      }
-      this.processing = true;
-      if (this.timeoutId) {
-        clearTimeout(this.timeoutId);
-        this.timeoutId = null;
-      }
-      const batch = this.queue.splice(0, this.batchSize);
-      try {
-        await this.processor(batch);
-      } catch (error) {
-        console.error("Batch processing error:", error);
-      } finally {
-        this.processing = false;
-        if (this.queue.length > 0) {
-          this.scheduleProcessing();
-        }
-      }
-    }
-    async flush() {
-      while (this.queue.length > 0) {
-        await this.processBatch();
-      }
-    }
-    get queueSize() {
-      return this.queue.length;
-    }
-  };
 
   // lib/shared/base.ts
   var BaseService = class {
     coreInfo = null;
     configured = false;
     headers = new Headers();
-    constructor(coreInfo) {
-      if (coreInfo) {
-        this.config(coreInfo);
-      }
-    }
     config(coreInfo) {
       this.validateCoreInfo(coreInfo);
       this.coreInfo = coreInfo;
@@ -481,11 +419,7 @@ var ElevationCore = (() => {
       if (!this.coreInfo)
         return;
       this.headers = new Headers({
-        "Authorization": `Bearer ${this.coreInfo.token}`,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "X-Device-Fingerprint": this.coreInfo.fingerPrint || "",
-        "X-Secondary-App": this.coreInfo.secondary ? "true" : "false"
+        "Elevated-Auth": btoa(this.coreInfo.token)
       });
     }
     checkConfiguration() {
@@ -544,9 +478,16 @@ var ElevationCore = (() => {
         body: JSON.stringify(data)
       });
     }
-    async get(path) {
+    async patch(path, data) {
       return this.makeRequest(path, {
-        method: "GET"
+        method: "PATCH",
+        body: JSON.stringify(data)
+      });
+    }
+    async get(path, headers) {
+      return this.makeRequest(path, {
+        method: "GET",
+        headers
       });
     }
     async put(path, data) {
@@ -561,55 +502,11 @@ var ElevationCore = (() => {
       });
     }
   };
-  var RetryHandler = class {
-    maxRetries;
-    retryDelay;
-    backoffMultiplier;
-    constructor(maxRetries = 3, retryDelay = 1e3, backoffMultiplier = 2) {
-      this.maxRetries = maxRetries;
-      this.retryDelay = retryDelay;
-      this.backoffMultiplier = backoffMultiplier;
-    }
-    async execute(fn, shouldRetry) {
-      let lastError;
-      let delay = this.retryDelay;
-      for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
-        try {
-          return await fn();
-        } catch (error) {
-          lastError = error;
-          if (attempt === this.maxRetries) {
-            throw error;
-          }
-          if (shouldRetry && !shouldRetry(error)) {
-            throw error;
-          }
-          await this.sleep(delay);
-          delay *= this.backoffMultiplier;
-        }
-      }
-      throw lastError;
-    }
-    sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-  };
 
   // lib/events/index.ts
   var ElevatedEvents = class extends BaseService {
     defaults = {};
     debouncedEvents = /* @__PURE__ */ new Map();
-    batchProcessor;
-    constructor(coreInfo) {
-      super(coreInfo);
-      this.batchProcessor = new BatchProcessor(
-        async (batch) => await this.sendBatch(batch),
-        50,
-        // Batch size
-        1e3
-        // Batch delay in ms
-      );
-    }
     setDefaults(options) {
       this.defaults = { ...options };
       if (options.debounceEvent) {
@@ -649,7 +546,7 @@ var ElevationCore = (() => {
       }
       return false;
     }
-    async send(eventData) {
+    async send(eventData, kiosk = null) {
       this.checkConfiguration();
       const fullEventData = {
         eventType: this.defaults.eventType,
@@ -659,25 +556,38 @@ var ElevationCore = (() => {
         ...eventData,
         eventData: eventData.eventData || {}
       };
+      if (!fullEventData.metaData) {
+        const metaData = {};
+        if (fullEventData.eventCode)
+          metaData.eventCode = fullEventData.eventCode;
+        if (fullEventData.eventData && fullEventData.eventData.airline)
+          metaData.airline = fullEventData.eventData.airline;
+        if (fullEventData.eventData && fullEventData.eventData.countryCode)
+          metaData.countryCode = fullEventData.eventData.countryCode;
+        if (fullEventData.ownerID)
+          metaData.ownerID = fullEventData.ownerID;
+        if (kiosk) {
+          metaData.tags = kiosk.tags || [];
+          metaData.location = kiosk.location || null;
+          metaData.testDevice = !!kiosk.metadata.testDevice;
+        }
+        fullEventData.metaData = metaData;
+      }
       if (fullEventData.eventCode && this.shouldDebounce(fullEventData.eventCode)) {
         return {
           success: true,
           message: "Event debounced"
         };
       }
-      this.batchProcessor.add(fullEventData);
-      return {
-        success: true,
-        message: "Event queued for sending"
-      };
-    }
-    async sendBatch(batch) {
-      if (batch.length === 0)
-        return;
       try {
-        await this.post("/api/events/batch", { events: batch });
+        const response = await this.post("/events", fullEventData);
+        return response;
       } catch (error) {
-        console.error("Failed to send event batch:", error);
+        console.error("Failed to send event:", error);
+        return {
+          success: false,
+          error: "Failed to send event"
+        };
       }
     }
     // Helper methods for different status codes
@@ -723,13 +633,27 @@ var ElevationCore = (() => {
         statusCode: 300 /* MODE_CHANGE */
       });
     }
-    // Flush any pending events
-    async flush() {
-      await this.batchProcessor.flush();
+    // Add debounce settings (reference library compatibility)
+    addDebounce(info) {
+      info.forEach(({ eventCode, debounce }) => {
+        this.debouncedEvents.set(eventCode, {
+          eventCode,
+          lastSent: 0,
+          debounceTime: debounce,
+          once: false
+        });
+      });
     }
-    // Get current queue size
-    get queueSize() {
-      return this.batchProcessor.queueSize;
+    // Add debounce once settings (reference library compatibility)
+    addDebounceOnce(info) {
+      info.forEach(({ eventCode, debounce }) => {
+        this.debouncedEvents.set(eventCode, {
+          eventCode,
+          lastSent: 0,
+          debounceTime: debounce,
+          once: true
+        });
+      });
     }
     // Clear all debounce settings
     clearDebounce() {
@@ -748,9 +672,6 @@ var ElevationCore = (() => {
     defaults = {};
     debouncer;
     lastLogHash = /* @__PURE__ */ new Map();
-    constructor(coreInfo) {
-      super(coreInfo);
-    }
     setDefaults(options) {
       this.defaults = { ...options };
       if (options.debounce) {
@@ -782,7 +703,7 @@ var ElevationCore = (() => {
         deviceId: this.defaults.deviceId || "",
         applicationName: this.defaults.applicationName,
         statusCode: this.defaults.statusCode,
-        level: 0 /* INFO */,
+        level: "INFO" /* INFO */,
         ...logData,
         message: logData.message || ""
       };
@@ -807,7 +728,7 @@ var ElevationCore = (() => {
         environment: Deno.env.get("DENO_ENV") || "production"
       };
       try {
-        const response = await this.post("/api/logs", logPayload);
+        const response = await this.post(`${this.coreInfo?.serviceEndpoint}/logs`, logPayload);
         return response;
       } catch (error) {
         console.error("Failed to send log:", error);
@@ -821,42 +742,47 @@ var ElevationCore = (() => {
     async information(logData) {
       return this.message({
         ...logData,
-        level: 0 /* INFO */
+        level: "INFO" /* INFO */
       });
     }
     async delayed(logData) {
       return this.message({
         ...logData,
-        level: 1 /* DELAYED */
+        level: "DELAYED" /* DELAYED */
       });
     }
     async error(logData) {
       return this.message({
         ...logData,
-        level: 2 /* ERROR */
+        level: "ERROR" /* ERROR */
       });
     }
     async critical(logData) {
       return this.message({
         ...logData,
-        level: 3 /* CRITICAL */
+        level: "CRITICAL" /* CRITICAL */
       });
     }
-    // Batch logging for multiple messages
+    // Send multiple logs individually (since no batch endpoint exists)
     async batch(logs) {
       this.checkConfiguration();
-      const fullLogs = logs.map((log) => ({
-        deviceId: this.defaults.deviceId || log.deviceId || "",
-        applicationName: this.defaults.applicationName || log.applicationName,
-        statusCode: this.defaults.statusCode,
-        level: 0 /* INFO */,
-        ...log,
-        message: log.message || "",
-        timestamp: formatDate()
-      }));
       try {
-        const response = await this.post("/api/logs/batch", { logs: fullLogs });
-        return response;
+        const results = await Promise.all(
+          logs.map((log) => this.message(log))
+        );
+        const failures = results.filter((r) => !r.success);
+        if (failures.length === 0) {
+          return {
+            success: true,
+            message: `Successfully sent ${logs.length} logs`
+          };
+        } else {
+          return {
+            success: false,
+            error: `Failed to send ${failures.length} of ${logs.length} logs`,
+            data: { failures }
+          };
+        }
       } catch (error) {
         console.error("Failed to send batch logs:", error);
         return {
@@ -910,12 +836,6 @@ var ElevationCore = (() => {
     iotInfo = { appName: "ElevationDenoService" };
     isConnected = false;
     shouldReconnect = true;
-    constructor(coreInfo, iotInfo) {
-      super(coreInfo);
-      if (iotInfo) {
-        this.iotInfo = iotInfo;
-      }
-    }
     config(coreInfo, iotInfo) {
       super.config(coreInfo);
       if (!coreInfo.iotEndpoint) {
@@ -1123,10 +1043,7 @@ var ElevationCore = (() => {
 
   // lib/enrollment/index.ts
   var ElevatedEnrollment = class extends BaseService {
-    deviceCache = null;
-    constructor(coreInfo) {
-      super(coreInfo);
-    }
+    started = false;
     config(coreInfo) {
       super.config(coreInfo);
       if (!coreInfo.fingerPrint) {
@@ -1135,20 +1052,21 @@ var ElevationCore = (() => {
     }
     async start() {
       this.checkConfiguration();
-      const response = await this.post("/api/enrollment/start", {
-        fingerPrint: this.coreInfo.fingerPrint,
-        ipAddress: await this.getLocalIP(),
-        macAddress: await this.getMacAddress()
-      });
+      const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/key`);
       if (response.success && response.data) {
-        this.deviceCache = response.data;
-        return response.data;
+        const device = response.data[0];
+        if (device.metadata?.configured) {
+          throw new Error("Device is already enrolled");
+        } else {
+          this.started = true;
+          return device;
+        }
       }
       throw new Error(response.error || "Failed to start enrollment");
     }
     async getLocations() {
       this.checkConfiguration();
-      const response = await this.get("/api/locations");
+      const response = await this.get(`${this.coreInfo?.serviceEndpoint}/locations`);
       if (response.success && response.data) {
         return response.data;
       }
@@ -1156,44 +1074,52 @@ var ElevationCore = (() => {
     }
     async getSpecification() {
       this.checkConfiguration();
-      const response = await this.get("/api/specifications");
+      const response = await this.get(`${this.coreInfo?.serviceEndpoint}/speficiations`);
       if (response.success && response.data) {
         return response.data;
       }
       throw new Error(response.error || "Failed to get specifications");
     }
-    async enrollDevice(deviceInfo) {
+    async enrollDevice(info) {
       this.checkConfiguration();
-      if (!deviceInfo.label) {
+      if (!this.started) {
+        throw new Error("start subscription first");
+      }
+      if (!info.label) {
         throw new Error("Device label is required");
       }
-      if (!deviceInfo.location?.id) {
+      if (!info.device?._id) {
+        throw new Error("Missing Device information");
+      }
+      if (!info.location?._id) {
         throw new Error("Location is required");
       }
-      if (!deviceInfo.terminal?.id) {
+      if (!info.terminal?._id) {
         throw new Error("Terminal is required");
       }
-      if (!deviceInfo.specification?.id) {
+      if (!info.specification?.id) {
         throw new Error("Specification is required");
       }
-      const isAvailable = await this.isLabelAvailable(deviceInfo.label);
+      const isAvailable = await this.isLabelAvailable(info.label);
       if (!isAvailable) {
-        throw new Error(`Device label '${deviceInfo.label}' is already in use`);
+        throw new Error(`Device label '${info.label}' is already in use`);
       }
-      const enrollmentData = {
-        fingerPrint: this.coreInfo.fingerPrint,
-        label: deviceInfo.label,
-        locationId: deviceInfo.location.id,
-        terminalId: deviceInfo.terminal.id,
-        specificationId: deviceInfo.specification.id,
-        deviceId: deviceInfo.device?.id,
-        ipAddress: await this.getLocalIP(),
-        macAddress: await this.getMacAddress()
-      };
-      const response = await this.post("/api/enrollment/enroll", enrollmentData);
-      if (response.success) {
-        this.deviceCache = null;
+      info.device.label = info.label;
+      info.device.location = info.location._id;
+      info.device.terminal = info.terminal._id;
+      if (info.specification) {
+        info.device.hardware = { model: info.specification.model };
       }
+      if (info.metadata) {
+        info.device.metadata = info.metadata;
+      }
+      if (info.location?.configurations) {
+        info.device.configurations = {
+          ...info.location.configurations,
+          ...info.device.configurations
+        };
+      }
+      const response = await this.patch(`${this.coreInfo?.serviceEndpoint}/devices/${info.device._id}`, info.device);
       return response;
     }
     async isLabelAvailable(label) {
@@ -1201,107 +1127,18 @@ var ElevationCore = (() => {
       if (!label) {
         return false;
       }
-      const response = await this.get(
-        `/api/enrollment/check-label?label=${encodeURIComponent(label)}`
-      );
+      const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/label/${label}`, {});
       if (response.success && response.data) {
-        return response.data.available;
+        return response.data.length === 0;
       }
       return false;
-    }
-    async updateDevice(update) {
-      this.checkConfiguration();
-      const updateData = {
-        ...update,
-        fingerPrint: this.coreInfo.fingerPrint
-      };
-      return await this.put("/api/enrollment/update", updateData);
-    }
-    async getDeviceInfo() {
-      this.checkConfiguration();
-      if (this.deviceCache) {
-        return this.deviceCache;
-      }
-      const response = await this.get(
-        `/api/enrollment/device?fingerPrint=${encodeURIComponent(this.coreInfo.fingerPrint)}`
-      );
-      if (response.success && response.data) {
-        this.deviceCache = response.data;
-        return response.data;
-      }
-      return null;
-    }
-    async unenroll() {
-      this.checkConfiguration();
-      const response = await this.delete(
-        `/api/enrollment/unenroll?fingerPrint=${encodeURIComponent(this.coreInfo.fingerPrint)}`
-      );
-      if (response.success) {
-        this.deviceCache = null;
-      }
-      return response;
-    }
-    // Helper method to get terminals for a specific location
-    async getTerminals(locationId) {
-      this.checkConfiguration();
-      const response = await this.get(
-        `/api/locations/${locationId}/terminals`
-      );
-      if (response.success && response.data) {
-        return response.data;
-      }
-      throw new Error(response.error || "Failed to get terminals");
-    }
-    // Helper method to validate enrollment status
-    async isEnrolled() {
-      const deviceInfo = await this.getDeviceInfo();
-      return !!deviceInfo && !!deviceInfo.id;
-    }
-    // Utility methods for getting system information
-    async getLocalIP() {
-      try {
-        const conn = await Deno.connect({ hostname: "8.8.8.8", port: 80 });
-        const localAddr = conn.localAddr;
-        conn.close();
-        return localAddr.hostname;
-      } catch {
-        return "127.0.0.1";
-      }
-    }
-    async getMacAddress() {
-      try {
-        const command = new Deno.Command("ifconfig", {
-          args: [],
-          stdout: "piped"
-        });
-        const output = await command.output();
-        const text = new TextDecoder().decode(output.stdout);
-        const macMatch = text.match(/([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}/);
-        if (macMatch) {
-          return macMatch[0];
-        }
-      } catch {
-      }
-      return "00:00:00:00:00:00";
-    }
-    // Clear cached data
-    clearCache() {
-      this.deviceCache = null;
     }
   };
   var enrollment = new ElevatedEnrollment();
 
   // lib/config/index.ts
-  var ConfigMgmt = class extends BaseService {
+  var ElevatedConfigurations = class extends BaseService {
     configInfo = null;
-    cache;
-    constructor(coreInfo, configInfo) {
-      super(coreInfo);
-      this.cache = new Cache(5 * 60 * 1e3);
-      if (configInfo) {
-        this.configInfo = configInfo;
-      }
-    }
     config(coreInfo, configInfo) {
       super.config(coreInfo);
       if (configInfo) {
@@ -1310,175 +1147,210 @@ var ElevationCore = (() => {
     }
     setConfigInfo(configInfo) {
       if (!configInfo.deviceId || !configInfo.locationId) {
-        throw new Error("Both deviceId and locationId are required in ConfigMgmtInfo");
+        throw new Error("Both deviceId and locationId are required in ElevatedConfigurationsInfo");
       }
       this.configInfo = configInfo;
-      this.cache.clear();
     }
     checkConfigInfo() {
       if (!this.configInfo) {
-        throw new Error("ConfigMgmtInfo not set. Call setConfigInfo() first");
+        throw new Error("ElevatedConfigurationsInfo not set. Call setConfigInfo() first");
       }
     }
-    async getAllConfigs() {
+    async getConfig(label) {
       this.checkConfiguration();
       this.checkConfigInfo();
-      const cacheKey = `all-${this.configInfo.deviceId}-${this.configInfo.locationId}`;
-      const cached = this.cache.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-      const params = new URLSearchParams({
-        deviceId: this.configInfo.deviceId,
-        locationId: this.configInfo.locationId
+      return this.get(`${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`).then((res) => {
+        return res.data || null;
+      }).catch((err) => {
+        console.error("Error fetching configuration:", err);
+        return null;
       });
-      const response = await this.get(
-        `/api/config?${params.toString()}`
-      );
-      if (response.success && response.data) {
-        this.cache.set(cacheKey, response.data);
-        for (const [key, value] of Object.entries(response.data)) {
-          this.cache.set(this.getCacheKey(key), value);
-        }
-        return response.data;
-      }
-      throw new Error(response.error || "Failed to get configurations");
     }
-    async getConfig(key) {
+    async getConfigs(labels) {
+      return Promise.all(labels.map((label) => this.getConfig(label)));
+    }
+  };
+  var elevatedConfigurations = new ElevatedConfigurations();
+
+  // lib/cms/index.ts
+  var CMS = class extends BaseService {
+    // Observable for reactive programming (using EventEmitter instead of RxJS)
+    stringsObservable = new EventEmitter();
+    cmsCache = /* @__PURE__ */ new Map();
+    allStrings = null;
+    reqHeaderNoCache = { "Cache-Control": "no-cache" };
+    config(coreInfo) {
+      super.config(coreInfo);
+      this.refreshInfo(coreInfo);
+    }
+    /**
+     * Refresh CMS information and reload strings
+     */
+    refreshInfo(info) {
+      this.config(info);
+    }
+    /**
+     * Get a specific key from CMS
+     * @param key - The CMS key to retrieve
+     * @param lan - Language code (e.g., 'en', 'es', 'fr')
+     * @param isConfig - Whether this is a configuration string
+     * @returns The CMS string or null if not found
+     */
+    async getKey(key, lan, isConfig = false) {
       this.checkConfiguration();
-      this.checkConfigInfo();
-      const cacheKey = this.getCacheKey(key);
-      const cached = this.cache.get(cacheKey);
-      if (cached) {
-        return cached;
+      if (!isConfig) {
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        return cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
       }
-      const params = new URLSearchParams({
-        key,
-        deviceId: this.configInfo.deviceId,
-        locationId: this.configInfo.locationId
-      });
-      const response = await this.get(
-        `/api/config/${encodeURIComponent(key)}?${params.toString()}`
-      );
-      if (response.success && response.data) {
-        this.cache.set(cacheKey, response.data);
-        return response.data;
+      if (!this.allStrings || this.allStrings.length === 0 || isConfig) {
+        await this.loadAllStrings(isConfig);
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        const found = cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
+        return isConfig && found ? JSON.parse(found) : found;
       }
       return null;
     }
-    async getConfigs(keys) {
-      this.checkConfiguration();
-      this.checkConfigInfo();
-      const result = {};
-      const uncachedKeys = [];
-      for (const key of keys) {
-        const cached = this.cache.get(this.getCacheKey(key));
-        if (cached) {
-          result[key] = cached;
-        } else {
-          uncachedKeys.push(key);
-        }
+    /**
+     * Get a string value directly (convenience method)
+     */
+    async getString(key, lan) {
+      const result = await this.getKey(key, lan, false);
+      if (typeof result === "string") {
+        return result;
       }
-      if (uncachedKeys.length > 0) {
-        const params = new URLSearchParams({
-          deviceId: this.configInfo.deviceId,
-          locationId: this.configInfo.locationId
-        });
-        uncachedKeys.forEach((key) => params.append("keys", key));
-        const response = await this.post(
-          `/api/config/batch?${params.toString()}`,
-          { keys: uncachedKeys }
-        );
+      return result?.content || null;
+    }
+    /**
+     * Get a configuration value
+     */
+    async getConfig(key, lan) {
+      const result = await this.getKey(key, lan, true);
+      if (typeof result === "string") {
+        return result;
+      }
+      return result?.content || null;
+    }
+    /**
+     * Load all CMS strings for the organization
+     */
+    async loadAllStrings(disableCache = false) {
+      this.checkConfiguration();
+      try {
+        const response = await this.get(`${this.coreInfo?.serviceEndpoint}/strings`, disableCache ? this.reqHeaderNoCache : void 0);
         if (response.success && response.data) {
-          for (const [key, value] of Object.entries(response.data)) {
-            this.cache.set(this.getCacheKey(key), value);
-            result[key] = value;
-          }
+          this.allStrings = response.data;
+          this.stringsObservable.emit(this.allStrings);
+          this.updateCacheFromStrings(this.allStrings);
         }
+      } catch (error) {
+        console.error("Failed to load CMS strings:", error);
+        this.stringsObservable.emit(null);
       }
-      return result;
     }
-    async setConfig(key, value, type = "device") {
-      this.checkConfiguration();
-      this.checkConfigInfo();
-      const configData = {
-        key,
-        value,
-        type,
-        deviceId: type === "device" ? this.configInfo.deviceId : void 0,
-        locationId: type === "location" ? this.configInfo.locationId : void 0
-      };
-      const response = await this.put(`/api/config/${encodeURIComponent(key)}`, configData);
-      if (response.success) {
-        this.cache.delete(this.getCacheKey(key));
-        this.cache.delete(`all-${this.configInfo.deviceId}-${this.configInfo.locationId}`);
-      }
-      return response;
+    /**
+     * Get all loaded strings
+     */
+    getAllStrings() {
+      return this.allStrings;
     }
-    async deleteConfig(key) {
-      this.checkConfiguration();
-      this.checkConfigInfo();
-      const params = new URLSearchParams({
-        deviceId: this.configInfo.deviceId,
-        locationId: this.configInfo.locationId
-      });
-      const response = await this.delete(
-        `/api/config/${encodeURIComponent(key)}?${params.toString()}`
-      );
-      if (response.success) {
-        this.cache.delete(this.getCacheKey(key));
-        this.cache.delete(`all-${this.configInfo.deviceId}-${this.configInfo.locationId}`);
-      }
-      return response;
-    }
-    // Helper method to get the resolved value considering overrides
-    getResolvedValue(config) {
-      if (config.overrides?.device !== void 0) {
-        return config.overrides.device;
-      }
-      if (config.overrides?.location !== void 0) {
-        return config.overrides.location;
-      }
-      return config.value;
-    }
-    // Watch for configuration changes (polling-based)
-    watchConfig(key, callback, interval = 3e4) {
-      let lastValue = null;
-      const checkForChanges = async () => {
-        try {
-          const currentValue = await this.getConfig(key);
-          if (JSON.stringify(currentValue) !== JSON.stringify(lastValue)) {
-            lastValue = currentValue;
-            callback(currentValue);
-          }
-        } catch (error) {
-          console.error("Error checking config:", error);
-        }
-      };
-      checkForChanges();
-      const intervalId = setInterval(checkForChanges, interval);
-      return () => clearInterval(intervalId);
-    }
-    // Clear all cached configurations
+    /**
+     * Clear the local cache
+     */
     clearCache() {
-      this.cache.clear();
+      this.cmsCache.clear();
     }
-    // Get cache statistics
+    /**
+     * Get cache statistics
+     */
     getCacheStats() {
       return {
-        size: this.cache["cache"].size,
-        ttl: this.cache["ttl"]
+        size: this.cmsCache.size,
+        keys: Array.from(this.cmsCache.keys())
       };
     }
-    getCacheKey(key) {
-      return `${key}-${this.configInfo.deviceId}-${this.configInfo.locationId}`;
+    /**
+     * Private method to update cache from loaded strings
+     */
+    updateCacheFromStrings(strings) {
+      for (const cms2 of strings) {
+        for (const [langCode, langData] of Object.entries(cms2.languages)) {
+          const publishedVersion = langData.versions.find((v) => v.published) || langData.versions[0];
+          if (publishedVersion) {
+            const cacheKey = `${cms2.element}-${langCode}`;
+            this.cmsCache.set(cacheKey, publishedVersion.string);
+          }
+        }
+      }
     }
-    // Clean up resources
+    /**
+     * Clean up resources
+     */
     destroy() {
-      this.cache.destroy();
+      this.clearCache();
+      this.stringsObservable.clear();
+      this.allStrings = null;
     }
   };
-  var configMgmt = new ConfigMgmt();
+  var cms = new CMS();
+
+  // lib/touchpoint/index.ts
+  var TouchPoint = class extends BaseService {
+    touchPointId = null;
+    getDeviceByFingerPrint() {
+      this.checkConfiguration();
+      if (!this.coreInfo?.fingerPrint) {
+        throw new Error("Device fingerprint is required for TouchPoint service");
+      }
+      return this.get(`${this.coreInfo?.serviceEndpoint}/devices/key/${this.coreInfo.fingerPrint}`).then((res) => {
+        if (res.data?.length) {
+          const tp = res.data[0];
+          if (tp)
+            this.touchPointId = tp._id;
+          return tp;
+        }
+        return null;
+      }).catch((err) => {
+        console.error(err);
+        return null;
+      });
+    }
+    /**
+     * Get complete TouchPoint information
+     * @returns TouchPoint information or null if not found
+     */
+    async getInfo() {
+      return this.getDeviceByFingerPrint();
+    }
+    /**
+     * Set the device in service or out of service
+     * @param state - true for in-service, false for out-of-service
+     * @param reason - Reason for the state change
+     */
+    async inService(state, reason) {
+      this.checkConfiguration();
+      if (!this.coreInfo?.fingerPrint) {
+        throw new Error("Device fingerprint is required for TouchPoint service");
+      }
+      try {
+        if (!this.touchPointId) {
+          await this.getDeviceByFingerPrint();
+        }
+        if (!this.touchPointId) {
+          return;
+        }
+        await this.post(`${this.coreInfo.serviceEndpoint}/devices/service`, {
+          id: this.touchPointId,
+          state,
+          reason
+        });
+      } catch (error) {
+        console.error(`Unable to transition to state: ${state} ${error}`);
+      }
+    }
+  };
+  var touchPoint = new TouchPoint();
 
   // index.ts
   var ElevationService = class {
@@ -1486,11 +1358,15 @@ var ElevationCore = (() => {
     logs = elogs;
     iot = iot;
     enrollment = enrollment;
-    config = configMgmt;
+    config = elevatedConfigurations;
+    cms = cms;
+    touchPoint = touchPoint;
     initialize(coreInfo) {
       this.events.config(coreInfo);
       this.logs.config(coreInfo);
       this.enrollment.config(coreInfo);
+      this.cms.config(coreInfo);
+      this.touchPoint.config(coreInfo);
       if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
         this.iot.config(coreInfo);
       }

@@ -13,10 +13,6 @@ export class ElevatedLogs extends BaseService {
   private debouncer?: Debouncer<(data: LogData) => Promise<ApiResponse>>;
   private lastLogHash = new Map<string, number>();
 
-  constructor(coreInfo?: CoreInfo) {
-    super(coreInfo);
-  }
-
   public setDefaults(options: LogOptions): void {
     this.defaults = { ...options };
     
@@ -93,7 +89,7 @@ export class ElevatedLogs extends BaseService {
     };
 
     try {
-      const response = await this.post('/api/logs', logPayload);
+      const response = await this.post(`${this.coreInfo?.serviceEndpoint}/logs`, logPayload);
       return response;
     } catch (error) {
       console.error('Failed to send log:', error);
@@ -133,23 +129,30 @@ export class ElevatedLogs extends BaseService {
     });
   }
 
-  // Batch logging for multiple messages
+  // Send multiple logs individually (since no batch endpoint exists)
   public async batch(logs: Partial<LogData>[]): Promise<ApiResponse> {
     this.checkConfiguration();
 
-    const fullLogs = logs.map(log => ({
-      deviceId: this.defaults.deviceId || log.deviceId || '',
-      applicationName: this.defaults.applicationName || log.applicationName,
-      statusCode: this.defaults.statusCode,
-      level: LogLevel.INFO,
-      ...log,
-      message: log.message || '',
-      timestamp: formatDate()
-    }));
-
     try {
-      const response = await this.post('/api/logs/batch', { logs: fullLogs });
-      return response;
+      const results = await Promise.all(
+        logs.map(log => this.message(log))
+      );
+      
+      // Check if any failed
+      const failures = results.filter(r => !r.success);
+      
+      if (failures.length === 0) {
+        return {
+          success: true,
+          message: `Successfully sent ${logs.length} logs`
+        };
+      } else {
+        return {
+          success: false,
+          error: `Failed to send ${failures.length} of ${logs.length} logs`,
+          data: { failures }
+        };
+      }
     } catch (error) {
       console.error('Failed to send batch logs:', error);
       return {

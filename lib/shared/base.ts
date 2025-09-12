@@ -5,12 +5,6 @@ export abstract class BaseService {
   protected configured = false;
   protected headers: Headers = new Headers();
 
-  constructor(coreInfo?: CoreInfo) {
-    if (coreInfo) {
-      this.config(coreInfo);
-    }
-  }
-
   public config(coreInfo: CoreInfo): void {
     this.validateCoreInfo(coreInfo);
     this.coreInfo = coreInfo;
@@ -29,13 +23,9 @@ export abstract class BaseService {
 
   protected setupHeaders(): void {
     if (!this.coreInfo) return;
-    
+
     this.headers = new Headers({
-      'Authorization': `Bearer ${this.coreInfo.token}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'X-Device-Fingerprint': this.coreInfo.fingerPrint || '',
-      'X-Secondary-App': this.coreInfo.secondary ? 'true' : 'false'
+      'Elevated-Auth': btoa(this.coreInfo.token)
     });
   }
 
@@ -50,7 +40,7 @@ export abstract class BaseService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     this.checkConfiguration();
-    
+
     const url = `${this.coreInfo!.serviceEndpoint}${path}`;
     const timeout = this.coreInfo!.timeout || 30000;
 
@@ -80,7 +70,7 @@ export abstract class BaseService {
       };
     } catch (error) {
       clearTimeout(timeoutId);
-      
+
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           return {
@@ -94,7 +84,7 @@ export abstract class BaseService {
           error: error.message
         };
       }
-      
+
       return {
         success: false,
         error: 'Unknown error occurred'
@@ -109,9 +99,17 @@ export abstract class BaseService {
     });
   }
 
-  protected async get<T = any>(path: string): Promise<ApiResponse<T>> {
+  protected async patch<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'GET'
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  }
+
+  protected async get<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+    return this.makeRequest<T>(path, {
+      method: 'GET',
+      headers
     });
   }
 
@@ -126,55 +124,5 @@ export abstract class BaseService {
     return this.makeRequest<T>(path, {
       method: 'DELETE'
     });
-  }
-}
-
-// Retry utility for failed requests
-export class RetryHandler {
-  private maxRetries: number;
-  private retryDelay: number;
-  private backoffMultiplier: number;
-
-  constructor(
-    maxRetries = 3,
-    retryDelay = 1000,
-    backoffMultiplier = 2
-  ) {
-    this.maxRetries = maxRetries;
-    this.retryDelay = retryDelay;
-    this.backoffMultiplier = backoffMultiplier;
-  }
-
-  async execute<T>(
-    fn: () => Promise<T>,
-    shouldRetry?: (error: any) => boolean
-  ): Promise<T> {
-    let lastError: any;
-    let delay = this.retryDelay;
-
-    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
-      try {
-        return await fn();
-      } catch (error) {
-        lastError = error;
-
-        if (attempt === this.maxRetries) {
-          throw error;
-        }
-
-        if (shouldRetry && !shouldRetry(error)) {
-          throw error;
-        }
-
-        await this.sleep(delay);
-        delay *= this.backoffMultiplier;
-      }
-    }
-
-    throw lastError;
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

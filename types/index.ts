@@ -21,9 +21,69 @@ export interface IOTInfo {
   appVersion?: string;
 }
 
-export interface ConfigMgmtInfo {
+export interface ElevatedConfigurationsInfo {
   deviceId: string;
   locationId: string;
+}
+
+export interface Software {
+  softwareName?: string;
+  version?: string;
+  lastUpdate?: Date;
+  cussVersion?: string;
+}
+
+export interface Hardware {
+  model?: string;
+  resolution?: string;
+  processor?: string;
+  memory?: string;
+  os?: string;
+  hasLocalSpecs?: boolean;
+}
+
+export interface Metadata {
+  inService: boolean;
+}
+
+export interface Device {
+  _id: string;
+  elevatedKey: string;
+  label: string;
+  note?: string;
+  organization: string;
+  location?: string;
+  terminal?: string;
+  hardware?: Hardware;
+  software?: Software;
+  kioskNumber?: string; // ?
+  schedule?: DeviceSchedule;
+  metadata?: DeviceMetadata;
+  configurations?: { [key: string]: string | number | boolean };
+  configurationsOverride?: { [key: string]: boolean };
+  settings?: DeviceSettings[];
+  images?: { [key: string]: string };
+  tags?: string[];
+}
+
+export interface DeviceSettings {
+  code?: string;
+  values?: any;
+}
+
+export interface DeviceSchedule {
+  uptimeStart?: Date;
+  uptimeEnd?: Date;
+  follow?: boolean;
+}
+
+export interface DeviceMetadata {
+  environment?: number;
+  testDevice?: boolean;
+  configured?: boolean;
+  archived?: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 // Import enums for use in interfaces
@@ -42,6 +102,8 @@ export interface EventData {
   statusCode?: StatusCode;
   created?: Date;
   metaData?: any;
+  tid?: string; // Transaction ID
+  organization?: string; // Organization field
 }
 
 export interface LogData {
@@ -54,34 +116,29 @@ export interface LogData {
   statusCode?: number;
 }
 
-export interface DeviceUpdate {
-  id?: string;
-  label?: string;
-  locationId?: string;
-  terminalId?: string;
-  specificationId?: string;
-  fingerPrint?: string;
-  ipAddress?: string;
-  macAddress?: string;
-  status?: string;
-  lastSeen?: Date;
+export interface DeviceLocation {
+	_id?: string;
+	code?: string;
+	type?: string;
+	name?: string;
+	terminals: Terminal[];
+	organization?: string;
+	images?: { [key: string]: string };
+	metadata?: LocationMetadata;
+	configurations?: { [key: string]: boolean | string | number }
 }
 
-export interface DeviceLocation {
-  id: string;
-  name: string;
-  code?: string;
-  terminals?: Terminal[];
-  city?: string;
-  country?: string;
-  timezone?: string;
+export interface LocationMetadata {
+	hasElevatedPlatform?: boolean;
+	maxBagCheckinTime?: number;
+	minBagCheckinTime?: number;
+	cussConfigKey?: string;
+	rebootTime?: string | Date;
 }
 
 export interface Terminal {
-  id: string;
+  _id: string;
   name: string;
-  code?: string;
-  locationId?: string;
 }
 
 export interface Specification {
@@ -95,17 +152,18 @@ export interface Specification {
 
 export interface DeviceInfo {
   label: string;
-  device: DeviceUpdate;
+  device: Device;
   location: DeviceLocation;
   terminal: Terminal;
   specification: Specification;
+  metadata?: DeviceMetadata;
 }
 
 export enum LogLevel {
-  INFO = 0,
-  DELAYED = 1,
-  ERROR = 2,
-  CRITICAL = 3
+  INFO = "INFO",
+  DELAYED = "DELAYED",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL"
 }
 
 // Options interfaces
@@ -146,13 +204,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface ConfigValue {
-  key: string;
-  value: any;
-  type: 'global' | 'location' | 'device';
-  overrides?: {
-    location?: any;
-    device?: any;
-  };
+  [key: string]: any;
 }
 
 // Utility type for debouncing
