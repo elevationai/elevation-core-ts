@@ -1,10 +1,10 @@
 // Core interfaces and types for Elevation Deno Service
 
 // Export enums
-export * from './event-code.ts';
-export * from './event-mode.ts';
-export * from './event-type.ts';
-export * from './status-codes.ts';
+export * from './enums/event-code.ts';
+export * from './enums/event-mode.ts';
+export * from './enums/event-type.ts';
+export * from './enums/status-codes.ts';
 
 export interface CoreInfo {
   token: string;
@@ -27,10 +27,10 @@ export interface ConfigMgmtInfo {
 }
 
 // Import enums for use in interfaces
-import type { EventCode } from './event-code.ts';
-import type { EventType } from './event-type.ts';
-import type { EventMode } from './event-mode.ts';
-import type { StatusCode } from './status-codes.ts';
+import type { EventCode } from './enums/event-code.ts';
+import type { EventType } from './enums/event-type.ts';
+import type { EventMode } from './enums/event-mode.ts';
+import type { StatusCode } from './enums/status-codes.ts';
 
 // Data structures
 export interface EventData {
