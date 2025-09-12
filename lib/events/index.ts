@@ -1,6 +1,5 @@
 import { BaseService } from '../shared/base.ts';
 import type {
-  CoreInfo,
   EventData,
   EventOptions,
   DebouncedEvent,

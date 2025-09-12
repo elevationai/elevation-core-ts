@@ -1,7 +1,6 @@
 import { BaseService } from '../shared/base.ts';
 import { Debouncer, formatDate } from '../shared/utils.ts';
 import type {
-  CoreInfo,
   LogData,
   LogOptions,
   ApiResponse
