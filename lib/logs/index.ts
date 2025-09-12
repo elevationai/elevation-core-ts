@@ -189,4 +189,4 @@ export class ElevatedLogs extends BaseService {
 }
 
 // Export singleton instance
-export const elogs = new ElevatedLogs();
+export const elogs: ElevatedLogs = new ElevatedLogs();

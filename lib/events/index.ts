@@ -194,4 +194,4 @@ export class ElevatedEvents extends BaseService {
 }
 
 // Export singleton instance
-export const events = new ElevatedEvents();
+export const events: ElevatedEvents = new ElevatedEvents();

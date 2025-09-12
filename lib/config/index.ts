@@ -274,4 +274,4 @@ export class ConfigMgmt extends BaseService {
 }
 
 // Export singleton instance
-export const configMgmt = new ConfigMgmt();
+export const configMgmt: ConfigMgmt = new ConfigMgmt();

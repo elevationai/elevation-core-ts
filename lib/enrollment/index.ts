@@ -239,4 +239,4 @@ export class ElevatedEnrollment extends BaseService {
 }
 
 // Export singleton instance
-export const enrollment = new ElevatedEnrollment();
+export const enrollment: ElevatedEnrollment = new ElevatedEnrollment();

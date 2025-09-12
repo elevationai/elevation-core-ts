@@ -8,15 +8,15 @@ import type {
 
 export class ElevatedIOT extends BaseService {
   // Event emitters for reactive programming
-  public onConnected = new EventEmitter<void>();
-  public onDisconnect = new EventEmitter<void>();
-  public onConfigRequired = new EventEmitter<void>();
-  public onCommand = new EventEmitter<Commands>();
-  public onFlightInfo = new EventEmitter<any>();
-  public onRefresh = new EventEmitter<void>();
-  public onPrint = new EventEmitter<any>();
-  public onRestart = new EventEmitter<void>();
-  public onNavigate = new EventEmitter<string>();
+  public onConnected: EventEmitter<void> = new EventEmitter<void>();
+  public onDisconnect: EventEmitter<void> = new EventEmitter<void>();
+  public onConfigRequired: EventEmitter<void> = new EventEmitter<void>();
+  public onCommand: EventEmitter<Commands> = new EventEmitter<Commands>();
+  public onFlightInfo: EventEmitter<any> = new EventEmitter<any>();
+  public onRefresh: EventEmitter<void> = new EventEmitter<void>();
+  public onPrint: EventEmitter<any> = new EventEmitter<any>();
+  public onRestart: EventEmitter<void> = new EventEmitter<void>();
+  public onNavigate: EventEmitter<string> = new EventEmitter<string>();
 
   private ws: WebSocket | null = null;
   private reconnectTimer: number | null = null;
@@ -301,4 +301,4 @@ export class ElevatedIOT extends BaseService {
 }
 
 // Export singleton instance
-export const iot = new ElevatedIOT();
+export const iot: ElevatedIOT = new ElevatedIOT();
