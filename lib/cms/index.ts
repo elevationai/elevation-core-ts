@@ -32,14 +32,6 @@ export interface ICMS {
   organization: string;
 }
 
-export interface CMSString {
-  key: string;
-  content: string;
-  language: string;
-  version: number;
-  isConfig: boolean;
-}
-
 export class CMS extends BaseService {
   // Observable for reactive programming (using EventEmitter instead of RxJS)
   public stringsObservable: EventEmitter<ICMS[] | null> = new EventEmitter<ICMS[] | null>();
@@ -67,17 +59,19 @@ export class CMS extends BaseService {
    * @param isConfig - Whether this is a configuration string
    * @returns The CMS string or null if not found
    */
-  async getKey(key: string, lan: string, isConfig: boolean = false): Promise<CMSString | string | null> {
+  async getKey(key: string, lan: string, isConfig: boolean = false, allowCache = true): Promise<string | null> {
     this.checkConfiguration();
     
-    if (!isConfig) {
+    // If cache is allowed and cache exists, return from cache
+    if (allowCache && this.allStrings?.length) {
       const cached = this.cmsCache.get(`${key}-${lan}`);
       const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
-      return cached !== undefined ? cached : cachedLangFallback !== undefined ? cachedLangFallback : null;
+      const found = cached !== undefined ? cached : cachedLangFallback !== undefined ? cachedLangFallback : null;
+      return isConfig && found ? JSON.parse(found) : found;
     }
 
-    // If not in cache, try to reload all strings first
-    if (!this.allStrings || this.allStrings.length === 0 || isConfig) {
+    // If cache is not allowed or cache is not loaded, load all strings
+    if (!allowCache || !this.allStrings?.length ) {
       await this.loadAllStrings(isConfig);
       
       // Check cache again after loading
@@ -93,23 +87,15 @@ export class CMS extends BaseService {
   /**
    * Get a string value directly (convenience method)
    */
-  async getString(key: string, lan: string): Promise<string | null> {
-    const result = await this.getKey(key, lan, false);
-    if (typeof result === 'string') {
-      return result;
-    }
-    return result?.content || null;
+  async getString(key: string, lan: string, allowCache = true): Promise<string | null> {
+    return this.getKey(key, lan, false, allowCache);
   }
 
   /**
    * Get a configuration value
    */
-  async getConfig(key: string, lan: string): Promise<string | null> {
-    const result = await this.getKey(key, lan, true);
-    if (typeof result === 'string') {
-      return result;
-    }
-    return result?.content || null;
+  async getConfig(key: string, lan: string, allowCache = true): Promise<string | null> {
+    return this.getKey(key, lan, true, allowCache);
   }
 
   /**
