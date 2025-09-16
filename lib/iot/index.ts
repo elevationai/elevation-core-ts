@@ -15,6 +15,7 @@ export class ElevatedIOT extends BaseService {
   public onPrint: Subject<any> = new Subject<any>();
   public onRestart: Subject<void> = new Subject<void>();
   public onEvent: Subject<EventData> = new Subject<EventData>();
+  public onToast: Subject<any> = new Subject<any>();
   public onlineKiosks: Subject<OnlineKiosk[]> = new Subject<OnlineKiosk[]>();
 
   private reconnectTimer: any;
@@ -72,10 +73,10 @@ export class ElevatedIOT extends BaseService {
       this.ws = new WebSocket(wsUrl.toString());
 
       // Setup event handlers
-      this.ws.onopen = () => this.handleOpen();
-      this.ws.onmessage = (event) => this.handleMessage(event);
-      this.ws.onclose = (event) => this.handleClose(event);
-      this.ws.onerror = (error) => this.handleError(error);
+      this.ws.addEventListener('open', this.handleOpen);
+      this.ws.addEventListener('message', this.handleMessage);
+      this.ws.addEventListener('close', this.handleClose);
+      this.ws.addEventListener('error', this.handleError);
     } catch (error) {
       console.error('Failed to create WebSocket connection:', error);
       this.scheduleReconnect();
@@ -118,6 +119,10 @@ export class ElevatedIOT extends BaseService {
 
         case 'event':
           this.onEvent.next(message.data);
+          break;
+
+        case 'toast':
+          this.onToast.next(message.data);
           break;
 
         case 'refresh':
@@ -212,6 +217,10 @@ export class ElevatedIOT extends BaseService {
     }
   }
 
+  public sendMessage(type: string, data: any): void {
+    this.send({ type: 'message', data: { type, data } });
+  }
+
   public disconnect(shouldReconnect = false): void {
     this.shouldReconnect = shouldReconnect;
 
@@ -223,6 +232,12 @@ export class ElevatedIOT extends BaseService {
     this.stopPing();
 
     if (this.ws) {
+      // remove event handlers
+      this.ws.removeEventListener('open', this.handleOpen);
+      this.ws.removeEventListener('message', this.handleMessage);
+      this.ws.removeEventListener('close', this.handleClose);
+      this.ws.removeEventListener('error', this.handleError);
+
       this.ws.close();
       this.ws = null;
     }

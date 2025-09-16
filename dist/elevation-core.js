@@ -2434,6 +2434,7 @@ var ElevationCore = (() => {
     onPrint = new Subject();
     onRestart = new Subject();
     onEvent = new Subject();
+    onToast = new Subject();
     onlineKiosks = new Subject();
     reconnectTimer;
     pingTimer;
@@ -2474,10 +2475,10 @@ var ElevationCore = (() => {
           wsUrl.searchParams.set("secondary", "true");
         }
         this.ws = new WebSocket(wsUrl.toString());
-        this.ws.onopen = () => this.handleOpen();
-        this.ws.onmessage = (event) => this.handleMessage(event);
-        this.ws.onclose = (event) => this.handleClose(event);
-        this.ws.onerror = (error) => this.handleError(error);
+        this.ws.addEventListener("open", this.handleOpen);
+        this.ws.addEventListener("message", this.handleMessage);
+        this.ws.addEventListener("close", this.handleClose);
+        this.ws.addEventListener("error", this.handleError);
       } catch (error) {
         console.error("Failed to create WebSocket connection:", error);
         this.scheduleReconnect();
@@ -2511,6 +2512,9 @@ var ElevationCore = (() => {
             break;
           case "event":
             this.onEvent.next(message.data);
+            break;
+          case "toast":
+            this.onToast.next(message.data);
             break;
           case "refresh":
             this.onRefresh.next();
@@ -2585,6 +2589,9 @@ var ElevationCore = (() => {
         this.ws.send(JSON.stringify(data));
       }
     }
+    sendMessage(type, data) {
+      this.send({ type: "message", data: { type, data } });
+    }
     disconnect(shouldReconnect = false) {
       this.shouldReconnect = shouldReconnect;
       if (this.reconnectTimer) {
@@ -2593,6 +2600,10 @@ var ElevationCore = (() => {
       }
       this.stopPing();
       if (this.ws) {
+        this.ws.removeEventListener("open", this.handleOpen);
+        this.ws.removeEventListener("message", this.handleMessage);
+        this.ws.removeEventListener("close", this.handleClose);
+        this.ws.removeEventListener("error", this.handleError);
         this.ws.close();
         this.ws = null;
       }
