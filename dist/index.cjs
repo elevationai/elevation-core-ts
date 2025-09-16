@@ -2465,11 +2465,11 @@ var ElevatedIOT = class extends BaseService {
     }
     try {
       this.disconnect(false);
-      const wsUrl = new URL(this.coreInfo.iotEndpoint);
+      const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? "/events" : "/kiosk"}`);
       wsUrl.searchParams.set("token", this.coreInfo.token);
-      wsUrl.searchParams.set("fingerprint", this.coreInfo.fingerPrint);
-      wsUrl.searchParams.set("appName", this.iotInfo.appName);
-      wsUrl.searchParams.set("appVersion", this.iotInfo.appVersion || "1.0.0");
+      wsUrl.searchParams.set("key", this.coreInfo.fingerPrint);
+      wsUrl.searchParams.set("app", this.iotInfo.appName);
+      wsUrl.searchParams.set("version", this.iotInfo.appVersion || "1.0.0");
       if (this.coreInfo.secondary) {
         wsUrl.searchParams.set("secondary", "true");
       }
@@ -2810,7 +2810,7 @@ var CMS = class extends BaseService {
     }
     this.stringsObservable = from(
       this.get(
-        "strings",
+        `/strings`,
         disableCache ? this.reqHeaderNoCache : void 0
       )
     ).pipe(

@@ -111,7 +111,7 @@ export class CMS extends BaseService {
     // Create new loading observable
     this.stringsObservable = from(
       this.get(
-        'strings',
+        `/strings`,
         disableCache ? this.reqHeaderNoCache : undefined,
       ),
     ).pipe(

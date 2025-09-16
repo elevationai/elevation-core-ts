@@ -1,6 +1,6 @@
 {
   "name": "@eai/elevation-core-ts",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "license": "UNLICENSED",
   "exports": "./index.ts",
   "tasks": {
