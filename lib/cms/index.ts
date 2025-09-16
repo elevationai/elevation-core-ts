@@ -46,13 +46,6 @@ export class CMS extends BaseService {
   }
 
   /**
-   * Refresh CMS information and reload strings
-   */
-  refreshInfo(info: CoreInfo): void {
-    super.config(info);
-  }
-
-  /**
    * Get a specific key from CMS
    * @param key - The CMS key to retrieve
    * @param lan - Language code (e.g., 'en', 'es', 'fr')

@@ -45,8 +45,8 @@ export class ElevatedIOT extends BaseService {
     this.connect();
   }
 
-  public refreshConfig(coreInfo: CoreInfo): void {
-    this.config(coreInfo);
+  public override refreshInfo(info: CoreInfo): void {
+    this.config(info);
   }
 
   private connect(): void {

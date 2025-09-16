@@ -12,6 +12,10 @@ export abstract class BaseService {
     this.configured = true;
   }
 
+  public refreshInfo(info: CoreInfo): void {
+    this.config(info);
+  }
+
   protected validateCoreInfo(coreInfo: CoreInfo): void {
     if (!coreInfo.token) {
       throw new Error('Token is required in CoreInfo');

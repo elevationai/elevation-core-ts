@@ -338,6 +338,9 @@ var BaseService = class {
     this.setupHeaders();
     this.configured = true;
   }
+  refreshInfo(info) {
+    this.config(info);
+  }
   validateCoreInfo(coreInfo) {
     if (!coreInfo.token) {
       throw new Error("Token is required in CoreInfo");
@@ -2406,8 +2409,8 @@ var ElevatedIOT = class extends BaseService {
     }
     this.connect();
   }
-  refreshConfig(coreInfo) {
-    this.config(coreInfo);
+  refreshInfo(info) {
+    this.config(info);
   }
   connect() {
     if (!this.coreInfo || !this.coreInfo.iotEndpoint) {
@@ -2709,12 +2712,6 @@ var CMS = class extends BaseService {
   config(coreInfo) {
     super.config(coreInfo);
     this.refreshInfo(coreInfo);
-  }
-  /**
-   * Refresh CMS information and reload strings
-   */
-  refreshInfo(info) {
-    super.config(info);
   }
   /**
    * Get a specific key from CMS
