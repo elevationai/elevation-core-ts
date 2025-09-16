@@ -15,8 +15,8 @@ export class ElevatedIOT extends BaseService {
   public onNavigate: Subject<string> = new Subject<string>();
 
   private ws: WebSocket | null = null;
-  private reconnectTimer: number | null = null;
-  private pingTimer: number | null = null;
+  private reconnectTimer: any;
+  private pingTimer: any;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;

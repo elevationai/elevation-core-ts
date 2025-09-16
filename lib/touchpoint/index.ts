@@ -1,4 +1,4 @@
-import { Device } from '../../types/index.ts';
+import type { Device } from '../../types/index.ts';
 import { BaseService } from '../shared/base.ts';
 
 export class TouchPoint extends BaseService {
@@ -19,7 +19,7 @@ export class TouchPoint extends BaseService {
           return tp;
         }
         return null;
-      }).catch(err => {
+      }).catch((err) => {
         console.error(err);
         return null;
       });
@@ -29,7 +29,7 @@ export class TouchPoint extends BaseService {
    * Get complete TouchPoint information
    * @returns TouchPoint information or null if not found
    */
-  async getInfo(): Promise<Device | null> {
+  getInfo(): Promise<Device | null> {
     return this.getDeviceByFingerPrint();
   }
 
@@ -56,7 +56,7 @@ export class TouchPoint extends BaseService {
       await this.post(`${this.coreInfo.serviceEndpoint}/devices/service`, {
         id: this.touchPointId,
         state,
-        reason
+        reason,
       });
     } catch (error) {
       console.error(`Unable to transition to state: ${state} ${error}`);

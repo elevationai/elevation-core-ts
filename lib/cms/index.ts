@@ -1,5 +1,5 @@
 import { BaseService } from '../shared/base.ts';
-import { EMPTY, firstValueFrom, from, Observable, of } from 'rxjs';
+import { EMPTY, firstValueFrom, from, type Observable, of } from 'rxjs';
 import { catchError, map, share, tap } from 'rxjs/operators';
 import type { CoreInfo } from '../../types/index.ts';
 

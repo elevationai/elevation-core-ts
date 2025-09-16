@@ -1,14 +1,6 @@
 import { BaseService } from '../shared/base.ts';
-import type {
-  EventData,
-  EventOptions,
-  DebouncedEvent,
-  ApiResponse
-} from '../../types/index.ts';
-import {
-  EventCode,
-  StatusCode
-} from '../../types/index.ts';
+import type { ApiResponse, DebouncedEvent, EventData, EventOptions } from '../../types/index.ts';
+import { type EventCode, StatusCode } from '../../types/index.ts';
 
 export class ElevatedEvents extends BaseService {
   private defaults: EventOptions = {};
@@ -16,7 +8,7 @@ export class ElevatedEvents extends BaseService {
 
   public setDefaults(options: EventOptions): void {
     this.defaults = { ...options };
-    
+
     // Setup debounced events
     if (options.debounceEvent) {
       options.debounceEvent.forEach(({ eventCode, debounce }) => {
@@ -24,7 +16,7 @@ export class ElevatedEvents extends BaseService {
           eventCode,
           lastSent: 0,
           debounceTime: debounce,
-          once: false
+          once: false,
         });
       });
     }
@@ -35,7 +27,7 @@ export class ElevatedEvents extends BaseService {
           eventCode,
           lastSent: 0,
           debounceTime: debounce,
-          once: true
+          once: true,
         });
       });
     }
@@ -43,7 +35,7 @@ export class ElevatedEvents extends BaseService {
 
   private shouldDebounce(eventCode: EventCode | number): boolean {
     const debouncedEvent = this.debouncedEvents.get(eventCode);
-    
+
     if (!debouncedEvent) {
       return false;
     }
@@ -76,23 +68,27 @@ export class ElevatedEvents extends BaseService {
       ownerID: this.defaults.ownerID,
       created: new Date(),
       ...eventData,
-      eventData: eventData.eventData || {}
+      eventData: eventData.eventData || {},
     };
 
     // MetaData validation and auto-population (from reference library)
     if (!fullEventData.metaData) {
       const metaData: any = {};
       if (fullEventData.eventCode) metaData.eventCode = fullEventData.eventCode;
-      if (fullEventData.eventData && fullEventData.eventData.airline) metaData.airline = fullEventData.eventData.airline;
-      if (fullEventData.eventData && fullEventData.eventData.countryCode) metaData.countryCode = fullEventData.eventData.countryCode;
+      if (fullEventData.eventData && fullEventData.eventData.airline) {
+        metaData.airline = fullEventData.eventData.airline;
+      }
+      if (fullEventData.eventData && fullEventData.eventData.countryCode) {
+        metaData.countryCode = fullEventData.eventData.countryCode;
+      }
       if (fullEventData.ownerID) metaData.ownerID = fullEventData.ownerID;
-      
+
       if (kiosk) {
         metaData.tags = kiosk.tags || [];
         metaData.location = kiosk.location || null;
         metaData.testDevice = !!kiosk.metadata.testDevice;
       }
-      
+
       fullEventData.metaData = metaData;
     }
 
@@ -100,7 +96,7 @@ export class ElevatedEvents extends BaseService {
     if (fullEventData.eventCode && this.shouldDebounce(fullEventData.eventCode)) {
       return {
         success: true,
-        message: 'Event debounced'
+        message: 'Event debounced',
       };
     }
 
@@ -112,62 +108,60 @@ export class ElevatedEvents extends BaseService {
       console.error('Failed to send event:', error);
       return {
         success: false,
-        error: 'Failed to send event'
+        error: 'Failed to send event',
       };
     }
   }
 
-
   // Helper methods for different status codes
-  public async success(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public success(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.SUCCESS
+      statusCode: StatusCode.SUCCESS,
     });
   }
 
-  public async failure(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public failure(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.FAILURE
+      statusCode: StatusCode.FAILURE,
     });
   }
 
-  public async error(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public error(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.FAILURE
+      statusCode: StatusCode.FAILURE,
     });
   }
 
-  public async critical(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public critical(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.CRITICAL_FAILURE
+      statusCode: StatusCode.CRITICAL_FAILURE,
     });
   }
 
-  public async infraction(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public infraction(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.INFRACTION
+      statusCode: StatusCode.INFRACTION,
     });
   }
 
-  public async timeout(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public timeout(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.TIMEOUT
+      statusCode: StatusCode.TIMEOUT,
     });
   }
 
-  public async modeChange(eventData: Partial<EventData>): Promise<ApiResponse> {
+  public modeChange(eventData: Partial<EventData>): Promise<ApiResponse> {
     return this.send({
       ...eventData,
-      statusCode: StatusCode.MODE_CHANGE
+      statusCode: StatusCode.MODE_CHANGE,
     });
   }
-
 
   // Add debounce settings (reference library compatibility)
   public addDebounce(info: Array<{ eventCode: EventCode | number; debounce: number }>): void {
@@ -176,7 +170,7 @@ export class ElevatedEvents extends BaseService {
         eventCode,
         lastSent: 0,
         debounceTime: debounce,
-        once: false
+        once: false,
       });
     });
   }
@@ -188,7 +182,7 @@ export class ElevatedEvents extends BaseService {
         eventCode,
         lastSent: 0,
         debounceTime: debounce,
-        once: true
+        once: true,
       });
     });
   }

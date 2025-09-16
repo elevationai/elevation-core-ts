@@ -1,16 +1,12 @@
 import { BaseService } from '../shared/base.ts';
-import type {
-  CoreInfo,
-  ElevatedConfigurationsInfo,
-  ConfigValue
-} from '../../types/index.ts';
+import type { ConfigValue, CoreInfo, ElevatedConfigurationsInfo } from '../../types/index.ts';
 
 export class ElevatedConfigurations extends BaseService {
   private configInfo: ElevatedConfigurationsInfo | null = null;
 
   public override config(coreInfo: CoreInfo, configInfo?: ElevatedConfigurationsInfo): void {
     super.config(coreInfo);
-    
+
     if (configInfo) {
       this.setConfigInfo(configInfo);
     }
@@ -20,7 +16,7 @@ export class ElevatedConfigurations extends BaseService {
     if (!configInfo.deviceId || !configInfo.locationId) {
       throw new Error('Both deviceId and locationId are required in ElevatedConfigurationsInfo');
     }
-    
+
     this.configInfo = configInfo;
   }
 
@@ -30,21 +26,23 @@ export class ElevatedConfigurations extends BaseService {
     }
   }
 
-  public async getConfig(label: string): Promise<ConfigValue | null> {
+  public getConfig(label: string): Promise<ConfigValue | null> {
     this.checkConfiguration();
     this.checkConfigInfo();
 
-    return this.get<ConfigValue>(`${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`)
-    .then(res => {
-      return res.data || null;
-    }).catch(err => {
-      console.error('Error fetching configuration:', err);
-      return null;
-    });
+    return this.get<ConfigValue>(
+      `${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
+    )
+      .then((res) => {
+        return res.data || null;
+      }).catch((err) => {
+        console.error('Error fetching configuration:', err);
+        return null;
+      });
   }
 
-  public async getConfigs(labels: string[]): Promise<(ConfigValue | null)[]> {
-		return Promise.all(labels.map((label: string) => this.getConfig(label)));
+  public getConfigs(labels: string[]): Promise<(ConfigValue | null)[]> {
+    return Promise.all(labels.map((label: string) => this.getConfig(label)));
   }
 }
 

@@ -1,4 +1,4 @@
-import type { CoreInfo, ApiResponse } from '../../types/index.ts';
+import type { ApiResponse, CoreInfo } from '../../types/index.ts';
 
 export abstract class BaseService {
   protected coreInfo: CoreInfo | null = null;
@@ -25,7 +25,7 @@ export abstract class BaseService {
     if (!this.coreInfo) return;
 
     this.headers = new Headers({
-      'Elevated-Auth': btoa(this.coreInfo.token)
+      'Elevated-Auth': btoa(this.coreInfo.token),
     });
   }
 
@@ -37,7 +37,7 @@ export abstract class BaseService {
 
   protected async makeRequest<T = any>(
     path: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
     this.checkConfiguration();
 
@@ -52,9 +52,9 @@ export abstract class BaseService {
         ...options,
         headers: {
           ...Object.fromEntries(this.headers.entries()),
-          ...Object.fromEntries(new Headers(options.headers || {}).entries())
+          ...Object.fromEntries(new Headers(options.headers || {}).entries()),
         },
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
@@ -66,7 +66,7 @@ export abstract class BaseService {
       const data = await response.json();
       return {
         success: true,
-        data
+        data,
       };
     } catch (error) {
       clearTimeout(timeoutId);
@@ -76,53 +76,53 @@ export abstract class BaseService {
           return {
             success: false,
             error: 'Request timeout',
-            message: `Request timed out after ${timeout}ms`
+            message: `Request timed out after ${timeout}ms`,
           };
         }
         return {
           success: false,
-          error: error.message
+          error: error.message,
         };
       }
 
       return {
         success: false,
-        error: 'Unknown error occurred'
+        error: 'Unknown error occurred',
       };
     }
   }
 
-  protected async post<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected post<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'POST',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
-  protected async patch<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected patch<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'PATCH',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
-  protected async get<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  protected get<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'GET',
-      headers
+      headers,
     });
   }
 
-  protected async put<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected put<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'PUT',
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
-  protected async delete<T = any>(path: string): Promise<ApiResponse<T>> {
+  protected delete<T = any>(path: string): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
   }
 }

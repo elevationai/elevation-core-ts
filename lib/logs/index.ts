@@ -1,10 +1,6 @@
 import { BaseService } from '../shared/base.ts';
 import { Debouncer, formatDate } from '../shared/utils.ts';
-import type {
-  LogData,
-  LogOptions,
-  ApiResponse
-} from '../../types/index.ts';
+import type { ApiResponse, LogData, LogOptions } from '../../types/index.ts';
 import { LogLevel } from '../../types/index.ts';
 
 export class ElevatedLogs extends BaseService {
@@ -14,12 +10,12 @@ export class ElevatedLogs extends BaseService {
 
   public setDefaults(options: LogOptions): void {
     this.defaults = { ...options };
-    
+
     // Setup debouncer if specified
     if (options.debounce) {
       this.debouncer = new Debouncer(
         async (data: LogData) => await this.sendLog(data),
-        options.debounce
+        options.debounce,
       );
     }
   }
@@ -56,7 +52,7 @@ export class ElevatedLogs extends BaseService {
       statusCode: this.defaults.statusCode,
       level: LogLevel.INFO,
       ...logData,
-      message: logData.message || ''
+      message: logData.message || '',
     };
 
     // Validate required fields
@@ -72,7 +68,7 @@ export class ElevatedLogs extends BaseService {
     if (this.shouldDebounce(fullLogData)) {
       return {
         success: true,
-        message: 'Log debounced'
+        message: 'Log debounced',
       };
     }
 
@@ -84,7 +80,7 @@ export class ElevatedLogs extends BaseService {
     const logPayload = {
       ...data,
       timestamp: formatDate(),
-      environment: Deno.env.get('DENO_ENV') || 'production'
+      environment: Deno.env.get('DENO_ENV') || 'production',
     };
 
     try {
@@ -94,37 +90,37 @@ export class ElevatedLogs extends BaseService {
       console.error('Failed to send log:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
 
   // Helper methods for different log levels
-  public async information(logData: Partial<LogData>): Promise<ApiResponse> {
+  public information(logData: Partial<LogData>): Promise<ApiResponse> {
     return this.message({
       ...logData,
-      level: LogLevel.INFO
+      level: LogLevel.INFO,
     });
   }
 
-  public async delayed(logData: Partial<LogData>): Promise<ApiResponse> {
+  public delayed(logData: Partial<LogData>): Promise<ApiResponse> {
     return this.message({
       ...logData,
-      level: LogLevel.DELAYED
+      level: LogLevel.DELAYED,
     });
   }
 
-  public async error(logData: Partial<LogData>): Promise<ApiResponse> {
+  public error(logData: Partial<LogData>): Promise<ApiResponse> {
     return this.message({
       ...logData,
-      level: LogLevel.ERROR
+      level: LogLevel.ERROR,
     });
   }
 
-  public async critical(logData: Partial<LogData>): Promise<ApiResponse> {
+  public critical(logData: Partial<LogData>): Promise<ApiResponse> {
     return this.message({
       ...logData,
-      level: LogLevel.CRITICAL
+      level: LogLevel.CRITICAL,
     });
   }
 
@@ -134,29 +130,29 @@ export class ElevatedLogs extends BaseService {
 
     try {
       const results = await Promise.all(
-        logs.map(log => this.message(log))
+        logs.map((log) => this.message(log)),
       );
-      
+
       // Check if any failed
-      const failures = results.filter(r => !r.success);
-      
+      const failures = results.filter((r) => !r.success);
+
       if (failures.length === 0) {
         return {
           success: true,
-          message: `Successfully sent ${logs.length} logs`
+          message: `Successfully sent ${logs.length} logs`,
         };
       } else {
         return {
           success: false,
           error: `Failed to send ${failures.length} of ${logs.length} logs`,
-          data: { failures }
+          data: { failures },
         };
       }
     } catch (error) {
       console.error('Failed to send batch logs:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   }
@@ -185,7 +181,7 @@ export class ElevatedLogs extends BaseService {
     return {
       debounceActive: !!this.debouncer,
       cacheSize: this.lastLogHash.size,
-      defaults: this.defaults
+      defaults: this.defaults,
     };
   }
 }
