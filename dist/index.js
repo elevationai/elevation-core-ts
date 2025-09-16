@@ -2709,10 +2709,6 @@ var CMS = class extends BaseService {
   cmsCache = /* @__PURE__ */ new Map();
   allStrings = null;
   reqHeaderNoCache = { "Cache-Control": "no-cache" };
-  config(coreInfo) {
-    super.config(coreInfo);
-    this.refreshInfo(coreInfo);
-  }
   /**
    * Get a specific key from CMS
    * @param key - The CMS key to retrieve

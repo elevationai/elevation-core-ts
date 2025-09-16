@@ -1,7 +1,6 @@
 import { BaseService } from '../shared/base.ts';
 import { EMPTY, firstValueFrom, from, type Observable, of } from 'rxjs';
 import { catchError, map, share, tap } from 'rxjs/operators';
-import type { CoreInfo } from '../../types/index.ts';
 
 // CMS Interfaces matching the reference library
 export interface LanguageVersion {
@@ -39,11 +38,6 @@ export class CMS extends BaseService {
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
   private reqHeaderNoCache = { 'Cache-Control': 'no-cache' };
-
-  override config(coreInfo: CoreInfo): void {
-    super.config(coreInfo);
-    this.refreshInfo(coreInfo);
-  }
 
   /**
    * Get a specific key from CMS
