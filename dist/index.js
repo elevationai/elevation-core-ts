@@ -2373,17 +2373,18 @@ function tap(observerOrNext, error, complete) {
 
 // lib/iot/index.ts
 var ElevatedIOT = class extends BaseService {
+  ws = null;
   // Event subjects for reactive programming with RxJS
   onConnected = new Subject();
   onDisconnect = new Subject();
-  onConfigRequired = new Subject();
+  onConfigurationRequired = new Subject();
   onCommand = new Subject();
   onFlightInfo = new Subject();
   onRefresh = new Subject();
   onPrint = new Subject();
   onRestart = new Subject();
-  onNavigate = new Subject();
-  ws = null;
+  onEvent = new Subject();
+  onlineKiosks = new Subject();
   reconnectTimer;
   pingTimer;
   reconnectAttempts = 0;
@@ -2404,6 +2405,9 @@ var ElevatedIOT = class extends BaseService {
       this.iotInfo = iotInfo;
     }
     this.connect();
+  }
+  refreshConfig(coreInfo) {
+    this.config(coreInfo);
   }
   connect() {
     if (!this.coreInfo || !this.coreInfo.iotEndpoint) {
@@ -2432,6 +2436,7 @@ var ElevatedIOT = class extends BaseService {
   handleOpen() {
     console.log("IOT WebSocket connected");
     this.isConnected = true;
+    this.onConnected.next();
     this.reconnectAttempts = 0;
     this.send({
       type: "handshake",
@@ -2448,21 +2453,20 @@ var ElevatedIOT = class extends BaseService {
     try {
       const message = JSON.parse(event.data);
       switch (message.type) {
-        case "connected":
-          this.onConnected.next();
-          break;
-        case "config_required":
-          this.onConfigRequired.next();
-          break;
         case "command":
           this.onCommand.next(message.data);
-          this.parseSpecialCommands(message.data);
           break;
-        case "flight_info":
+        case "flightinfo":
           this.onFlightInfo.next(message.data);
+          break;
+        case "event":
+          this.onEvent.next(message.data);
           break;
         case "refresh":
           this.onRefresh.next();
+          break;
+        case "onlineKiosks":
+          this.onlineKiosks.next(message.data);
           break;
         case "print":
           this.onPrint.next(message.data);
@@ -2476,23 +2480,6 @@ var ElevatedIOT = class extends BaseService {
       console.error("Failed to parse IOT message:", error);
     }
   }
-  parseSpecialCommands(commands) {
-    if (commands.refresh) {
-      this.onRefresh.next();
-    }
-    if (commands.restart) {
-      this.onRestart.next();
-    }
-    if (commands.navigate) {
-      this.onNavigate.next(commands.navigate);
-    }
-    if (commands.print) {
-      this.onPrint.next(commands.print);
-    }
-    if (commands.flightInfo) {
-      this.onFlightInfo.next(commands.flightInfo);
-    }
-  }
   handleClose(event) {
     console.log("IOT WebSocket closed:", event.code, event.reason);
     this.isConnected = false;
@@ -2504,6 +2491,11 @@ var ElevatedIOT = class extends BaseService {
   }
   handleError(error) {
     console.error("IOT WebSocket error:", error);
+    if (/5000/gi.test(error?.message) || /5001/gi.test(error?.toString())) {
+      console.error(`[ERROR] [${(/* @__PURE__ */ new Date()).toLocaleString()}] Configuration error received`);
+      this.onConfigurationRequired.next();
+      this.disconnect(true);
+    }
   }
   scheduleReconnect() {
     if (this.reconnectTimer) {
@@ -2542,19 +2534,6 @@ var ElevatedIOT = class extends BaseService {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
     }
-  }
-  sendCommand(command) {
-    this.send({
-      type: "command",
-      data: command
-    });
-  }
-  sendEvent(eventType, eventData) {
-    this.send({
-      type: "event",
-      eventType,
-      data: eventData
-    });
   }
   disconnect(shouldReconnect = false) {
     this.shouldReconnect = shouldReconnect;

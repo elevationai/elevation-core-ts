@@ -21,6 +21,11 @@ export interface IOTInfo {
   appVersion?: string;
 }
 
+export interface OnlineKiosk {
+  socketID: string;
+  kioskID: string;
+}
+
 export interface ElevatedConfigurationsInfo {
   deviceId: string;
   locationId: string;
@@ -117,23 +122,23 @@ export interface LogData {
 }
 
 export interface DeviceLocation {
-	_id?: string;
-	code?: string;
-	type?: string;
-	name?: string;
-	terminals: Terminal[];
-	organization?: string;
-	images?: { [key: string]: string };
-	metadata?: LocationMetadata;
-	configurations?: { [key: string]: boolean | string | number }
+  _id?: string;
+  code?: string;
+  type?: string;
+  name?: string;
+  terminals: Terminal[];
+  organization?: string;
+  images?: { [key: string]: string };
+  metadata?: LocationMetadata;
+  configurations?: { [key: string]: boolean | string | number };
 }
 
 export interface LocationMetadata {
-	hasElevatedPlatform?: boolean;
-	maxBagCheckinTime?: number;
-	minBagCheckinTime?: number;
-	cussConfigKey?: string;
-	rebootTime?: string | Date;
+  hasElevatedPlatform?: boolean;
+  maxBagCheckinTime?: number;
+  minBagCheckinTime?: number;
+  cussConfigKey?: string;
+  rebootTime?: string | Date;
 }
 
 export interface Terminal {
@@ -160,10 +165,10 @@ export interface DeviceInfo {
 }
 
 export enum LogLevel {
-  INFO = "INFO",
-  DELAYED = "DELAYED",
-  ERROR = "ERROR",
-  CRITICAL = "CRITICAL"
+  INFO = 'INFO',
+  DELAYED = 'DELAYED',
+  ERROR = 'ERROR',
+  CRITICAL = 'CRITICAL',
 }
 
 // Options interfaces

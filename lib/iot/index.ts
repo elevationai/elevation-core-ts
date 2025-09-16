@@ -1,20 +1,22 @@
 import { BaseService } from '../shared/base.ts';
 import { Subject } from 'rxjs';
-import type { Commands, CoreInfo, IOTInfo } from '../../types/index.ts';
+import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from '../../types/index.ts';
 
 export class ElevatedIOT extends BaseService {
+  public ws: WebSocket | null = null;
+
   // Event subjects for reactive programming with RxJS
   public onConnected: Subject<void> = new Subject<void>();
   public onDisconnect: Subject<void> = new Subject<void>();
-  public onConfigRequired: Subject<void> = new Subject<void>();
+  public onConfigurationRequired: Subject<void> = new Subject<void>();
   public onCommand: Subject<Commands> = new Subject<Commands>();
   public onFlightInfo: Subject<any> = new Subject<any>();
   public onRefresh: Subject<void> = new Subject<void>();
   public onPrint: Subject<any> = new Subject<any>();
   public onRestart: Subject<void> = new Subject<void>();
-  public onNavigate: Subject<string> = new Subject<string>();
+  public onEvent: Subject<EventData> = new Subject<EventData>();
+  public onlineKiosks: Subject<OnlineKiosk[]> = new Subject<OnlineKiosk[]>();
 
-  private ws: WebSocket | null = null;
   private reconnectTimer: any;
   private pingTimer: any;
   private reconnectAttempts = 0;
@@ -41,6 +43,10 @@ export class ElevatedIOT extends BaseService {
 
     // Start connection
     this.connect();
+  }
+
+  public refreshConfig(coreInfo: CoreInfo): void {
+    this.config(coreInfo);
   }
 
   private connect(): void {
@@ -79,6 +85,7 @@ export class ElevatedIOT extends BaseService {
   private handleOpen(): void {
     console.log('IOT WebSocket connected');
     this.isConnected = true;
+    this.onConnected.next();
     this.reconnectAttempts = 0;
 
     // Send initial handshake
@@ -101,25 +108,24 @@ export class ElevatedIOT extends BaseService {
       const message = JSON.parse(event.data);
 
       switch (message.type) {
-        case 'connected':
-          this.onConnected.next();
-          break;
-
-        case 'config_required':
-          this.onConfigRequired.next();
-          break;
-
         case 'command':
           this.onCommand.next(message.data);
-          this.parseSpecialCommands(message.data);
           break;
 
-        case 'flight_info':
+        case 'flightinfo':
           this.onFlightInfo.next(message.data);
+          break;
+
+        case 'event':
+          this.onEvent.next(message.data);
           break;
 
         case 'refresh':
           this.onRefresh.next();
+          break;
+
+        case 'onlineKiosks':
+          this.onlineKiosks.next(message.data);
           break;
 
         case 'print':
@@ -138,28 +144,6 @@ export class ElevatedIOT extends BaseService {
     }
   }
 
-  private parseSpecialCommands(commands: Commands): void {
-    if (commands.refresh) {
-      this.onRefresh.next();
-    }
-
-    if (commands.restart) {
-      this.onRestart.next();
-    }
-
-    if (commands.navigate) {
-      this.onNavigate.next(commands.navigate);
-    }
-
-    if (commands.print) {
-      this.onPrint.next(commands.print);
-    }
-
-    if (commands.flightInfo) {
-      this.onFlightInfo.next(commands.flightInfo);
-    }
-  }
-
   private handleClose(event: CloseEvent): void {
     console.log('IOT WebSocket closed:', event.code, event.reason);
     this.isConnected = false;
@@ -172,8 +156,14 @@ export class ElevatedIOT extends BaseService {
     }
   }
 
-  private handleError(error: Event): void {
+  private handleError(error: Event | ErrorEvent): void {
     console.error('IOT WebSocket error:', error);
+
+    if (/5000/gi.test((error as ErrorEvent)?.message) || /5001/gi.test(error?.toString())) {
+      console.error(`[ERROR] [${new Date().toLocaleString()}] Configuration error received`);
+      this.onConfigurationRequired.next();
+      this.disconnect(true);
+    }
   }
 
   private scheduleReconnect(): void {
@@ -216,25 +206,10 @@ export class ElevatedIOT extends BaseService {
     }
   }
 
-  private send(data: any): void {
+  public send(data: any): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data));
     }
-  }
-
-  public sendCommand(command: Commands): void {
-    this.send({
-      type: 'command',
-      data: command,
-    });
-  }
-
-  public sendEvent(eventType: string, eventData: any): void {
-    this.send({
-      type: 'event',
-      eventType,
-      data: eventData,
-    });
   }
 
   public disconnect(shouldReconnect = false): void {
