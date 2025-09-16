@@ -7,11 +7,11 @@ var ElevationCore = (() => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
   };
-  var __copyProps = (to, from, except, desc) => {
-    if (from && typeof from === "object" || typeof from === "function") {
-      for (let key of __getOwnPropNames(from))
+  var __copyProps = (to, from2, except, desc) => {
+    if (from2 && typeof from2 === "object" || typeof from2 === "function") {
+      for (let key of __getOwnPropNames(from2))
         if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+          __defProp(to, key, { get: () => from2[key], enumerable: !(desc = __getOwnPropDesc(from2, key)) || desc.enumerable });
     }
     return to;
   };
@@ -30,7 +30,6 @@ var ElevationCore = (() => {
     ElevatedLogs: () => ElevatedLogs,
     ElevationService: () => ElevationService,
     EventCode: () => EventCode,
-    EventEmitter: () => EventEmitter,
     EventMode: () => EventMode,
     EventType: () => EventType,
     LogLevel: () => LogLevel,
@@ -318,27 +317,6 @@ var ElevationCore = (() => {
         this.timeoutId = null;
       }
       this.lastCall = 0;
-    }
-  };
-  var EventEmitter = class {
-    listeners = [];
-    subscribe(listener) {
-      this.listeners.push(listener);
-      return () => {
-        const index = this.listeners.indexOf(listener);
-        if (index > -1) {
-          this.listeners.splice(index, 1);
-        }
-      };
-    }
-    emit(data) {
-      this.listeners.forEach((listener) => listener(data));
-    }
-    clear() {
-      this.listeners = [];
-    }
-    get listenerCount() {
-      return this.listeners.length;
     }
   };
   var Cache = class {
@@ -815,18 +793,1641 @@ var ElevationCore = (() => {
   };
   var elogs = new ElevatedLogs();
 
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs
+  var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+      d2.__proto__ = b2;
+    } || function(d2, b2) {
+      for (var p in b2)
+        if (Object.prototype.hasOwnProperty.call(b2, p))
+          d2[p] = b2[p];
+    };
+    return extendStatics(d, b);
+  };
+  function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+      throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  }
+  function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P ? value : new P(function(resolve) {
+        resolve(value);
+      });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  }
+  function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() {
+      if (t[0] & 1)
+        throw t[1];
+      return t[1];
+    }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      return this;
+    }), g;
+    function verb(n) {
+      return function(v) {
+        return step([n, v]);
+      };
+    }
+    function step(op) {
+      if (f)
+        throw new TypeError("Generator is already executing.");
+      while (g && (g = 0, op[0] && (_ = 0)), _)
+        try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
+            return t;
+          if (y = 0, t)
+            op = [op[0] & 2, t.value];
+          switch (op[0]) {
+            case 0:
+            case 1:
+              t = op;
+              break;
+            case 4:
+              _.label++;
+              return { value: op[1], done: false };
+            case 5:
+              _.label++;
+              y = op[1];
+              op = [0];
+              continue;
+            case 7:
+              op = _.ops.pop();
+              _.trys.pop();
+              continue;
+            default:
+              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                _ = 0;
+                continue;
+              }
+              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                _.label = op[1];
+                break;
+              }
+              if (op[0] === 6 && _.label < t[1]) {
+                _.label = t[1];
+                t = op;
+                break;
+              }
+              if (t && _.label < t[2]) {
+                _.label = t[2];
+                _.ops.push(op);
+                break;
+              }
+              if (t[2])
+                _.ops.pop();
+              _.trys.pop();
+              continue;
+          }
+          op = body.call(thisArg, _);
+        } catch (e) {
+          op = [6, e];
+          y = 0;
+        } finally {
+          f = t = 0;
+        }
+      if (op[0] & 5)
+        throw op[1];
+      return { value: op[0] ? op[1] : void 0, done: true };
+    }
+  }
+  function __values(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m)
+      return m.call(o);
+    if (o && typeof o.length === "number")
+      return {
+        next: function() {
+          if (o && i >= o.length)
+            o = void 0;
+          return { value: o && o[i++], done: !o };
+        }
+      };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+  }
+  function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m)
+      return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+      while ((n === void 0 || n-- > 0) && !(r = i.next()).done)
+        ar.push(r.value);
+    } catch (error) {
+      e = { error };
+    } finally {
+      try {
+        if (r && !r.done && (m = i["return"]))
+          m.call(i);
+      } finally {
+        if (e)
+          throw e.error;
+      }
+    }
+    return ar;
+  }
+  function __spreadArray(to, from2, pack) {
+    if (pack || arguments.length === 2)
+      for (var i = 0, l = from2.length, ar; i < l; i++) {
+        if (ar || !(i in from2)) {
+          if (!ar)
+            ar = Array.prototype.slice.call(from2, 0, i);
+          ar[i] = from2[i];
+        }
+      }
+    return to.concat(ar || Array.prototype.slice.call(from2));
+  }
+  function __await(v) {
+    return this instanceof __await ? (this.v = v, this) : new __await(v);
+  }
+  function __asyncGenerator(thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator)
+      throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function() {
+      return this;
+    }, i;
+    function awaitReturn(f) {
+      return function(v) {
+        return Promise.resolve(v).then(f, reject);
+      };
+    }
+    function verb(n, f) {
+      if (g[n]) {
+        i[n] = function(v) {
+          return new Promise(function(a, b) {
+            q.push([n, v, a, b]) > 1 || resume(n, v);
+          });
+        };
+        if (f)
+          i[n] = f(i[n]);
+      }
+    }
+    function resume(n, v) {
+      try {
+        step(g[n](v));
+      } catch (e) {
+        settle(q[0][3], e);
+      }
+    }
+    function step(r) {
+      r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r);
+    }
+    function fulfill(value) {
+      resume("next", value);
+    }
+    function reject(value) {
+      resume("throw", value);
+    }
+    function settle(f, v) {
+      if (f(v), q.shift(), q.length)
+        resume(q[0][0], q[0][1]);
+    }
+  }
+  function __asyncValues(o) {
+    if (!Symbol.asyncIterator)
+      throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function() {
+      return this;
+    }, i);
+    function verb(n) {
+      i[n] = o[n] && function(v) {
+        return new Promise(function(resolve, reject) {
+          v = o[n](v), settle(resolve, reject, v.done, v.value);
+        });
+      };
+    }
+    function settle(resolve, reject, d, v) {
+      Promise.resolve(v).then(function(v2) {
+        resolve({ value: v2, done: d });
+      }, reject);
+    }
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isFunction.js
+  function isFunction(value) {
+    return typeof value === "function";
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js
+  function createErrorClass(createImpl) {
+    var _super = function(instance) {
+      Error.call(instance);
+      instance.stack = new Error().stack;
+    };
+    var ctorFunc = createImpl(_super);
+    ctorFunc.prototype = Object.create(Error.prototype);
+    ctorFunc.prototype.constructor = ctorFunc;
+    return ctorFunc;
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/UnsubscriptionError.js
+  var UnsubscriptionError = createErrorClass(function(_super) {
+    return function UnsubscriptionErrorImpl(errors) {
+      _super(this);
+      this.message = errors ? errors.length + " errors occurred during unsubscription:\n" + errors.map(function(err, i) {
+        return i + 1 + ") " + err.toString();
+      }).join("\n  ") : "";
+      this.name = "UnsubscriptionError";
+      this.errors = errors;
+    };
+  });
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/arrRemove.js
+  function arrRemove(arr, item) {
+    if (arr) {
+      var index = arr.indexOf(item);
+      0 <= index && arr.splice(index, 1);
+    }
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/Subscription.js
+  var Subscription = function() {
+    function Subscription2(initialTeardown) {
+      this.initialTeardown = initialTeardown;
+      this.closed = false;
+      this._parentage = null;
+      this._finalizers = null;
+    }
+    Subscription2.prototype.unsubscribe = function() {
+      var e_1, _a, e_2, _b;
+      var errors;
+      if (!this.closed) {
+        this.closed = true;
+        var _parentage = this._parentage;
+        if (_parentage) {
+          this._parentage = null;
+          if (Array.isArray(_parentage)) {
+            try {
+              for (var _parentage_1 = __values(_parentage), _parentage_1_1 = _parentage_1.next(); !_parentage_1_1.done; _parentage_1_1 = _parentage_1.next()) {
+                var parent_1 = _parentage_1_1.value;
+                parent_1.remove(this);
+              }
+            } catch (e_1_1) {
+              e_1 = { error: e_1_1 };
+            } finally {
+              try {
+                if (_parentage_1_1 && !_parentage_1_1.done && (_a = _parentage_1.return))
+                  _a.call(_parentage_1);
+              } finally {
+                if (e_1)
+                  throw e_1.error;
+              }
+            }
+          } else {
+            _parentage.remove(this);
+          }
+        }
+        var initialFinalizer = this.initialTeardown;
+        if (isFunction(initialFinalizer)) {
+          try {
+            initialFinalizer();
+          } catch (e) {
+            errors = e instanceof UnsubscriptionError ? e.errors : [e];
+          }
+        }
+        var _finalizers = this._finalizers;
+        if (_finalizers) {
+          this._finalizers = null;
+          try {
+            for (var _finalizers_1 = __values(_finalizers), _finalizers_1_1 = _finalizers_1.next(); !_finalizers_1_1.done; _finalizers_1_1 = _finalizers_1.next()) {
+              var finalizer = _finalizers_1_1.value;
+              try {
+                execFinalizer(finalizer);
+              } catch (err) {
+                errors = errors !== null && errors !== void 0 ? errors : [];
+                if (err instanceof UnsubscriptionError) {
+                  errors = __spreadArray(__spreadArray([], __read(errors)), __read(err.errors));
+                } else {
+                  errors.push(err);
+                }
+              }
+            }
+          } catch (e_2_1) {
+            e_2 = { error: e_2_1 };
+          } finally {
+            try {
+              if (_finalizers_1_1 && !_finalizers_1_1.done && (_b = _finalizers_1.return))
+                _b.call(_finalizers_1);
+            } finally {
+              if (e_2)
+                throw e_2.error;
+            }
+          }
+        }
+        if (errors) {
+          throw new UnsubscriptionError(errors);
+        }
+      }
+    };
+    Subscription2.prototype.add = function(teardown) {
+      var _a;
+      if (teardown && teardown !== this) {
+        if (this.closed) {
+          execFinalizer(teardown);
+        } else {
+          if (teardown instanceof Subscription2) {
+            if (teardown.closed || teardown._hasParent(this)) {
+              return;
+            }
+            teardown._addParent(this);
+          }
+          (this._finalizers = (_a = this._finalizers) !== null && _a !== void 0 ? _a : []).push(teardown);
+        }
+      }
+    };
+    Subscription2.prototype._hasParent = function(parent) {
+      var _parentage = this._parentage;
+      return _parentage === parent || Array.isArray(_parentage) && _parentage.includes(parent);
+    };
+    Subscription2.prototype._addParent = function(parent) {
+      var _parentage = this._parentage;
+      this._parentage = Array.isArray(_parentage) ? (_parentage.push(parent), _parentage) : _parentage ? [_parentage, parent] : parent;
+    };
+    Subscription2.prototype._removeParent = function(parent) {
+      var _parentage = this._parentage;
+      if (_parentage === parent) {
+        this._parentage = null;
+      } else if (Array.isArray(_parentage)) {
+        arrRemove(_parentage, parent);
+      }
+    };
+    Subscription2.prototype.remove = function(teardown) {
+      var _finalizers = this._finalizers;
+      _finalizers && arrRemove(_finalizers, teardown);
+      if (teardown instanceof Subscription2) {
+        teardown._removeParent(this);
+      }
+    };
+    Subscription2.EMPTY = function() {
+      var empty = new Subscription2();
+      empty.closed = true;
+      return empty;
+    }();
+    return Subscription2;
+  }();
+  var EMPTY_SUBSCRIPTION = Subscription.EMPTY;
+  function isSubscription(value) {
+    return value instanceof Subscription || value && "closed" in value && isFunction(value.remove) && isFunction(value.add) && isFunction(value.unsubscribe);
+  }
+  function execFinalizer(finalizer) {
+    if (isFunction(finalizer)) {
+      finalizer();
+    } else {
+      finalizer.unsubscribe();
+    }
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/config.js
+  var config = {
+    onUnhandledError: null,
+    onStoppedNotification: null,
+    Promise: void 0,
+    useDeprecatedSynchronousErrorHandling: false,
+    useDeprecatedNextContext: false
+  };
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduler/timeoutProvider.js
+  var timeoutProvider = {
+    setTimeout: function(handler, timeout) {
+      var args = [];
+      for (var _i = 2; _i < arguments.length; _i++) {
+        args[_i - 2] = arguments[_i];
+      }
+      var delegate = timeoutProvider.delegate;
+      if (delegate === null || delegate === void 0 ? void 0 : delegate.setTimeout) {
+        return delegate.setTimeout.apply(delegate, __spreadArray([handler, timeout], __read(args)));
+      }
+      return setTimeout.apply(void 0, __spreadArray([handler, timeout], __read(args)));
+    },
+    clearTimeout: function(handle) {
+      var delegate = timeoutProvider.delegate;
+      return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearTimeout) || clearTimeout)(handle);
+    },
+    delegate: void 0
+  };
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/reportUnhandledError.js
+  function reportUnhandledError(err) {
+    timeoutProvider.setTimeout(function() {
+      var onUnhandledError = config.onUnhandledError;
+      if (onUnhandledError) {
+        onUnhandledError(err);
+      } else {
+        throw err;
+      }
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/noop.js
+  function noop() {
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/NotificationFactories.js
+  var COMPLETE_NOTIFICATION = function() {
+    return createNotification("C", void 0, void 0);
+  }();
+  function errorNotification(error) {
+    return createNotification("E", void 0, error);
+  }
+  function nextNotification(value) {
+    return createNotification("N", value, void 0);
+  }
+  function createNotification(kind, value, error) {
+    return {
+      kind,
+      value,
+      error
+    };
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/errorContext.js
+  var context = null;
+  function errorContext(cb) {
+    if (config.useDeprecatedSynchronousErrorHandling) {
+      var isRoot = !context;
+      if (isRoot) {
+        context = { errorThrown: false, error: null };
+      }
+      cb();
+      if (isRoot) {
+        var _a = context, errorThrown = _a.errorThrown, error = _a.error;
+        context = null;
+        if (errorThrown) {
+          throw error;
+        }
+      }
+    } else {
+      cb();
+    }
+  }
+  function captureError(err) {
+    if (config.useDeprecatedSynchronousErrorHandling && context) {
+      context.errorThrown = true;
+      context.error = err;
+    }
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/Subscriber.js
+  var Subscriber = function(_super) {
+    __extends(Subscriber2, _super);
+    function Subscriber2(destination) {
+      var _this = _super.call(this) || this;
+      _this.isStopped = false;
+      if (destination) {
+        _this.destination = destination;
+        if (isSubscription(destination)) {
+          destination.add(_this);
+        }
+      } else {
+        _this.destination = EMPTY_OBSERVER;
+      }
+      return _this;
+    }
+    Subscriber2.create = function(next, error, complete) {
+      return new SafeSubscriber(next, error, complete);
+    };
+    Subscriber2.prototype.next = function(value) {
+      if (this.isStopped) {
+        handleStoppedNotification(nextNotification(value), this);
+      } else {
+        this._next(value);
+      }
+    };
+    Subscriber2.prototype.error = function(err) {
+      if (this.isStopped) {
+        handleStoppedNotification(errorNotification(err), this);
+      } else {
+        this.isStopped = true;
+        this._error(err);
+      }
+    };
+    Subscriber2.prototype.complete = function() {
+      if (this.isStopped) {
+        handleStoppedNotification(COMPLETE_NOTIFICATION, this);
+      } else {
+        this.isStopped = true;
+        this._complete();
+      }
+    };
+    Subscriber2.prototype.unsubscribe = function() {
+      if (!this.closed) {
+        this.isStopped = true;
+        _super.prototype.unsubscribe.call(this);
+        this.destination = null;
+      }
+    };
+    Subscriber2.prototype._next = function(value) {
+      this.destination.next(value);
+    };
+    Subscriber2.prototype._error = function(err) {
+      try {
+        this.destination.error(err);
+      } finally {
+        this.unsubscribe();
+      }
+    };
+    Subscriber2.prototype._complete = function() {
+      try {
+        this.destination.complete();
+      } finally {
+        this.unsubscribe();
+      }
+    };
+    return Subscriber2;
+  }(Subscription);
+  var _bind = Function.prototype.bind;
+  function bind(fn, thisArg) {
+    return _bind.call(fn, thisArg);
+  }
+  var ConsumerObserver = function() {
+    function ConsumerObserver2(partialObserver) {
+      this.partialObserver = partialObserver;
+    }
+    ConsumerObserver2.prototype.next = function(value) {
+      var partialObserver = this.partialObserver;
+      if (partialObserver.next) {
+        try {
+          partialObserver.next(value);
+        } catch (error) {
+          handleUnhandledError(error);
+        }
+      }
+    };
+    ConsumerObserver2.prototype.error = function(err) {
+      var partialObserver = this.partialObserver;
+      if (partialObserver.error) {
+        try {
+          partialObserver.error(err);
+        } catch (error) {
+          handleUnhandledError(error);
+        }
+      } else {
+        handleUnhandledError(err);
+      }
+    };
+    ConsumerObserver2.prototype.complete = function() {
+      var partialObserver = this.partialObserver;
+      if (partialObserver.complete) {
+        try {
+          partialObserver.complete();
+        } catch (error) {
+          handleUnhandledError(error);
+        }
+      }
+    };
+    return ConsumerObserver2;
+  }();
+  var SafeSubscriber = function(_super) {
+    __extends(SafeSubscriber2, _super);
+    function SafeSubscriber2(observerOrNext, error, complete) {
+      var _this = _super.call(this) || this;
+      var partialObserver;
+      if (isFunction(observerOrNext) || !observerOrNext) {
+        partialObserver = {
+          next: observerOrNext !== null && observerOrNext !== void 0 ? observerOrNext : void 0,
+          error: error !== null && error !== void 0 ? error : void 0,
+          complete: complete !== null && complete !== void 0 ? complete : void 0
+        };
+      } else {
+        var context_1;
+        if (_this && config.useDeprecatedNextContext) {
+          context_1 = Object.create(observerOrNext);
+          context_1.unsubscribe = function() {
+            return _this.unsubscribe();
+          };
+          partialObserver = {
+            next: observerOrNext.next && bind(observerOrNext.next, context_1),
+            error: observerOrNext.error && bind(observerOrNext.error, context_1),
+            complete: observerOrNext.complete && bind(observerOrNext.complete, context_1)
+          };
+        } else {
+          partialObserver = observerOrNext;
+        }
+      }
+      _this.destination = new ConsumerObserver(partialObserver);
+      return _this;
+    }
+    return SafeSubscriber2;
+  }(Subscriber);
+  function handleUnhandledError(error) {
+    if (config.useDeprecatedSynchronousErrorHandling) {
+      captureError(error);
+    } else {
+      reportUnhandledError(error);
+    }
+  }
+  function defaultErrorHandler(err) {
+    throw err;
+  }
+  function handleStoppedNotification(notification, subscriber) {
+    var onStoppedNotification = config.onStoppedNotification;
+    onStoppedNotification && timeoutProvider.setTimeout(function() {
+      return onStoppedNotification(notification, subscriber);
+    });
+  }
+  var EMPTY_OBSERVER = {
+    closed: true,
+    next: noop,
+    error: defaultErrorHandler,
+    complete: noop
+  };
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/symbol/observable.js
+  var observable = function() {
+    return typeof Symbol === "function" && Symbol.observable || "@@observable";
+  }();
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/identity.js
+  function identity(x) {
+    return x;
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/pipe.js
+  function pipeFromArray(fns) {
+    if (fns.length === 0) {
+      return identity;
+    }
+    if (fns.length === 1) {
+      return fns[0];
+    }
+    return function piped(input) {
+      return fns.reduce(function(prev, fn) {
+        return fn(prev);
+      }, input);
+    };
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/Observable.js
+  var Observable = function() {
+    function Observable3(subscribe) {
+      if (subscribe) {
+        this._subscribe = subscribe;
+      }
+    }
+    Observable3.prototype.lift = function(operator) {
+      var observable2 = new Observable3();
+      observable2.source = this;
+      observable2.operator = operator;
+      return observable2;
+    };
+    Observable3.prototype.subscribe = function(observerOrNext, error, complete) {
+      var _this = this;
+      var subscriber = isSubscriber(observerOrNext) ? observerOrNext : new SafeSubscriber(observerOrNext, error, complete);
+      errorContext(function() {
+        var _a = _this, operator = _a.operator, source = _a.source;
+        subscriber.add(operator ? operator.call(subscriber, source) : source ? _this._subscribe(subscriber) : _this._trySubscribe(subscriber));
+      });
+      return subscriber;
+    };
+    Observable3.prototype._trySubscribe = function(sink) {
+      try {
+        return this._subscribe(sink);
+      } catch (err) {
+        sink.error(err);
+      }
+    };
+    Observable3.prototype.forEach = function(next, promiseCtor) {
+      var _this = this;
+      promiseCtor = getPromiseCtor(promiseCtor);
+      return new promiseCtor(function(resolve, reject) {
+        var subscriber = new SafeSubscriber({
+          next: function(value) {
+            try {
+              next(value);
+            } catch (err) {
+              reject(err);
+              subscriber.unsubscribe();
+            }
+          },
+          error: reject,
+          complete: resolve
+        });
+        _this.subscribe(subscriber);
+      });
+    };
+    Observable3.prototype._subscribe = function(subscriber) {
+      var _a;
+      return (_a = this.source) === null || _a === void 0 ? void 0 : _a.subscribe(subscriber);
+    };
+    Observable3.prototype[observable] = function() {
+      return this;
+    };
+    Observable3.prototype.pipe = function() {
+      var operations = [];
+      for (var _i = 0; _i < arguments.length; _i++) {
+        operations[_i] = arguments[_i];
+      }
+      return pipeFromArray(operations)(this);
+    };
+    Observable3.prototype.toPromise = function(promiseCtor) {
+      var _this = this;
+      promiseCtor = getPromiseCtor(promiseCtor);
+      return new promiseCtor(function(resolve, reject) {
+        var value;
+        _this.subscribe(function(x) {
+          return value = x;
+        }, function(err) {
+          return reject(err);
+        }, function() {
+          return resolve(value);
+        });
+      });
+    };
+    Observable3.create = function(subscribe) {
+      return new Observable3(subscribe);
+    };
+    return Observable3;
+  }();
+  function getPromiseCtor(promiseCtor) {
+    var _a;
+    return (_a = promiseCtor !== null && promiseCtor !== void 0 ? promiseCtor : config.Promise) !== null && _a !== void 0 ? _a : Promise;
+  }
+  function isObserver(value) {
+    return value && isFunction(value.next) && isFunction(value.error) && isFunction(value.complete);
+  }
+  function isSubscriber(value) {
+    return value && value instanceof Subscriber || isObserver(value) && isSubscription(value);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/lift.js
+  function hasLift(source) {
+    return isFunction(source === null || source === void 0 ? void 0 : source.lift);
+  }
+  function operate(init) {
+    return function(source) {
+      if (hasLift(source)) {
+        return source.lift(function(liftedSource) {
+          try {
+            return init(liftedSource, this);
+          } catch (err) {
+            this.error(err);
+          }
+        });
+      }
+      throw new TypeError("Unable to lift unknown Observable type");
+    };
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js
+  function createOperatorSubscriber(destination, onNext, onComplete, onError, onFinalize) {
+    return new OperatorSubscriber(destination, onNext, onComplete, onError, onFinalize);
+  }
+  var OperatorSubscriber = function(_super) {
+    __extends(OperatorSubscriber2, _super);
+    function OperatorSubscriber2(destination, onNext, onComplete, onError, onFinalize, shouldUnsubscribe) {
+      var _this = _super.call(this, destination) || this;
+      _this.onFinalize = onFinalize;
+      _this.shouldUnsubscribe = shouldUnsubscribe;
+      _this._next = onNext ? function(value) {
+        try {
+          onNext(value);
+        } catch (err) {
+          destination.error(err);
+        }
+      } : _super.prototype._next;
+      _this._error = onError ? function(err) {
+        try {
+          onError(err);
+        } catch (err2) {
+          destination.error(err2);
+        } finally {
+          this.unsubscribe();
+        }
+      } : _super.prototype._error;
+      _this._complete = onComplete ? function() {
+        try {
+          onComplete();
+        } catch (err) {
+          destination.error(err);
+        } finally {
+          this.unsubscribe();
+        }
+      } : _super.prototype._complete;
+      return _this;
+    }
+    OperatorSubscriber2.prototype.unsubscribe = function() {
+      var _a;
+      if (!this.shouldUnsubscribe || this.shouldUnsubscribe()) {
+        var closed_1 = this.closed;
+        _super.prototype.unsubscribe.call(this);
+        !closed_1 && ((_a = this.onFinalize) === null || _a === void 0 ? void 0 : _a.call(this));
+      }
+    };
+    return OperatorSubscriber2;
+  }(Subscriber);
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/ObjectUnsubscribedError.js
+  var ObjectUnsubscribedError = createErrorClass(function(_super) {
+    return function ObjectUnsubscribedErrorImpl() {
+      _super(this);
+      this.name = "ObjectUnsubscribedError";
+      this.message = "object unsubscribed";
+    };
+  });
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/Subject.js
+  var Subject = function(_super) {
+    __extends(Subject2, _super);
+    function Subject2() {
+      var _this = _super.call(this) || this;
+      _this.closed = false;
+      _this.currentObservers = null;
+      _this.observers = [];
+      _this.isStopped = false;
+      _this.hasError = false;
+      _this.thrownError = null;
+      return _this;
+    }
+    Subject2.prototype.lift = function(operator) {
+      var subject = new AnonymousSubject(this, this);
+      subject.operator = operator;
+      return subject;
+    };
+    Subject2.prototype._throwIfClosed = function() {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError();
+      }
+    };
+    Subject2.prototype.next = function(value) {
+      var _this = this;
+      errorContext(function() {
+        var e_1, _a;
+        _this._throwIfClosed();
+        if (!_this.isStopped) {
+          if (!_this.currentObservers) {
+            _this.currentObservers = Array.from(_this.observers);
+          }
+          try {
+            for (var _b = __values(_this.currentObservers), _c = _b.next(); !_c.done; _c = _b.next()) {
+              var observer = _c.value;
+              observer.next(value);
+            }
+          } catch (e_1_1) {
+            e_1 = { error: e_1_1 };
+          } finally {
+            try {
+              if (_c && !_c.done && (_a = _b.return))
+                _a.call(_b);
+            } finally {
+              if (e_1)
+                throw e_1.error;
+            }
+          }
+        }
+      });
+    };
+    Subject2.prototype.error = function(err) {
+      var _this = this;
+      errorContext(function() {
+        _this._throwIfClosed();
+        if (!_this.isStopped) {
+          _this.hasError = _this.isStopped = true;
+          _this.thrownError = err;
+          var observers = _this.observers;
+          while (observers.length) {
+            observers.shift().error(err);
+          }
+        }
+      });
+    };
+    Subject2.prototype.complete = function() {
+      var _this = this;
+      errorContext(function() {
+        _this._throwIfClosed();
+        if (!_this.isStopped) {
+          _this.isStopped = true;
+          var observers = _this.observers;
+          while (observers.length) {
+            observers.shift().complete();
+          }
+        }
+      });
+    };
+    Subject2.prototype.unsubscribe = function() {
+      this.isStopped = this.closed = true;
+      this.observers = this.currentObservers = null;
+    };
+    Object.defineProperty(Subject2.prototype, "observed", {
+      get: function() {
+        var _a;
+        return ((_a = this.observers) === null || _a === void 0 ? void 0 : _a.length) > 0;
+      },
+      enumerable: false,
+      configurable: true
+    });
+    Subject2.prototype._trySubscribe = function(subscriber) {
+      this._throwIfClosed();
+      return _super.prototype._trySubscribe.call(this, subscriber);
+    };
+    Subject2.prototype._subscribe = function(subscriber) {
+      this._throwIfClosed();
+      this._checkFinalizedStatuses(subscriber);
+      return this._innerSubscribe(subscriber);
+    };
+    Subject2.prototype._innerSubscribe = function(subscriber) {
+      var _this = this;
+      var _a = this, hasError = _a.hasError, isStopped = _a.isStopped, observers = _a.observers;
+      if (hasError || isStopped) {
+        return EMPTY_SUBSCRIPTION;
+      }
+      this.currentObservers = null;
+      observers.push(subscriber);
+      return new Subscription(function() {
+        _this.currentObservers = null;
+        arrRemove(observers, subscriber);
+      });
+    };
+    Subject2.prototype._checkFinalizedStatuses = function(subscriber) {
+      var _a = this, hasError = _a.hasError, thrownError = _a.thrownError, isStopped = _a.isStopped;
+      if (hasError) {
+        subscriber.error(thrownError);
+      } else if (isStopped) {
+        subscriber.complete();
+      }
+    };
+    Subject2.prototype.asObservable = function() {
+      var observable2 = new Observable();
+      observable2.source = this;
+      return observable2;
+    };
+    Subject2.create = function(destination, source) {
+      return new AnonymousSubject(destination, source);
+    };
+    return Subject2;
+  }(Observable);
+  var AnonymousSubject = function(_super) {
+    __extends(AnonymousSubject2, _super);
+    function AnonymousSubject2(destination, source) {
+      var _this = _super.call(this) || this;
+      _this.destination = destination;
+      _this.source = source;
+      return _this;
+    }
+    AnonymousSubject2.prototype.next = function(value) {
+      var _a, _b;
+      (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.next) === null || _b === void 0 ? void 0 : _b.call(_a, value);
+    };
+    AnonymousSubject2.prototype.error = function(err) {
+      var _a, _b;
+      (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.error) === null || _b === void 0 ? void 0 : _b.call(_a, err);
+    };
+    AnonymousSubject2.prototype.complete = function() {
+      var _a, _b;
+      (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.complete) === null || _b === void 0 ? void 0 : _b.call(_a);
+    };
+    AnonymousSubject2.prototype._subscribe = function(subscriber) {
+      var _a, _b;
+      return (_b = (_a = this.source) === null || _a === void 0 ? void 0 : _a.subscribe(subscriber)) !== null && _b !== void 0 ? _b : EMPTY_SUBSCRIPTION;
+    };
+    return AnonymousSubject2;
+  }(Subject);
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/observable/empty.js
+  var EMPTY = new Observable(function(subscriber) {
+    return subscriber.complete();
+  });
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isScheduler.js
+  function isScheduler(value) {
+    return value && isFunction(value.schedule);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/args.js
+  function last(arr) {
+    return arr[arr.length - 1];
+  }
+  function popScheduler(args) {
+    return isScheduler(last(args)) ? args.pop() : void 0;
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js
+  var isArrayLike = function(x) {
+    return x && typeof x.length === "number" && typeof x !== "function";
+  };
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isPromise.js
+  function isPromise(value) {
+    return isFunction(value === null || value === void 0 ? void 0 : value.then);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js
+  function isInteropObservable(input) {
+    return isFunction(input[observable]);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js
+  function isAsyncIterable(obj) {
+    return Symbol.asyncIterator && isFunction(obj === null || obj === void 0 ? void 0 : obj[Symbol.asyncIterator]);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js
+  function createInvalidObservableTypeError(input) {
+    return new TypeError("You provided " + (input !== null && typeof input === "object" ? "an invalid object" : "'" + input + "'") + " where a stream was expected. You can provide an Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.");
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/symbol/iterator.js
+  function getSymbolIterator() {
+    if (typeof Symbol !== "function" || !Symbol.iterator) {
+      return "@@iterator";
+    }
+    return Symbol.iterator;
+  }
+  var iterator = getSymbolIterator();
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isIterable.js
+  function isIterable(input) {
+    return isFunction(input === null || input === void 0 ? void 0 : input[iterator]);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js
+  function readableStreamLikeToAsyncGenerator(readableStream) {
+    return __asyncGenerator(this, arguments, function readableStreamLikeToAsyncGenerator_1() {
+      var reader, _a, value, done;
+      return __generator(this, function(_b) {
+        switch (_b.label) {
+          case 0:
+            reader = readableStream.getReader();
+            _b.label = 1;
+          case 1:
+            _b.trys.push([1, , 9, 10]);
+            _b.label = 2;
+          case 2:
+            if (false)
+              return [3, 8];
+            return [4, __await(reader.read())];
+          case 3:
+            _a = _b.sent(), value = _a.value, done = _a.done;
+            if (!done)
+              return [3, 5];
+            return [4, __await(void 0)];
+          case 4:
+            return [2, _b.sent()];
+          case 5:
+            return [4, __await(value)];
+          case 6:
+            return [4, _b.sent()];
+          case 7:
+            _b.sent();
+            return [3, 2];
+          case 8:
+            return [3, 10];
+          case 9:
+            reader.releaseLock();
+            return [7];
+          case 10:
+            return [2];
+        }
+      });
+    });
+  }
+  function isReadableStreamLike(obj) {
+    return isFunction(obj === null || obj === void 0 ? void 0 : obj.getReader);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js
+  function innerFrom(input) {
+    if (input instanceof Observable) {
+      return input;
+    }
+    if (input != null) {
+      if (isInteropObservable(input)) {
+        return fromInteropObservable(input);
+      }
+      if (isArrayLike(input)) {
+        return fromArrayLike(input);
+      }
+      if (isPromise(input)) {
+        return fromPromise(input);
+      }
+      if (isAsyncIterable(input)) {
+        return fromAsyncIterable(input);
+      }
+      if (isIterable(input)) {
+        return fromIterable(input);
+      }
+      if (isReadableStreamLike(input)) {
+        return fromReadableStreamLike(input);
+      }
+    }
+    throw createInvalidObservableTypeError(input);
+  }
+  function fromInteropObservable(obj) {
+    return new Observable(function(subscriber) {
+      var obs = obj[observable]();
+      if (isFunction(obs.subscribe)) {
+        return obs.subscribe(subscriber);
+      }
+      throw new TypeError("Provided object does not correctly implement Symbol.observable");
+    });
+  }
+  function fromArrayLike(array) {
+    return new Observable(function(subscriber) {
+      for (var i = 0; i < array.length && !subscriber.closed; i++) {
+        subscriber.next(array[i]);
+      }
+      subscriber.complete();
+    });
+  }
+  function fromPromise(promise) {
+    return new Observable(function(subscriber) {
+      promise.then(function(value) {
+        if (!subscriber.closed) {
+          subscriber.next(value);
+          subscriber.complete();
+        }
+      }, function(err) {
+        return subscriber.error(err);
+      }).then(null, reportUnhandledError);
+    });
+  }
+  function fromIterable(iterable) {
+    return new Observable(function(subscriber) {
+      var e_1, _a;
+      try {
+        for (var iterable_1 = __values(iterable), iterable_1_1 = iterable_1.next(); !iterable_1_1.done; iterable_1_1 = iterable_1.next()) {
+          var value = iterable_1_1.value;
+          subscriber.next(value);
+          if (subscriber.closed) {
+            return;
+          }
+        }
+      } catch (e_1_1) {
+        e_1 = { error: e_1_1 };
+      } finally {
+        try {
+          if (iterable_1_1 && !iterable_1_1.done && (_a = iterable_1.return))
+            _a.call(iterable_1);
+        } finally {
+          if (e_1)
+            throw e_1.error;
+        }
+      }
+      subscriber.complete();
+    });
+  }
+  function fromAsyncIterable(asyncIterable) {
+    return new Observable(function(subscriber) {
+      process(asyncIterable, subscriber).catch(function(err) {
+        return subscriber.error(err);
+      });
+    });
+  }
+  function fromReadableStreamLike(readableStream) {
+    return fromAsyncIterable(readableStreamLikeToAsyncGenerator(readableStream));
+  }
+  function process(asyncIterable, subscriber) {
+    var asyncIterable_1, asyncIterable_1_1;
+    var e_2, _a;
+    return __awaiter(this, void 0, void 0, function() {
+      var value, e_2_1;
+      return __generator(this, function(_b) {
+        switch (_b.label) {
+          case 0:
+            _b.trys.push([0, 5, 6, 11]);
+            asyncIterable_1 = __asyncValues(asyncIterable);
+            _b.label = 1;
+          case 1:
+            return [4, asyncIterable_1.next()];
+          case 2:
+            if (!(asyncIterable_1_1 = _b.sent(), !asyncIterable_1_1.done))
+              return [3, 4];
+            value = asyncIterable_1_1.value;
+            subscriber.next(value);
+            if (subscriber.closed) {
+              return [2];
+            }
+            _b.label = 3;
+          case 3:
+            return [3, 1];
+          case 4:
+            return [3, 11];
+          case 5:
+            e_2_1 = _b.sent();
+            e_2 = { error: e_2_1 };
+            return [3, 11];
+          case 6:
+            _b.trys.push([6, , 9, 10]);
+            if (!(asyncIterable_1_1 && !asyncIterable_1_1.done && (_a = asyncIterable_1.return)))
+              return [3, 8];
+            return [4, _a.call(asyncIterable_1)];
+          case 7:
+            _b.sent();
+            _b.label = 8;
+          case 8:
+            return [3, 10];
+          case 9:
+            if (e_2)
+              throw e_2.error;
+            return [7];
+          case 10:
+            return [7];
+          case 11:
+            subscriber.complete();
+            return [2];
+        }
+      });
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js
+  function executeSchedule(parentSubscription, scheduler, work, delay, repeat) {
+    if (delay === void 0) {
+      delay = 0;
+    }
+    if (repeat === void 0) {
+      repeat = false;
+    }
+    var scheduleSubscription = scheduler.schedule(function() {
+      work();
+      if (repeat) {
+        parentSubscription.add(this.schedule(null, delay));
+      } else {
+        this.unsubscribe();
+      }
+    }, delay);
+    parentSubscription.add(scheduleSubscription);
+    if (!repeat) {
+      return scheduleSubscription;
+    }
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/observeOn.js
+  function observeOn(scheduler, delay) {
+    if (delay === void 0) {
+      delay = 0;
+    }
+    return operate(function(source, subscriber) {
+      source.subscribe(createOperatorSubscriber(subscriber, function(value) {
+        return executeSchedule(subscriber, scheduler, function() {
+          return subscriber.next(value);
+        }, delay);
+      }, function() {
+        return executeSchedule(subscriber, scheduler, function() {
+          return subscriber.complete();
+        }, delay);
+      }, function(err) {
+        return executeSchedule(subscriber, scheduler, function() {
+          return subscriber.error(err);
+        }, delay);
+      }));
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js
+  function subscribeOn(scheduler, delay) {
+    if (delay === void 0) {
+      delay = 0;
+    }
+    return operate(function(source, subscriber) {
+      subscriber.add(scheduler.schedule(function() {
+        return source.subscribe(subscriber);
+      }, delay));
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduleObservable.js
+  function scheduleObservable(input, scheduler) {
+    return innerFrom(input).pipe(subscribeOn(scheduler), observeOn(scheduler));
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/schedulePromise.js
+  function schedulePromise(input, scheduler) {
+    return innerFrom(input).pipe(subscribeOn(scheduler), observeOn(scheduler));
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduleArray.js
+  function scheduleArray(input, scheduler) {
+    return new Observable(function(subscriber) {
+      var i = 0;
+      return scheduler.schedule(function() {
+        if (i === input.length) {
+          subscriber.complete();
+        } else {
+          subscriber.next(input[i++]);
+          if (!subscriber.closed) {
+            this.schedule();
+          }
+        }
+      });
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduleIterable.js
+  function scheduleIterable(input, scheduler) {
+    return new Observable(function(subscriber) {
+      var iterator2;
+      executeSchedule(subscriber, scheduler, function() {
+        iterator2 = input[iterator]();
+        executeSchedule(subscriber, scheduler, function() {
+          var _a;
+          var value;
+          var done;
+          try {
+            _a = iterator2.next(), value = _a.value, done = _a.done;
+          } catch (err) {
+            subscriber.error(err);
+            return;
+          }
+          if (done) {
+            subscriber.complete();
+          } else {
+            subscriber.next(value);
+          }
+        }, 0, true);
+      });
+      return function() {
+        return isFunction(iterator2 === null || iterator2 === void 0 ? void 0 : iterator2.return) && iterator2.return();
+      };
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js
+  function scheduleAsyncIterable(input, scheduler) {
+    if (!input) {
+      throw new Error("Iterable cannot be null");
+    }
+    return new Observable(function(subscriber) {
+      executeSchedule(subscriber, scheduler, function() {
+        var iterator2 = input[Symbol.asyncIterator]();
+        executeSchedule(subscriber, scheduler, function() {
+          iterator2.next().then(function(result) {
+            if (result.done) {
+              subscriber.complete();
+            } else {
+              subscriber.next(result.value);
+            }
+          });
+        }, 0, true);
+      });
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduleReadableStreamLike.js
+  function scheduleReadableStreamLike(input, scheduler) {
+    return scheduleAsyncIterable(readableStreamLikeToAsyncGenerator(input), scheduler);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/scheduled/scheduled.js
+  function scheduled(input, scheduler) {
+    if (input != null) {
+      if (isInteropObservable(input)) {
+        return scheduleObservable(input, scheduler);
+      }
+      if (isArrayLike(input)) {
+        return scheduleArray(input, scheduler);
+      }
+      if (isPromise(input)) {
+        return schedulePromise(input, scheduler);
+      }
+      if (isAsyncIterable(input)) {
+        return scheduleAsyncIterable(input, scheduler);
+      }
+      if (isIterable(input)) {
+        return scheduleIterable(input, scheduler);
+      }
+      if (isReadableStreamLike(input)) {
+        return scheduleReadableStreamLike(input, scheduler);
+      }
+    }
+    throw createInvalidObservableTypeError(input);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/observable/from.js
+  function from(input, scheduler) {
+    return scheduler ? scheduled(input, scheduler) : innerFrom(input);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/observable/of.js
+  function of() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      args[_i] = arguments[_i];
+    }
+    var scheduler = popScheduler(args);
+    return from(args, scheduler);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/util/EmptyError.js
+  var EmptyError = createErrorClass(function(_super) {
+    return function EmptyErrorImpl() {
+      _super(this);
+      this.name = "EmptyError";
+      this.message = "no elements in sequence";
+    };
+  });
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/firstValueFrom.js
+  function firstValueFrom(source, config2) {
+    var hasConfig = typeof config2 === "object";
+    return new Promise(function(resolve, reject) {
+      var subscriber = new SafeSubscriber({
+        next: function(value) {
+          resolve(value);
+          subscriber.unsubscribe();
+        },
+        error: reject,
+        complete: function() {
+          if (hasConfig) {
+            resolve(config2.defaultValue);
+          } else {
+            reject(new EmptyError());
+          }
+        }
+      });
+      source.subscribe(subscriber);
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/map.js
+  function map(project, thisArg) {
+    return operate(function(source, subscriber) {
+      var index = 0;
+      source.subscribe(createOperatorSubscriber(subscriber, function(value) {
+        subscriber.next(project.call(thisArg, value, index++));
+      }));
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/catchError.js
+  function catchError(selector) {
+    return operate(function(source, subscriber) {
+      var innerSub = null;
+      var syncUnsub = false;
+      var handledResult;
+      innerSub = source.subscribe(createOperatorSubscriber(subscriber, void 0, void 0, function(err) {
+        handledResult = innerFrom(selector(err, catchError(selector)(source)));
+        if (innerSub) {
+          innerSub.unsubscribe();
+          innerSub = null;
+          handledResult.subscribe(subscriber);
+        } else {
+          syncUnsub = true;
+        }
+      }));
+      if (syncUnsub) {
+        innerSub.unsubscribe();
+        innerSub = null;
+        handledResult.subscribe(subscriber);
+      }
+    });
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/share.js
+  function share(options) {
+    if (options === void 0) {
+      options = {};
+    }
+    var _a = options.connector, connector = _a === void 0 ? function() {
+      return new Subject();
+    } : _a, _b = options.resetOnError, resetOnError = _b === void 0 ? true : _b, _c = options.resetOnComplete, resetOnComplete = _c === void 0 ? true : _c, _d = options.resetOnRefCountZero, resetOnRefCountZero = _d === void 0 ? true : _d;
+    return function(wrapperSource) {
+      var connection;
+      var resetConnection;
+      var subject;
+      var refCount = 0;
+      var hasCompleted = false;
+      var hasErrored = false;
+      var cancelReset = function() {
+        resetConnection === null || resetConnection === void 0 ? void 0 : resetConnection.unsubscribe();
+        resetConnection = void 0;
+      };
+      var reset = function() {
+        cancelReset();
+        connection = subject = void 0;
+        hasCompleted = hasErrored = false;
+      };
+      var resetAndUnsubscribe = function() {
+        var conn = connection;
+        reset();
+        conn === null || conn === void 0 ? void 0 : conn.unsubscribe();
+      };
+      return operate(function(source, subscriber) {
+        refCount++;
+        if (!hasErrored && !hasCompleted) {
+          cancelReset();
+        }
+        var dest = subject = subject !== null && subject !== void 0 ? subject : connector();
+        subscriber.add(function() {
+          refCount--;
+          if (refCount === 0 && !hasErrored && !hasCompleted) {
+            resetConnection = handleReset(resetAndUnsubscribe, resetOnRefCountZero);
+          }
+        });
+        dest.subscribe(subscriber);
+        if (!connection && refCount > 0) {
+          connection = new SafeSubscriber({
+            next: function(value) {
+              return dest.next(value);
+            },
+            error: function(err) {
+              hasErrored = true;
+              cancelReset();
+              resetConnection = handleReset(reset, resetOnError, err);
+              dest.error(err);
+            },
+            complete: function() {
+              hasCompleted = true;
+              cancelReset();
+              resetConnection = handleReset(reset, resetOnComplete);
+              dest.complete();
+            }
+          });
+          innerFrom(source).subscribe(connection);
+        }
+      })(wrapperSource);
+    };
+  }
+  function handleReset(reset, on) {
+    var args = [];
+    for (var _i = 2; _i < arguments.length; _i++) {
+      args[_i - 2] = arguments[_i];
+    }
+    if (on === true) {
+      reset();
+      return;
+    }
+    if (on === false) {
+      return;
+    }
+    var onSubscriber = new SafeSubscriber({
+      next: function() {
+        onSubscriber.unsubscribe();
+        reset();
+      }
+    });
+    return innerFrom(on.apply(void 0, __spreadArray([], __read(args)))).subscribe(onSubscriber);
+  }
+
+  // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/operators/tap.js
+  function tap(observerOrNext, error, complete) {
+    var tapObserver = isFunction(observerOrNext) || error || complete ? { next: observerOrNext, error, complete } : observerOrNext;
+    return tapObserver ? operate(function(source, subscriber) {
+      var _a;
+      (_a = tapObserver.subscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+      var isUnsub = true;
+      source.subscribe(createOperatorSubscriber(subscriber, function(value) {
+        var _a2;
+        (_a2 = tapObserver.next) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver, value);
+        subscriber.next(value);
+      }, function() {
+        var _a2;
+        isUnsub = false;
+        (_a2 = tapObserver.complete) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver);
+        subscriber.complete();
+      }, function(err) {
+        var _a2;
+        isUnsub = false;
+        (_a2 = tapObserver.error) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver, err);
+        subscriber.error(err);
+      }, function() {
+        var _a2, _b;
+        if (isUnsub) {
+          (_a2 = tapObserver.unsubscribe) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver);
+        }
+        (_b = tapObserver.finalize) === null || _b === void 0 ? void 0 : _b.call(tapObserver);
+      }));
+    }) : identity;
+  }
+
   // lib/iot/index.ts
   var ElevatedIOT = class extends BaseService {
-    // Event emitters for reactive programming
-    onConnected = new EventEmitter();
-    onDisconnect = new EventEmitter();
-    onConfigRequired = new EventEmitter();
-    onCommand = new EventEmitter();
-    onFlightInfo = new EventEmitter();
-    onRefresh = new EventEmitter();
-    onPrint = new EventEmitter();
-    onRestart = new EventEmitter();
-    onNavigate = new EventEmitter();
+    // Event subjects for reactive programming with RxJS
+    onConnected = new Subject();
+    onDisconnect = new Subject();
+    onConfigRequired = new Subject();
+    onCommand = new Subject();
+    onFlightInfo = new Subject();
+    onRefresh = new Subject();
+    onPrint = new Subject();
+    onRestart = new Subject();
+    onNavigate = new Subject();
     ws = null;
     reconnectTimer = null;
     pingTimer = null;
@@ -893,23 +2494,23 @@ var ElevationCore = (() => {
         const message = JSON.parse(event.data);
         switch (message.type) {
           case "connected":
-            this.onConnected.emit();
+            this.onConnected.next();
             break;
           case "config_required":
-            this.onConfigRequired.emit();
+            this.onConfigRequired.next();
             break;
           case "command":
-            this.onCommand.emit(message.data);
+            this.onCommand.next(message.data);
             this.parseSpecialCommands(message.data);
             break;
           case "flight_info":
-            this.onFlightInfo.emit(message.data);
+            this.onFlightInfo.next(message.data);
             break;
           case "refresh":
-            this.onRefresh.emit();
+            this.onRefresh.next();
             break;
           case "print":
-            this.onPrint.emit(message.data);
+            this.onPrint.next(message.data);
             break;
           case "pong":
             break;
@@ -922,25 +2523,25 @@ var ElevationCore = (() => {
     }
     parseSpecialCommands(commands) {
       if (commands.refresh) {
-        this.onRefresh.emit();
+        this.onRefresh.next();
       }
       if (commands.restart) {
-        this.onRestart.emit();
+        this.onRestart.next();
       }
       if (commands.navigate) {
-        this.onNavigate.emit(commands.navigate);
+        this.onNavigate.next(commands.navigate);
       }
       if (commands.print) {
-        this.onPrint.emit(commands.print);
+        this.onPrint.next(commands.print);
       }
       if (commands.flightInfo) {
-        this.onFlightInfo.emit(commands.flightInfo);
+        this.onFlightInfo.next(commands.flightInfo);
       }
     }
     handleClose(event) {
       console.log("IOT WebSocket closed:", event.code, event.reason);
       this.isConnected = false;
-      this.onDisconnect.emit();
+      this.onDisconnect.next();
       this.stopPing();
       if (this.shouldReconnect && !event.wasClean) {
         this.scheduleReconnect();
@@ -1028,15 +2629,6 @@ var ElevationCore = (() => {
     // Clean up resources
     destroy() {
       this.disconnect(false);
-      this.onConnected.clear();
-      this.onDisconnect.clear();
-      this.onConfigRequired.clear();
-      this.onCommand.clear();
-      this.onFlightInfo.clear();
-      this.onRefresh.clear();
-      this.onPrint.clear();
-      this.onRestart.clear();
-      this.onNavigate.clear();
     }
   };
   var iot = new ElevatedIOT();
@@ -1174,8 +2766,7 @@ var ElevationCore = (() => {
 
   // lib/cms/index.ts
   var CMS = class extends BaseService {
-    // Observable for reactive programming (using EventEmitter instead of RxJS)
-    stringsObservable = new EventEmitter();
+    stringsObservable = null;
     cmsCache = /* @__PURE__ */ new Map();
     allStrings = null;
     reqHeaderNoCache = { "Cache-Control": "no-cache" };
@@ -1187,7 +2778,7 @@ var ElevationCore = (() => {
      * Refresh CMS information and reload strings
      */
     refreshInfo(info) {
-      this.config(info);
+      super.config(info);
     }
     /**
      * Get a specific key from CMS
@@ -1196,15 +2787,20 @@ var ElevationCore = (() => {
      * @param isConfig - Whether this is a configuration string
      * @returns The CMS string or null if not found
      */
-    async getKey(key, lan, isConfig = false) {
+    async getKey(key, lan, isConfig = false, allowCache = true) {
       this.checkConfiguration();
-      if (!isConfig) {
+      if (allowCache && this.allStrings?.length) {
         const cached = this.cmsCache.get(`${key}-${lan}`);
         const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
-        return cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
+        const found = cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
+        return isConfig && found ? JSON.parse(found) : found;
       }
-      if (!this.allStrings || this.allStrings.length === 0 || isConfig) {
-        await this.loadAllStrings(isConfig);
+      if (!allowCache || !this.allStrings?.length) {
+        try {
+          await firstValueFrom(this.loadAllStrings(isConfig));
+        } catch (error) {
+          console.error("Failed to load strings for key lookup:", error);
+        }
         const cached = this.cmsCache.get(`${key}-${lan}`);
         const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
         const found = cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
@@ -1215,39 +2811,59 @@ var ElevationCore = (() => {
     /**
      * Get a string value directly (convenience method)
      */
-    async getString(key, lan) {
-      const result = await this.getKey(key, lan, false);
-      if (typeof result === "string") {
-        return result;
-      }
-      return result?.content || null;
+    getString(key, lan, allowCache = true) {
+      return this.getKey(key, lan, false, allowCache);
     }
     /**
      * Get a configuration value
      */
-    async getConfig(key, lan) {
-      const result = await this.getKey(key, lan, true);
-      if (typeof result === "string") {
-        return result;
-      }
-      return result?.content || null;
+    getConfig(key, lan, allowCache = true) {
+      return this.getKey(key, lan, true, allowCache);
     }
     /**
      * Load all CMS strings for the organization
+     * Returns an Observable that is shared when called multiple times rapidly
      */
-    async loadAllStrings(disableCache = false) {
+    loadAllStrings(disableCache = false) {
       this.checkConfiguration();
-      try {
-        const response = await this.get(`${this.coreInfo?.serviceEndpoint}/strings`, disableCache ? this.reqHeaderNoCache : void 0);
-        if (response.success && response.data) {
-          this.allStrings = response.data;
-          this.stringsObservable.emit(this.allStrings);
-          this.updateCacheFromStrings(this.allStrings);
-        }
-      } catch (error) {
-        console.error("Failed to load CMS strings:", error);
-        this.stringsObservable.emit(null);
+      if (!disableCache && this.stringsObservable) {
+        return this.stringsObservable;
       }
+      if (!disableCache && this.allStrings && this.allStrings.length > 0) {
+        return of(this.allStrings);
+      }
+      this.stringsObservable = from(
+        this.get(
+          `${this.coreInfo?.serviceEndpoint}/strings`,
+          disableCache ? this.reqHeaderNoCache : void 0
+        )
+      ).pipe(
+        map((response) => {
+          if (!response.success || !response.data) {
+            throw new Error("Failed to load CMS strings");
+          }
+          return response.data;
+        }),
+        tap((data) => {
+          this.allStrings = data;
+          this.updateCacheFromStrings(this.allStrings);
+        }),
+        catchError((error) => {
+          console.error("Failed to load CMS strings:", error);
+          this.stringsObservable = null;
+          return EMPTY;
+        }),
+        // Share the observable among multiple subscribers
+        share(),
+        tap({
+          complete: () => {
+            setTimeout(() => {
+              this.stringsObservable = null;
+            }, 0);
+          }
+        })
+      );
+      return this.stringsObservable;
     }
     /**
      * Get all loaded strings
@@ -1289,7 +2905,6 @@ var ElevationCore = (() => {
      */
     destroy() {
       this.clearCache();
-      this.stringsObservable.clear();
       this.allStrings = null;
     }
   };

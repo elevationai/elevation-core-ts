@@ -1,22 +1,18 @@
 import { BaseService } from '../shared/base.ts';
-import { EventEmitter } from '../shared/utils.ts';
-import type {
-  CoreInfo,
-  IOTInfo,
-  Commands
-} from '../../types/index.ts';
+import { Subject } from 'rxjs';
+import type { Commands, CoreInfo, IOTInfo } from '../../types/index.ts';
 
 export class ElevatedIOT extends BaseService {
-  // Event emitters for reactive programming
-  public onConnected: EventEmitter<void> = new EventEmitter<void>();
-  public onDisconnect: EventEmitter<void> = new EventEmitter<void>();
-  public onConfigRequired: EventEmitter<void> = new EventEmitter<void>();
-  public onCommand: EventEmitter<Commands> = new EventEmitter<Commands>();
-  public onFlightInfo: EventEmitter<any> = new EventEmitter<any>();
-  public onRefresh: EventEmitter<void> = new EventEmitter<void>();
-  public onPrint: EventEmitter<any> = new EventEmitter<any>();
-  public onRestart: EventEmitter<void> = new EventEmitter<void>();
-  public onNavigate: EventEmitter<string> = new EventEmitter<string>();
+  // Event subjects for reactive programming with RxJS
+  public onConnected = new Subject<void>();
+  public onDisconnect = new Subject<void>();
+  public onConfigRequired = new Subject<void>();
+  public onCommand = new Subject<Commands>();
+  public onFlightInfo = new Subject<any>();
+  public onRefresh = new Subject<void>();
+  public onPrint = new Subject<any>();
+  public onRestart = new Subject<void>();
+  public onNavigate = new Subject<string>();
 
   private ws: WebSocket | null = null;
   private reconnectTimer: number | null = null;
@@ -30,11 +26,11 @@ export class ElevatedIOT extends BaseService {
 
   public override config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
     super.config(coreInfo);
-    
+
     if (!coreInfo.iotEndpoint) {
       throw new Error('iotEndpoint is required in CoreInfo for IOT service');
     }
-    
+
     if (!coreInfo.fingerPrint) {
       throw new Error('fingerPrint is required in CoreInfo for IOT service');
     }
@@ -62,7 +58,7 @@ export class ElevatedIOT extends BaseService {
       wsUrl.searchParams.set('fingerprint', this.coreInfo.fingerPrint!);
       wsUrl.searchParams.set('appName', this.iotInfo.appName);
       wsUrl.searchParams.set('appVersion', this.iotInfo.appVersion || '1.0.0');
-      
+
       if (this.coreInfo.secondary) {
         wsUrl.searchParams.set('secondary', 'true');
       }
@@ -74,7 +70,6 @@ export class ElevatedIOT extends BaseService {
       this.ws.onmessage = (event) => this.handleMessage(event);
       this.ws.onclose = (event) => this.handleClose(event);
       this.ws.onerror = (error) => this.handleError(error);
-
     } catch (error) {
       console.error('Failed to create WebSocket connection:', error);
       this.scheduleReconnect();
@@ -85,7 +80,7 @@ export class ElevatedIOT extends BaseService {
     console.log('IOT WebSocket connected');
     this.isConnected = true;
     this.reconnectAttempts = 0;
-    
+
     // Send initial handshake
     this.send({
       type: 'handshake',
@@ -93,8 +88,8 @@ export class ElevatedIOT extends BaseService {
         fingerPrint: this.coreInfo!.fingerPrint,
         appName: this.iotInfo.appName,
         appVersion: this.iotInfo.appVersion,
-        secondary: this.coreInfo!.secondary || false
-      }
+        secondary: this.coreInfo!.secondary || false,
+      },
     });
 
     // Start ping timer
@@ -104,37 +99,37 @@ export class ElevatedIOT extends BaseService {
   private handleMessage(event: MessageEvent): void {
     try {
       const message = JSON.parse(event.data);
-      
+
       switch (message.type) {
         case 'connected':
-          this.onConnected.emit();
+          this.onConnected.next();
           break;
-          
+
         case 'config_required':
-          this.onConfigRequired.emit();
+          this.onConfigRequired.next();
           break;
-          
+
         case 'command':
-          this.onCommand.emit(message.data);
+          this.onCommand.next(message.data);
           this.parseSpecialCommands(message.data);
           break;
-          
+
         case 'flight_info':
-          this.onFlightInfo.emit(message.data);
+          this.onFlightInfo.next(message.data);
           break;
-          
+
         case 'refresh':
-          this.onRefresh.emit();
+          this.onRefresh.next();
           break;
-          
+
         case 'print':
-          this.onPrint.emit(message.data);
+          this.onPrint.next(message.data);
           break;
-          
+
         case 'pong':
           // Pong received, connection is alive
           break;
-          
+
         default:
           console.log('Unknown IOT message type:', message.type);
       }
@@ -145,33 +140,33 @@ export class ElevatedIOT extends BaseService {
 
   private parseSpecialCommands(commands: Commands): void {
     if (commands.refresh) {
-      this.onRefresh.emit();
+      this.onRefresh.next();
     }
-    
+
     if (commands.restart) {
-      this.onRestart.emit();
+      this.onRestart.next();
     }
-    
+
     if (commands.navigate) {
-      this.onNavigate.emit(commands.navigate);
+      this.onNavigate.next(commands.navigate);
     }
-    
+
     if (commands.print) {
-      this.onPrint.emit(commands.print);
+      this.onPrint.next(commands.print);
     }
-    
+
     if (commands.flightInfo) {
-      this.onFlightInfo.emit(commands.flightInfo);
+      this.onFlightInfo.next(commands.flightInfo);
     }
   }
 
   private handleClose(event: CloseEvent): void {
     console.log('IOT WebSocket closed:', event.code, event.reason);
     this.isConnected = false;
-    this.onDisconnect.emit();
-    
+    this.onDisconnect.next();
+
     this.stopPing();
-    
+
     if (this.shouldReconnect && !event.wasClean) {
       this.scheduleReconnect();
     }
@@ -194,11 +189,11 @@ export class ElevatedIOT extends BaseService {
     this.reconnectAttempts++;
     const delay = Math.min(
       this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
-      30000 // Max 30 seconds
+      30000, // Max 30 seconds
     );
 
     console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
-    
+
     this.reconnectTimer = setTimeout(() => {
       this.connect();
     }, delay);
@@ -206,7 +201,7 @@ export class ElevatedIOT extends BaseService {
 
   private startPing(): void {
     this.stopPing();
-    
+
     this.pingTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.send({ type: 'ping' });
@@ -230,7 +225,7 @@ export class ElevatedIOT extends BaseService {
   public sendCommand(command: Commands): void {
     this.send({
       type: 'command',
-      data: command
+      data: command,
     });
   }
 
@@ -238,25 +233,25 @@ export class ElevatedIOT extends BaseService {
     this.send({
       type: 'event',
       eventType,
-      data: eventData
+      data: eventData,
     });
   }
 
   public disconnect(shouldReconnect = false): void {
     this.shouldReconnect = shouldReconnect;
-    
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
-    
+
     this.stopPing();
-    
+
     if (this.ws) {
       this.ws.close();
       this.ws = null;
     }
-    
+
     this.isConnected = false;
   }
 
@@ -274,22 +269,13 @@ export class ElevatedIOT extends BaseService {
     return {
       connected: this.isConnected,
       reconnectAttempts: this.reconnectAttempts,
-      endpoint: this.coreInfo?.iotEndpoint
+      endpoint: this.coreInfo?.iotEndpoint,
     };
   }
 
   // Clean up resources
   public destroy(): void {
     this.disconnect(false);
-    this.onConnected.clear();
-    this.onDisconnect.clear();
-    this.onConfigRequired.clear();
-    this.onCommand.clear();
-    this.onFlightInfo.clear();
-    this.onRefresh.clear();
-    this.onPrint.clear();
-    this.onRestart.clear();
-    this.onNavigate.clear();
   }
 }
 

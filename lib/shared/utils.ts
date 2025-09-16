@@ -52,35 +52,6 @@ export class Debouncer<T extends (...args: any[]) => any> {
   }
 }
 
-// Event emitter for reactive programming
-export class EventEmitter<T = any> {
-  private listeners: Array<(data: T) => void> = [];
-
-  subscribe(listener: (data: T) => void): () => void {
-    this.listeners.push(listener);
-    
-    // Return unsubscribe function
-    return () => {
-      const index = this.listeners.indexOf(listener);
-      if (index > -1) {
-        this.listeners.splice(index, 1);
-      }
-    };
-  }
-
-  emit(data: T): void {
-    this.listeners.forEach(listener => listener(data));
-  }
-
-  clear(): void {
-    this.listeners = [];
-  }
-
-  get listenerCount(): number {
-    return this.listeners.length;
-  }
-}
-
 // Simple in-memory cache
 export class Cache<T> {
   private cache = new Map<string, { value: T; expires: number }>();

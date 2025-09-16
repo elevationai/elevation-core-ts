@@ -1,6 +1,6 @@
 {
   "name": "@eai/elevation-core-ts",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "UNLICENSED",
   "exports": "./index.ts",
   "tasks": {
@@ -8,7 +8,9 @@
     "test": "deno test --allow-net --allow-env --allow-read"
   },
   "imports": {
-    "@std/testing": "https://deno.land/std@0.224.0/testing/mod.ts"
+    "@std/testing": "https://deno.land/std@0.224.0/testing/mod.ts",
+    "rxjs": "npm:rxjs@^7.8.1",
+    "rxjs/operators": "npm:rxjs@^7.8.1/operators"
   },
   "compilerOptions": {
     "noUnusedLocals": true,

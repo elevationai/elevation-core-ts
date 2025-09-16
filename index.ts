@@ -4,7 +4,7 @@
 export * from './types/index.ts';
 
 // Export shared utilities
-export { uuid, Debouncer, EventEmitter, Cache } from './lib/shared/utils.ts';
+export { uuid, Debouncer, Cache } from './lib/shared/utils.ts';
 
 // Export service modules and classes
 export { ElevatedEvents, events } from './lib/events/index.ts';
