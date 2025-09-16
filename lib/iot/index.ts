@@ -1,10 +1,12 @@
 import { BaseService } from '../shared/base.ts';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { io, type Socket } from 'socket.io-client';
 import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from '../../types/index.ts';
 
 export class ElevatedIOT extends BaseService {
-  public socket: Socket | null = null;
+  private socket: Socket | null = null;
+  public socket$: BehaviorSubject<Socket | null> = new BehaviorSubject<Socket | null>(null);
+  public isConnected: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   // Event subjects for reactive programming with RxJS
   public onConnected: Subject<void> = new Subject<void>();
@@ -24,7 +26,6 @@ export class ElevatedIOT extends BaseService {
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;
   private iotInfo: IOTInfo = { appName: 'ElevationDenoService' };
-  private isConnected = false;
 
   public override config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
     super.config(coreInfo);
@@ -53,7 +54,7 @@ export class ElevatedIOT extends BaseService {
 
       // Determine namespace based on iotEvents flag
       const namespace = this.coreInfo.iotEvents ? '/events' : '/device';
-      
+
       // Parse the base URL
       const baseUrl = this.coreInfo.iotEndpoint.replace(/\/$/, ''); // Remove trailing slash
       const socketUrl = `${baseUrl}${namespace}`;
@@ -62,20 +63,16 @@ export class ElevatedIOT extends BaseService {
 
       // Create Socket.io connection with authentication
       this.socket = io(socketUrl, {
-        transports: ['websocket', 'polling'], // Try WebSocket first, fall back to polling
-        auth: {
+        query: {
           token: this.coreInfo.token,
           key: this.coreInfo.fingerPrint,
           app: this.iotInfo.appName,
           version: this.iotInfo.appVersion || '1.0.0',
           secondary: this.coreInfo.secondary || false,
         },
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: this.reconnectDelay,
-        reconnectionDelayMax: 10000,
-        timeout: 20000,
       });
+
+      this.socket$.next(this.socket);
 
       // Setup event handlers
       this.setupSocketHandlers();
@@ -91,14 +88,14 @@ export class ElevatedIOT extends BaseService {
     // Connection events
     this.socket.on('connect', () => {
       console.log('IOT Socket.io connected:', this.socket?.id);
-      this.isConnected = true;
+      this.isConnected.next(true);
       this.onConnected.next();
       this.reconnectAttempts = 0;
     });
 
     this.socket.on('disconnect', (reason: string) => {
       console.log('IOT Socket.io disconnected:', reason);
-      this.isConnected = false;
+      this.isConnected.next(false);
       this.onDisconnect.next();
 
       // Socket.io handles reconnection automatically unless server-side disconnect
@@ -110,10 +107,12 @@ export class ElevatedIOT extends BaseService {
 
     this.socket.on('connect_error', (error: any) => {
       console.error('IOT Socket.io connection error:', error.message);
-      
+
       // Check for configuration errors
-      if (error.message?.includes('5000') || error.message?.includes('5001') || 
-          error.message?.includes('Configuration') || error.message?.includes('Unauthorized')) {
+      if (
+        error.message?.includes('5000') || error.message?.includes('5001') ||
+        error.message?.includes('Configuration') || error.message?.includes('Unauthorized')
+      ) {
         console.error('Configuration error received');
         this.onConfigurationRequired.next();
         this.disconnect(true);
@@ -156,7 +155,7 @@ export class ElevatedIOT extends BaseService {
     // Handle disconnect reasons from server
     this.socket.on('error', (error: any) => {
       console.error('IOT Socket.io error:', error);
-      
+
       if (typeof error === 'object' && error !== null) {
         const errorMessage = (error as any).message || (error as any).reason || '';
         if (errorMessage.includes('Configuration') || errorMessage.includes('5000') || errorMessage.includes('5001')) {
@@ -218,7 +217,6 @@ export class ElevatedIOT extends BaseService {
   }
 
   public disconnect(_shouldReconnect = false): void {
-
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -227,13 +225,13 @@ export class ElevatedIOT extends BaseService {
     if (this.socket) {
       // Remove all listeners to prevent memory leaks
       this.socket.removeAllListeners();
-      
+
       // Disconnect from Socket.io server
       this.socket.disconnect();
       this.socket = null;
     }
 
-    this.isConnected = false;
+    this.isConnected.next(false);
   }
 
   public reconnect(): void {

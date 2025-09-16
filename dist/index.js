@@ -1766,6 +1766,40 @@ var AnonymousSubject = function(_super) {
   return AnonymousSubject2;
 }(Subject);
 
+// ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/BehaviorSubject.js
+var BehaviorSubject = function(_super) {
+  __extends(BehaviorSubject2, _super);
+  function BehaviorSubject2(_value) {
+    var _this = _super.call(this) || this;
+    _this._value = _value;
+    return _this;
+  }
+  Object.defineProperty(BehaviorSubject2.prototype, "value", {
+    get: function() {
+      return this.getValue();
+    },
+    enumerable: false,
+    configurable: true
+  });
+  BehaviorSubject2.prototype._subscribe = function(subscriber) {
+    var subscription = _super.prototype._subscribe.call(this, subscriber);
+    !subscription.closed && subscriber.next(this._value);
+    return subscription;
+  };
+  BehaviorSubject2.prototype.getValue = function() {
+    var _a = this, hasError = _a.hasError, thrownError = _a.thrownError, _value = _a._value;
+    if (hasError) {
+      throw thrownError;
+    }
+    this._throwIfClosed();
+    return _value;
+  };
+  BehaviorSubject2.prototype.next = function(value) {
+    _super.prototype.next.call(this, this._value = value);
+  };
+  return BehaviorSubject2;
+}(Subject);
+
 // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/observable/empty.js
 var EMPTY = new Observable(function(subscriber) {
   return subscriber.complete();
@@ -2377,6 +2411,8 @@ function tap(observerOrNext, error, complete) {
 import { io } from "socket.io-client";
 var ElevatedIOT = class extends BaseService {
   socket = null;
+  socket$ = new BehaviorSubject(null);
+  isConnected = new BehaviorSubject(false);
   // Event subjects for reactive programming with RxJS
   onConnected = new Subject();
   onDisconnect = new Subject();
@@ -2394,7 +2430,6 @@ var ElevatedIOT = class extends BaseService {
   maxReconnectAttempts = 10;
   reconnectDelay = 1e3;
   iotInfo = { appName: "ElevationDenoService" };
-  isConnected = false;
   config(coreInfo, iotInfo) {
     super.config(coreInfo);
     if (iotInfo) {
@@ -2417,21 +2452,15 @@ var ElevatedIOT = class extends BaseService {
       const socketUrl = `${baseUrl}${namespace}`;
       console.log(`Connecting to Socket.io server at ${socketUrl}`);
       this.socket = io(socketUrl, {
-        transports: ["websocket", "polling"],
-        // Try WebSocket first, fall back to polling
-        auth: {
+        query: {
           token: this.coreInfo.token,
           key: this.coreInfo.fingerPrint,
           app: this.iotInfo.appName,
           version: this.iotInfo.appVersion || "1.0.0",
           secondary: this.coreInfo.secondary || false
-        },
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: this.reconnectDelay,
-        reconnectionDelayMax: 1e4,
-        timeout: 2e4
+        }
       });
+      this.socket$.next(this.socket);
       this.setupSocketHandlers();
     } catch (error) {
       console.error("Failed to create Socket.io connection:", error);
@@ -2443,13 +2472,13 @@ var ElevatedIOT = class extends BaseService {
       return;
     this.socket.on("connect", () => {
       console.log("IOT Socket.io connected:", this.socket?.id);
-      this.isConnected = true;
+      this.isConnected.next(true);
       this.onConnected.next();
       this.reconnectAttempts = 0;
     });
     this.socket.on("disconnect", (reason) => {
       console.log("IOT Socket.io disconnected:", reason);
-      this.isConnected = false;
+      this.isConnected.next(false);
       this.onDisconnect.next();
       if (reason === "io server disconnect") {
         this.socket?.connect();
@@ -2547,7 +2576,7 @@ var ElevatedIOT = class extends BaseService {
       this.socket.disconnect();
       this.socket = null;
     }
-    this.isConnected = false;
+    this.isConnected.next(false);
   }
   reconnect() {
     this.reconnectAttempts = 0;
