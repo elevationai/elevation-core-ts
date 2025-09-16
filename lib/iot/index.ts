@@ -4,15 +4,15 @@ import type { Commands, CoreInfo, IOTInfo } from '../../types/index.ts';
 
 export class ElevatedIOT extends BaseService {
   // Event subjects for reactive programming with RxJS
-  public onConnected = new Subject<void>();
-  public onDisconnect = new Subject<void>();
-  public onConfigRequired = new Subject<void>();
-  public onCommand = new Subject<Commands>();
-  public onFlightInfo = new Subject<any>();
-  public onRefresh = new Subject<void>();
-  public onPrint = new Subject<any>();
-  public onRestart = new Subject<void>();
-  public onNavigate = new Subject<string>();
+  public onConnected: Subject<void> = new Subject<void>();
+  public onDisconnect: Subject<void> = new Subject<void>();
+  public onConfigRequired: Subject<void> = new Subject<void>();
+  public onCommand: Subject<Commands> = new Subject<Commands>();
+  public onFlightInfo: Subject<any> = new Subject<any>();
+  public onRefresh: Subject<void> = new Subject<void>();
+  public onPrint: Subject<any> = new Subject<any>();
+  public onRestart: Subject<void> = new Subject<void>();
+  public onNavigate: Subject<string> = new Subject<string>();
 
   private ws: WebSocket | null = null;
   private reconnectTimer: number | null = null;
