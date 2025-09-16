@@ -11,7 +11,7 @@ export class TouchPoint extends BaseService {
       throw new Error('Device fingerprint is required for TouchPoint service');
     }
 
-    return this.get<Device[]>(`${this.coreInfo?.serviceEndpoint}/devices/key/${this.coreInfo.fingerPrint}`)
+    return this.get<Device[]>(`/devices/key/${this.coreInfo.fingerPrint}`)
       .then((res) => {
         if (res.data?.length) {
           const tp = res.data[0] as Device;
@@ -53,7 +53,7 @@ export class TouchPoint extends BaseService {
         return;
       }
 
-      await this.post(`${this.coreInfo.serviceEndpoint}/devices/service`, {
+      await this.post(`/devices/service`, {
         id: this.touchPointId,
         state,
         reason,

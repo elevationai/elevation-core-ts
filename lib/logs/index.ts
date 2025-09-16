@@ -84,7 +84,7 @@ export class ElevatedLogs extends BaseService {
     };
 
     try {
-      const response = await this.post(`${this.coreInfo?.serviceEndpoint}/logs`, logPayload);
+      const response = await this.post(`/logs`, logPayload);
       return response;
     } catch (error) {
       console.error('Failed to send log:', error);

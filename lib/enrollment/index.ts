@@ -1,12 +1,5 @@
 import { BaseService } from '../shared/base.ts';
-import type {
-  CoreInfo,
-  DeviceLocation,
-  Specification,
-  DeviceInfo,
-  ApiResponse,
-  Device
-} from '../../types/index.ts';
+import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from '../../types/index.ts';
 
 export class ElevatedEnrollment extends BaseService {
   private started = false;
@@ -22,7 +15,7 @@ export class ElevatedEnrollment extends BaseService {
   public async start(): Promise<Device> {
     this.checkConfiguration();
 
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/key`);
+    const response = await this.get(`/devices/key`);
 
     if (response.success && response.data) {
       const device = response.data[0] as Device;
@@ -40,7 +33,7 @@ export class ElevatedEnrollment extends BaseService {
   public async getLocations(): Promise<DeviceLocation[]> {
     this.checkConfiguration();
 
-    const response = await this.get<DeviceLocation[]>(`${this.coreInfo?.serviceEndpoint}/locations`);
+    const response = await this.get<DeviceLocation[]>(`/locations`);
 
     if (response.success && response.data) {
       return response.data;
@@ -52,7 +45,7 @@ export class ElevatedEnrollment extends BaseService {
   public async getSpecification(): Promise<Specification[]> {
     this.checkConfiguration();
 
-    const response = await this.get<Specification[]>(`${this.coreInfo?.serviceEndpoint}/speficiations`);
+    const response = await this.get<Specification[]>(`/speficiations`);
 
     if (response.success && response.data) {
       return response.data;
@@ -107,11 +100,11 @@ export class ElevatedEnrollment extends BaseService {
     if (info.location?.configurations) {
       info.device.configurations = {
         ...info.location.configurations,
-        ...info.device.configurations
+        ...info.device.configurations,
       };
     }
 
-    const response = await this.patch(`${this.coreInfo?.serviceEndpoint}/devices/${info.device._id}`, info.device);
+    const response = await this.patch(`/devices/${info.device._id}`, info.device);
 
     return response;
   }
@@ -123,10 +116,10 @@ export class ElevatedEnrollment extends BaseService {
       return false;
     }
 
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/label/${label}`, {});
+    const response = await this.get(`/devices/label/${label}`, {});
 
     if (response.success && response.data) {
-      return response.data.length === 0
+      return response.data.length === 0;
     }
 
     return false;

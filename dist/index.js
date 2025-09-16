@@ -664,7 +664,7 @@ var ElevatedLogs = class extends BaseService {
       environment: Deno.env.get("DENO_ENV") || "production"
     };
     try {
-      const response = await this.post(`${this.coreInfo?.serviceEndpoint}/logs`, logPayload);
+      const response = await this.post(`/logs`, logPayload);
       return response;
     } catch (error) {
       console.error("Failed to send log:", error);
@@ -2581,7 +2581,7 @@ var ElevatedEnrollment = class extends BaseService {
   }
   async start() {
     this.checkConfiguration();
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/key`);
+    const response = await this.get(`/devices/key`);
     if (response.success && response.data) {
       const device = response.data[0];
       if (device.metadata?.configured) {
@@ -2595,7 +2595,7 @@ var ElevatedEnrollment = class extends BaseService {
   }
   async getLocations() {
     this.checkConfiguration();
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/locations`);
+    const response = await this.get(`/locations`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -2603,7 +2603,7 @@ var ElevatedEnrollment = class extends BaseService {
   }
   async getSpecification() {
     this.checkConfiguration();
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/speficiations`);
+    const response = await this.get(`/speficiations`);
     if (response.success && response.data) {
       return response.data;
     }
@@ -2648,7 +2648,7 @@ var ElevatedEnrollment = class extends BaseService {
         ...info.device.configurations
       };
     }
-    const response = await this.patch(`${this.coreInfo?.serviceEndpoint}/devices/${info.device._id}`, info.device);
+    const response = await this.patch(`/devices/${info.device._id}`, info.device);
     return response;
   }
   async isLabelAvailable(label) {
@@ -2656,7 +2656,7 @@ var ElevatedEnrollment = class extends BaseService {
     if (!label) {
       return false;
     }
-    const response = await this.get(`${this.coreInfo?.serviceEndpoint}/devices/label/${label}`, {});
+    const response = await this.get(`/devices/label/${label}`, {});
     if (response.success && response.data) {
       return response.data.length === 0;
     }
@@ -2689,7 +2689,7 @@ var ElevatedConfigurations = class extends BaseService {
     this.checkConfiguration();
     this.checkConfigInfo();
     return this.get(
-      `${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`
+      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`
     ).then((res) => {
       return res.data || null;
     }).catch((err) => {
@@ -2763,7 +2763,7 @@ var CMS = class extends BaseService {
     }
     this.stringsObservable = from(
       this.get(
-        `${this.coreInfo?.serviceEndpoint}/strings`,
+        "strings",
         disableCache ? this.reqHeaderNoCache : void 0
       )
     ).pipe(
@@ -2847,7 +2847,7 @@ var TouchPoint = class extends BaseService {
     if (!this.coreInfo?.fingerPrint) {
       throw new Error("Device fingerprint is required for TouchPoint service");
     }
-    return this.get(`${this.coreInfo?.serviceEndpoint}/devices/key/${this.coreInfo.fingerPrint}`).then((res) => {
+    return this.get(`/devices/key/${this.coreInfo.fingerPrint}`).then((res) => {
       if (res.data?.length) {
         const tp = res.data[0];
         if (tp)
@@ -2884,7 +2884,7 @@ var TouchPoint = class extends BaseService {
       if (!this.touchPointId) {
         return;
       }
-      await this.post(`${this.coreInfo.serviceEndpoint}/devices/service`, {
+      await this.post(`/devices/service`, {
         id: this.touchPointId,
         state,
         reason

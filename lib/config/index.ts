@@ -31,7 +31,7 @@ export class ElevatedConfigurations extends BaseService {
     this.checkConfigInfo();
 
     return this.get<ConfigValue>(
-      `${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
+      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
     )
       .then((res) => {
         return res.data || null;
