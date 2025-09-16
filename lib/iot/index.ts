@@ -59,7 +59,7 @@ export class ElevatedIOT extends BaseService {
       this.disconnect(false);
 
       // Create WebSocket connection
-      const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? '/events' : '/kiosk'}`);
+      const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? '/events' : '/device'}`);
       wsUrl.searchParams.set('token', this.coreInfo.token);
       wsUrl.searchParams.set('key', this.coreInfo.fingerPrint!);
       wsUrl.searchParams.set('app', this.iotInfo.appName);

@@ -2465,7 +2465,7 @@ var ElevationCore = (() => {
       }
       try {
         this.disconnect(false);
-        const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? "/events" : "/kiosk"}`);
+        const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? "/events" : "/device"}`);
         wsUrl.searchParams.set("token", this.coreInfo.token);
         wsUrl.searchParams.set("key", this.coreInfo.fingerPrint);
         wsUrl.searchParams.set("app", this.iotInfo.appName);
