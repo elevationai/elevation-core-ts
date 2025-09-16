@@ -1,5 +1,5 @@
 import { BaseService } from '../shared/base.ts';
-import { Debouncer, formatDate } from '../shared/utils.ts';
+import { Debouncer } from '../shared/utils.ts';
 import type { ApiResponse, LogData, LogOptions } from '../../types/index.ts';
 import { LogLevel } from '../../types/index.ts';
 
@@ -77,14 +77,8 @@ export class ElevatedLogs extends BaseService {
   }
 
   private async sendLog(data: LogData): Promise<ApiResponse> {
-    const logPayload = {
-      ...data,
-      timestamp: formatDate(),
-      environment: Deno.env.get('DENO_ENV') || 'production',
-    };
-
     try {
-      const response = await this.post(`/logs`, logPayload);
+      const response = await this.post(`/logs`, data);
       return response;
     } catch (error) {
       console.error('Failed to send log:', error);

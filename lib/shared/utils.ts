@@ -10,12 +10,12 @@ export class Debouncer<T extends (...args: any[]) => any> {
 
   constructor(
     private fn: T,
-    private delay: number
+    private delay: number,
   ) {}
 
   call(...args: Parameters<T>): void {
     const now = Date.now();
-    
+
     if (now - this.lastCall < this.delay) {
       return; // Skip if within debounce period
     }
@@ -30,7 +30,7 @@ export class Debouncer<T extends (...args: any[]) => any> {
 
   async callAsync(...args: Parameters<T>): Promise<ReturnType<T> | void> {
     const now = Date.now();
-    
+
     if (now - this.lastCall < this.delay) {
       return; // Skip if within debounce period
     }
@@ -59,7 +59,7 @@ export class Cache<T> {
 
   constructor(
     private ttl = 60000, // Default 1 minute
-    autoCleanup = true
+    autoCleanup = true,
   ) {
     if (autoCleanup) {
       this.startAutoCleanup();
@@ -73,7 +73,7 @@ export class Cache<T> {
 
   get(key: string): T | undefined {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return undefined;
     }
@@ -118,11 +118,6 @@ export class Cache<T> {
   }
 }
 
-// Format date for logging
-export function formatDate(date: Date = new Date()): string {
-  return date.toISOString();
-}
-
 // Validate email format
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -140,7 +135,7 @@ export function deepClone<T>(obj: T): T {
   }
 
   if (obj instanceof Array) {
-    return obj.map(item => deepClone(item)) as any;
+    return obj.map((item) => deepClone(item)) as any;
   }
 
   if (obj instanceof Object) {

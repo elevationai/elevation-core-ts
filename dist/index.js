@@ -323,9 +323,6 @@ var Cache = class {
     this.clear();
   }
 };
-function formatDate(date = /* @__PURE__ */ new Date()) {
-  return date.toISOString();
-}
 
 // lib/shared/base.ts
 var BaseService = class {
@@ -361,6 +358,13 @@ var BaseService = class {
       throw new Error("Service not configured. Call config() first with CoreInfo");
     }
   }
+  getHeadersObject(headers) {
+    const headersObj = {};
+    headers.forEach((value, key) => {
+      headersObj[key] = value;
+    });
+    return headersObj;
+  }
   async makeRequest(path, options = {}) {
     this.checkConfiguration();
     const url = `${this.coreInfo.serviceEndpoint}${path}`;
@@ -371,8 +375,8 @@ var BaseService = class {
       const response = await fetch(url, {
         ...options,
         headers: {
-          ...Object.fromEntries(this.headers.entries()),
-          ...Object.fromEntries(new Headers(options.headers || {}).entries())
+          ...this.getHeadersObject(this.headers),
+          ...this.getHeadersObject(new Headers(options.headers || {}))
         },
         signal: controller.signal
       });
@@ -658,13 +662,8 @@ var ElevatedLogs = class extends BaseService {
     return await this.sendLog(fullLogData);
   }
   async sendLog(data) {
-    const logPayload = {
-      ...data,
-      timestamp: formatDate(),
-      environment: Deno.env.get("DENO_ENV") || "production"
-    };
     try {
-      const response = await this.post(`/logs`, logPayload);
+      const response = await this.post(`/logs`, data);
       return response;
     } catch (error) {
       console.error("Failed to send log:", error);

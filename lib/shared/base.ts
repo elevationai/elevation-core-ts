@@ -39,6 +39,15 @@ export abstract class BaseService {
     }
   }
 
+  private getHeadersObject(headers: Headers): Record<string, string> {
+    const headersObj: Record<string, string> = {};
+    // Cross-platform way to iterate headers
+    headers.forEach((value, key) => {
+      headersObj[key] = value;
+    });
+    return headersObj;
+  }
+
   protected async makeRequest<T = any>(
     path: string,
     options: RequestInit = {},
@@ -55,8 +64,8 @@ export abstract class BaseService {
       const response = await fetch(url, {
         ...options,
         headers: {
-          ...Object.fromEntries(this.headers.entries()),
-          ...Object.fromEntries(new Headers(options.headers || {}).entries()),
+          ...this.getHeadersObject(this.headers),
+          ...this.getHeadersObject(new Headers(options.headers || {})),
         },
         signal: controller.signal,
       });
