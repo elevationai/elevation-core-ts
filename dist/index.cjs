@@ -2474,15 +2474,19 @@ var ElevatedIOT = class extends BaseService {
         wsUrl.searchParams.set("secondary", "true");
       }
       this.ws = new WebSocket(wsUrl.toString());
-      this.ws.addEventListener("open", this.handleOpen);
-      this.ws.addEventListener("message", this.handleMessage);
-      this.ws.addEventListener("close", this.handleClose);
-      this.ws.addEventListener("error", this.handleError);
+      this.ws.addEventListener("open", this.handleOpenBound);
+      this.ws.addEventListener("message", this.handleMessageBound);
+      this.ws.addEventListener("close", this.handleCloseBound);
+      this.ws.addEventListener("error", this.handleErrorBound);
     } catch (error) {
       console.error("Failed to create WebSocket connection:", error);
       this.scheduleReconnect();
     }
   }
+  handleOpenBound = this.handleOpen.bind(this);
+  handleMessageBound = this.handleMessage.bind(this);
+  handleCloseBound = this.handleClose.bind(this);
+  handleErrorBound = this.handleError.bind(this);
   handleOpen() {
     console.log("IOT WebSocket connected");
     this.isConnected = true;
@@ -2599,10 +2603,10 @@ var ElevatedIOT = class extends BaseService {
     }
     this.stopPing();
     if (this.ws) {
-      this.ws.removeEventListener("open", this.handleOpen);
-      this.ws.removeEventListener("message", this.handleMessage);
-      this.ws.removeEventListener("close", this.handleClose);
-      this.ws.removeEventListener("error", this.handleError);
+      this.ws.removeEventListener("open", this.handleOpenBound);
+      this.ws.removeEventListener("message", this.handleMessageBound);
+      this.ws.removeEventListener("close", this.handleCloseBound);
+      this.ws.removeEventListener("error", this.handleErrorBound);
       this.ws.close();
       this.ws = null;
     }
