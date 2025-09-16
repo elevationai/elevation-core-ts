@@ -1,9 +1,10 @@
 import { BaseService } from '../shared/base.ts';
 import { Subject } from 'rxjs';
+import { io, type Socket } from 'socket.io-client';
 import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from '../../types/index.ts';
 
 export class ElevatedIOT extends BaseService {
-  public ws: WebSocket | null = null;
+  public socket: Socket | null = null;
 
   // Event subjects for reactive programming with RxJS
   public onConnected: Subject<void> = new Subject<void>();
@@ -19,24 +20,14 @@ export class ElevatedIOT extends BaseService {
   public onlineKiosks: Subject<OnlineKiosk[]> = new Subject<OnlineKiosk[]>();
 
   private reconnectTimer: any;
-  private pingTimer: any;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;
   private iotInfo: IOTInfo = { appName: 'ElevationDenoService' };
   private isConnected = false;
-  private shouldReconnect = true;
 
   public override config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
     super.config(coreInfo);
-
-    if (!coreInfo.iotEndpoint) {
-      throw new Error('iotEndpoint is required in CoreInfo for IOT service');
-    }
-
-    if (!coreInfo.fingerPrint) {
-      throw new Error('fingerPrint is required in CoreInfo for IOT service');
-    }
 
     if (iotInfo) {
       this.iotInfo = iotInfo;
@@ -52,6 +43,7 @@ export class ElevatedIOT extends BaseService {
 
   private connect(): void {
     if (!this.coreInfo || !this.coreInfo.iotEndpoint) {
+      console.error('IOT endpoint not configured');
       return;
     }
 
@@ -59,121 +51,125 @@ export class ElevatedIOT extends BaseService {
       // Close existing connection if any
       this.disconnect(false);
 
-      // Create WebSocket connection
-      const wsUrl = new URL(`${this.coreInfo.iotEndpoint}${this.coreInfo.iotEvents ? '/events' : '/device'}`);
-      wsUrl.searchParams.set('token', this.coreInfo.token);
-      wsUrl.searchParams.set('key', this.coreInfo.fingerPrint!);
-      wsUrl.searchParams.set('app', this.iotInfo.appName);
-      wsUrl.searchParams.set('version', this.iotInfo.appVersion || '1.0.0');
+      // Determine namespace based on iotEvents flag
+      const namespace = this.coreInfo.iotEvents ? '/events' : '/device';
+      
+      // Parse the base URL
+      const baseUrl = this.coreInfo.iotEndpoint.replace(/\/$/, ''); // Remove trailing slash
+      const socketUrl = `${baseUrl}${namespace}`;
 
-      if (this.coreInfo.secondary) {
-        wsUrl.searchParams.set('secondary', 'true');
-      }
+      console.log(`Connecting to Socket.io server at ${socketUrl}`);
 
-      this.ws = new WebSocket(wsUrl.toString());
+      // Create Socket.io connection with authentication
+      this.socket = io(socketUrl, {
+        transports: ['websocket', 'polling'], // Try WebSocket first, fall back to polling
+        auth: {
+          token: this.coreInfo.token,
+          key: this.coreInfo.fingerPrint,
+          app: this.iotInfo.appName,
+          version: this.iotInfo.appVersion || '1.0.0',
+          secondary: this.coreInfo.secondary || false,
+        },
+        reconnection: true,
+        reconnectionAttempts: this.maxReconnectAttempts,
+        reconnectionDelay: this.reconnectDelay,
+        reconnectionDelayMax: 10000,
+        timeout: 20000,
+      });
 
       // Setup event handlers
-      this.ws.addEventListener('open', this.handleOpenBound);
-      this.ws.addEventListener('message', this.handleMessageBound);
-      this.ws.addEventListener('close', this.handleCloseBound);
-      this.ws.addEventListener('error', this.handleErrorBound);
+      this.setupSocketHandlers();
     } catch (error) {
-      console.error('Failed to create WebSocket connection:', error);
+      console.error('Failed to create Socket.io connection:', error);
       this.scheduleReconnect();
     }
   }
 
-  private handleOpenBound = this.handleOpen.bind(this);
-  private handleMessageBound = this.handleMessage.bind(this);
-  private handleCloseBound = this.handleClose.bind(this);
-  private handleErrorBound = this.handleError.bind(this);
+  private setupSocketHandlers(): void {
+    if (!this.socket) return;
 
-  private handleOpen(): void {
-    console.log('IOT WebSocket connected');
-    this.isConnected = true;
-    this.onConnected.next();
-    this.reconnectAttempts = 0;
-
-    // Send initial handshake
-    this.send({
-      type: 'handshake',
-      data: {
-        fingerPrint: this.coreInfo!.fingerPrint,
-        appName: this.iotInfo.appName,
-        appVersion: this.iotInfo.appVersion,
-        secondary: this.coreInfo!.secondary || false,
-      },
+    // Connection events
+    this.socket.on('connect', () => {
+      console.log('IOT Socket.io connected:', this.socket?.id);
+      this.isConnected = true;
+      this.onConnected.next();
+      this.reconnectAttempts = 0;
     });
 
-    // Start ping timer
-    this.startPing();
-  }
+    this.socket.on('disconnect', (reason: string) => {
+      console.log('IOT Socket.io disconnected:', reason);
+      this.isConnected = false;
+      this.onDisconnect.next();
 
-  private handleMessage(event: MessageEvent): void {
-    try {
-      const message = JSON.parse(event.data);
-
-      switch (message.type) {
-        case 'command':
-          this.onCommand.next(message.data);
-          break;
-
-        case 'flightinfo':
-          this.onFlightInfo.next(message.data);
-          break;
-
-        case 'event':
-          this.onEvent.next(message.data);
-          break;
-
-        case 'toast':
-          this.onToast.next(message.data);
-          break;
-
-        case 'refresh':
-          this.onRefresh.next();
-          break;
-
-        case 'onlineKiosks':
-          this.onlineKiosks.next(message.data);
-          break;
-
-        case 'print':
-          this.onPrint.next(message.data);
-          break;
-
-        case 'pong':
-          // Pong received, connection is alive
-          break;
-
-        default:
-          console.log('Unknown IOT message type:', message.type);
+      // Socket.io handles reconnection automatically unless server-side disconnect
+      if (reason === 'io server disconnect') {
+        // The server forcefully disconnected, need manual reconnect
+        this.socket?.connect();
       }
-    } catch (error) {
-      console.error('Failed to parse IOT message:', error);
-    }
-  }
+    });
 
-  private handleClose(event: CloseEvent): void {
-    console.log('IOT WebSocket closed:', event.code, event.reason);
-    this.isConnected = false;
-    this.onDisconnect.next();
+    this.socket.on('connect_error', (error: any) => {
+      console.error('IOT Socket.io connection error:', error.message);
+      
+      // Check for configuration errors
+      if (error.message?.includes('5000') || error.message?.includes('5001') || 
+          error.message?.includes('Configuration') || error.message?.includes('Unauthorized')) {
+        console.error('Configuration error received');
+        this.onConfigurationRequired.next();
+        this.disconnect(true);
+      }
+    });
 
-    this.stopPing();
+    // Custom events from server
+    this.socket.on('command', (data: any) => {
+      this.onCommand.next(data);
+    });
 
-    if (this.shouldReconnect && !event.wasClean) {
-      this.scheduleReconnect();
-    }
-  }
+    this.socket.on('flightinfo', (data: any) => {
+      this.onFlightInfo.next(data);
+    });
 
-  private handleError(error: Event | ErrorEvent): void {
-    console.error('IOT WebSocket error:', error);
+    this.socket.on('event', (data: any) => {
+      this.onEvent.next(data);
+    });
 
-    if (/5000/gi.test((error as ErrorEvent)?.message) || /5001/gi.test(error?.toString())) {
-      console.error(`[ERROR] [${new Date().toLocaleString()}] Configuration error received`);
-      this.onConfigurationRequired.next();
-      this.disconnect(true);
-    }
+    this.socket.on('toast', (data: any) => {
+      this.onToast.next(data);
+    });
+
+    this.socket.on('refresh', () => {
+      this.onRefresh.next();
+    });
+
+    this.socket.on('onlineKiosks', (data: any) => {
+      this.onlineKiosks.next(data);
+    });
+
+    this.socket.on('print', (data: any) => {
+      this.onPrint.next(data);
+    });
+
+    this.socket.on('restart', () => {
+      this.onRestart.next();
+    });
+
+    // Handle disconnect reasons from server
+    this.socket.on('error', (error: any) => {
+      console.error('IOT Socket.io error:', error);
+      
+      if (typeof error === 'object' && error !== null) {
+        const errorMessage = (error as any).message || (error as any).reason || '';
+        if (errorMessage.includes('Configuration') || errorMessage.includes('5000') || errorMessage.includes('5001')) {
+          this.onConfigurationRequired.next();
+          this.disconnect(true);
+        }
+      }
+    });
+
+    // Custom ping/pong if needed (Socket.io has built-in heartbeat)
+    this.socket.on('ping', () => {
+      this.socket?.emit('pong');
+    });
   }
 
   private scheduleReconnect(): void {
@@ -186,91 +182,86 @@ export class ElevatedIOT extends BaseService {
       return;
     }
 
-    this.reconnectAttempts++;
     const delay = Math.min(
-      this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
-      30000, // Max 30 seconds
+      this.reconnectDelay * Math.pow(2, this.reconnectAttempts),
+      30000,
     );
 
-    console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+    this.reconnectAttempts++;
+
+    console.log(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
 
     this.reconnectTimer = setTimeout(() => {
       this.connect();
     }, delay);
   }
 
-  private startPing(): void {
-    this.stopPing();
-
-    this.pingTimer = setInterval(() => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.send({ type: 'ping' });
-      }
-    }, 30000); // Ping every 30 seconds
-  }
-
-  private stopPing(): void {
-    if (this.pingTimer) {
-      clearInterval(this.pingTimer);
-      this.pingTimer = null;
-    }
-  }
-
   public send(data: any): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data));
+    if (this.socket && this.socket.connected) {
+      // For Socket.io, we emit events rather than sending raw data
+      if (data.type) {
+        this.socket.emit(data.type, data.data || data);
+      } else {
+        this.socket.emit('message', data);
+      }
+    } else {
+      console.warn('Cannot send data: Socket.io not connected');
     }
   }
 
   public sendMessage(type: string, data: any): void {
-    this.send({ type: 'message', data: { type, data } });
+    if (this.socket && this.socket.connected) {
+      this.socket.emit(type, data);
+    } else {
+      console.warn(`Cannot send ${type}: Socket.io not connected`);
+    }
   }
 
-  public disconnect(shouldReconnect = false): void {
-    this.shouldReconnect = shouldReconnect;
+  public disconnect(_shouldReconnect = false): void {
 
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
 
-    this.stopPing();
-
-    if (this.ws) {
-      // remove event handlers
-      this.ws.removeEventListener('open', this.handleOpenBound);
-      this.ws.removeEventListener('message', this.handleMessageBound);
-      this.ws.removeEventListener('close', this.handleCloseBound);
-      this.ws.removeEventListener('error', this.handleErrorBound);
-
-      this.ws.close();
-      this.ws = null;
+    if (this.socket) {
+      // Remove all listeners to prevent memory leaks
+      this.socket.removeAllListeners();
+      
+      // Disconnect from Socket.io server
+      this.socket.disconnect();
+      this.socket = null;
     }
 
     this.isConnected = false;
   }
 
   public reconnect(): void {
-    this.shouldReconnect = true;
     this.reconnectAttempts = 0;
     this.connect();
   }
 
-  public getStatus(): {
-    connected: boolean;
-    reconnectAttempts: number;
-    endpoint?: string;
-  } {
-    return {
-      connected: this.isConnected,
-      reconnectAttempts: this.reconnectAttempts,
-      endpoint: this.coreInfo?.iotEndpoint,
-    };
+  public getConnectionStatus(): boolean {
+    return this.isConnected && this.socket?.connected === true;
   }
 
-  // Clean up resources
+  public getSocketId(): string | undefined {
+    return this.socket?.id;
+  }
+
   public destroy(): void {
     this.disconnect(false);
+    this.onConnected.complete();
+    this.onDisconnect.complete();
+    this.onConfigurationRequired.complete();
+    this.onCommand.complete();
+    this.onFlightInfo.complete();
+    this.onRefresh.complete();
+    this.onPrint.complete();
+    this.onRestart.complete();
+    this.onEvent.complete();
+    this.onToast.complete();
+    this.onlineKiosks.complete();
   }
 }
 

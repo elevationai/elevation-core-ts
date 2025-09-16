@@ -51,7 +51,14 @@ try {
     bundle: true,
     platform: "neutral", // Works in both browser and Node.js
     treeShaking: true,
-    external: ["@std/testing"], // Don't bundle test dependencies
+    external: [
+      "@std/testing", // Don't bundle test dependencies
+      "socket.io-client", // Mark Socket.io client as external for Node.js usage
+      "@socket.io/component-emitter",
+      "xmlhttprequest-ssl",
+      "bufferutil",
+      "utf-8-validate"
+    ],
   };
 
   // Build ESM version
