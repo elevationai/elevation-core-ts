@@ -46,189 +46,189 @@ var ElevationCore = (() => {
   });
 
   // types/enums/event-code.ts
-  var EventCode = /* @__PURE__ */ ((EventCode3) => {
-    EventCode3[EventCode3["PNR_RETRIEVAL"] = 1] = "PNR_RETRIEVAL";
-    EventCode3[EventCode3["BAGTAG_PRINT"] = 2] = "BAGTAG_PRINT";
-    EventCode3[EventCode3["PAPER_LOW"] = 3] = "PAPER_LOW";
-    EventCode3[EventCode3["PAPER_OUT"] = 4] = "PAPER_OUT";
-    EventCode3[EventCode3["UPPER_DOOR_OPEN"] = 5] = "UPPER_DOOR_OPEN";
-    EventCode3[EventCode3["UPPER_DOOR_CLOSED"] = 6] = "UPPER_DOOR_CLOSED";
-    EventCode3[EventCode3["LOWER_DOOR_OPEN"] = 7] = "LOWER_DOOR_OPEN";
-    EventCode3[EventCode3["LOWER_DOOR_CLOSED"] = 8] = "LOWER_DOOR_CLOSED";
-    EventCode3[EventCode3["PASS_SCANNED"] = 9] = "PASS_SCANNED";
-    EventCode3[EventCode3["ONLINE"] = 10] = "ONLINE";
-    EventCode3[EventCode3["OFFLINE"] = 11] = "OFFLINE";
-    EventCode3[EventCode3["IN_SERVICE"] = 12] = "IN_SERVICE";
-    EventCode3[EventCode3["OUT_OF_SERVICE"] = 13] = "OUT_OF_SERVICE";
-    EventCode3[EventCode3["PAPER_JAM"] = 14] = "PAPER_JAM";
-    EventCode3[EventCode3["TOO_LATE_FOR_FLIGHT"] = 15] = "TOO_LATE_FOR_FLIGHT";
-    EventCode3[EventCode3["TOO_EARLY_FOR_FLIGHT"] = 16] = "TOO_EARLY_FOR_FLIGHT";
-    EventCode3[EventCode3["INCORRECT_LOCATION"] = 17] = "INCORRECT_LOCATION";
-    EventCode3[EventCode3["RESERVATION_NOT_FOUND"] = 18] = "RESERVATION_NOT_FOUND";
-    EventCode3[EventCode3["BOARDING_PASS_INVALID"] = 19] = "BOARDING_PASS_INVALID";
-    EventCode3[EventCode3["NOT_CHECKED_IN"] = 120] = "NOT_CHECKED_IN";
-    EventCode3[EventCode3["INELIGIBLE"] = 121] = "INELIGIBLE";
-    EventCode3[EventCode3["INTERNATIONAL"] = 122] = "INTERNATIONAL";
-    EventCode3[EventCode3["PREVIOUSLY_PRINTED"] = 123] = "PREVIOUSLY_PRINTED";
-    EventCode3[EventCode3["NO_BAGS"] = 64] = "NO_BAGS";
-    EventCode3[EventCode3["WRONG_AIRLINE"] = 65] = "WRONG_AIRLINE";
-    EventCode3[EventCode3["PRINTER_FAILURE"] = 66] = "PRINTER_FAILURE";
-    EventCode3[EventCode3["UNAUTHORIZED_CROSSING_ENTRANCE"] = 20] = "UNAUTHORIZED_CROSSING_ENTRANCE";
-    EventCode3[EventCode3["UNAUTHORIZED_CROSSING_EXIT"] = 21] = "UNAUTHORIZED_CROSSING_EXIT";
-    EventCode3[EventCode3["FRAUD_CRAWLING"] = 22] = "FRAUD_CRAWLING";
-    EventCode3[EventCode3["FRAUD_JUMP"] = 23] = "FRAUD_JUMP";
-    EventCode3[EventCode3["UNAUTHORIZED_STANDING_AT_ENTRANCE"] = 24] = "UNAUTHORIZED_STANDING_AT_ENTRANCE";
-    EventCode3[EventCode3["UNAUTHORIZED_STANDING_AT_EXIT"] = 25] = "UNAUTHORIZED_STANDING_AT_EXIT";
-    EventCode3[EventCode3["STOP_IN_GATE"] = 26] = "STOP_IN_GATE";
-    EventCode3[EventCode3["ONE_BOARD_ONE_LEFT_ENTRANCE"] = 27] = "ONE_BOARD_ONE_LEFT_ENTRANCE";
-    EventCode3[EventCode3["TWO_BOARDED"] = 28] = "TWO_BOARDED";
-    EventCode3[EventCode3["ONE_BOARDED_ONE_CROSSED"] = 29] = "ONE_BOARDED_ONE_CROSSED";
-    EventCode3[EventCode3["ONE_CROSSED_LEFT_ENTRANCE"] = 30] = "ONE_CROSSED_LEFT_ENTRANCE";
-    EventCode3[EventCode3["ONE_BOARDED_THEN_LEFT_VIA_ENTRANCE"] = 31] = "ONE_BOARDED_THEN_LEFT_VIA_ENTRANCE";
-    EventCode3[EventCode3["BOARDED_WITHOUT_AUTHORIZATION"] = 32] = "BOARDED_WITHOUT_AUTHORIZATION";
-    EventCode3[EventCode3["CROSSING_ENTRANCE_TIMEOUT"] = 33] = "CROSSING_ENTRANCE_TIMEOUT";
-    EventCode3[EventCode3["CROSSING_EXIT_TIMEOUT"] = 34] = "CROSSING_EXIT_TIMEOUT";
-    EventCode3[EventCode3["EXIT_NOT_CLEARED_TIMEOUT"] = 35] = "EXIT_NOT_CLEARED_TIMEOUT";
-    EventCode3[EventCode3["GATE_ENTRY_TIMEOUT"] = 36] = "GATE_ENTRY_TIMEOUT";
-    EventCode3[EventCode3["GATE_CROSSING_TIMEOUT"] = 37] = "GATE_CROSSING_TIMEOUT";
-    EventCode3[EventCode3["MANTRAP_VALIDATION_TIMEOUT"] = 38] = "MANTRAP_VALIDATION_TIMEOUT";
-    EventCode3[EventCode3["EXIT_AREA_CLEAR"] = 39] = "EXIT_AREA_CLEAR";
-    EventCode3[EventCode3["EXIT_AREA_OCCUPIED"] = 40] = "EXIT_AREA_OCCUPIED";
-    EventCode3[EventCode3["SELF_BOARDING_COMPLETE"] = 41] = "SELF_BOARDING_COMPLETE";
-    EventCode3[EventCode3["NO_PASS_FIRST_SENSOR"] = 42] = "NO_PASS_FIRST_SENSOR";
-    EventCode3[EventCode3["NO_PASS_LAST_SENSOR"] = 43] = "NO_PASS_LAST_SENSOR";
-    EventCode3[EventCode3["BOARDING_CANCELED"] = 44] = "BOARDING_CANCELED";
-    EventCode3[EventCode3["SENSOR_FAILURE"] = 45] = "SENSOR_FAILURE";
-    EventCode3[EventCode3["FLAPS_FAILURE"] = 46] = "FLAPS_FAILURE";
-    EventCode3[EventCode3["PAPER_RESTOCK"] = 47] = "PAPER_RESTOCK";
-    EventCode3[EventCode3["SESSION_TIME"] = 48] = "SESSION_TIME";
-    EventCode3[EventCode3["ALARM"] = 49] = "ALARM";
-    EventCode3[EventCode3["EXIT_BLOCKED"] = 50] = "EXIT_BLOCKED";
-    EventCode3[EventCode3["INCORRECT_GATE"] = 51] = "INCORRECT_GATE";
-    EventCode3[EventCode3["GATE_OPEN"] = 52] = "GATE_OPEN";
-    EventCode3[EventCode3["GATE_CLOSED"] = 53] = "GATE_CLOSED";
-    EventCode3[EventCode3["GATE_AUTHORIZED"] = 54] = "GATE_AUTHORIZED";
-    EventCode3[EventCode3["EMERGENCY"] = 55] = "EMERGENCY";
-    EventCode3[EventCode3["MAINTENANCE"] = 56] = "MAINTENANCE";
-    EventCode3[EventCode3["BOARDING_PASS_PREVIOUSLY_USED"] = 57] = "BOARDING_PASS_PREVIOUSLY_USED";
-    EventCode3[EventCode3["GATE_INOPERABLE"] = 58] = "GATE_INOPERABLE";
-    EventCode3[EventCode3["GATE_EMPLOYEE_AUTHORIZED"] = 59] = "GATE_EMPLOYEE_AUTHORIZED";
-    EventCode3[EventCode3["FREESTATE"] = 60] = "FREESTATE";
-    EventCode3[EventCode3["CONTROLSTATE"] = 61] = "CONTROLSTATE";
-    EventCode3[EventCode3["PRMMODE"] = 62] = "PRMMODE";
-    EventCode3[EventCode3["AIRLINE_PASS"] = 63] = "AIRLINE_PASS";
-    EventCode3[EventCode3["BOARDING_PASS_PRINT"] = 68] = "BOARDING_PASS_PRINT";
-    EventCode3[EventCode3["APPLICATION_AVAILABLE"] = 69] = "APPLICATION_AVAILABLE";
-    EventCode3[EventCode3["APPLICATION_UNAVAILABLE"] = 70] = "APPLICATION_UNAVAILABLE";
-    EventCode3[EventCode3["APPLICATION_ACTIVE"] = 71] = "APPLICATION_ACTIVE";
-    EventCode3[EventCode3["APPLICATION_STOP"] = 72] = "APPLICATION_STOP";
-    EventCode3[EventCode3["PASSPORT_SCANNED"] = 73] = "PASSPORT_SCANNED";
-    EventCode3[EventCode3["BAGTAG_PRINTER_ONLINE"] = 74] = "BAGTAG_PRINTER_ONLINE";
-    EventCode3[EventCode3["BAGTAG_PRINTER_OFFLINE"] = 75] = "BAGTAG_PRINTER_OFFLINE";
-    EventCode3[EventCode3["BARCODE_READER_ONLINE"] = 76] = "BARCODE_READER_ONLINE";
-    EventCode3[EventCode3["BARCODE_READER_OFFLINE"] = 77] = "BARCODE_READER_OFFLINE";
-    EventCode3[EventCode3["PASSPORT_READER_ONLINE"] = 78] = "PASSPORT_READER_ONLINE";
-    EventCode3[EventCode3["PASSPORT_READER_OFFLINE"] = 79] = "PASSPORT_READER_OFFLINE";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_ONLINE"] = 90] = "BOARDINGPASS_PRINTER_ONLINE";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_OFFLINE"] = 91] = "BOARDINGPASS_PRINTER_OFFLINE";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_PAPER_OUT"] = 92] = "BOARDINGPASS_PRINTER_PAPER_OUT";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_PAPER_LOW"] = 93] = "BOARDINGPASS_PRINTER_PAPER_LOW";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_PAPER_JAM"] = 94] = "BOARDINGPASS_PRINTER_PAPER_JAM";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_PAPER_RESTOCK"] = 95] = "BOARDINGPASS_PRINTER_PAPER_RESTOCK";
-    EventCode3[EventCode3["BOARDINGPASS_PRINTER_FAILURE"] = 96] = "BOARDINGPASS_PRINTER_FAILURE";
-    EventCode3[EventCode3["CONFIGURATION_REQUESTED"] = 103] = "CONFIGURATION_REQUESTED";
-    EventCode3[EventCode3["CONFIGURATION_COMPLETED"] = 110] = "CONFIGURATION_COMPLETED";
-    EventCode3[EventCode3["PASSENGER_CHECK_IN"] = 104] = "PASSENGER_CHECK_IN";
-    EventCode3[EventCode3["PASSENGER_CHECK_IN_FAILED"] = 105] = "PASSENGER_CHECK_IN_FAILED";
-    EventCode3[EventCode3["BAGTAG_PRINT_FAILURE"] = 106] = "BAGTAG_PRINT_FAILURE";
-    EventCode3[EventCode3["APPLICATION_ACTIVE_ACCESSIBLE"] = 108] = "APPLICATION_ACTIVE_ACCESSIBLE";
-    EventCode3[EventCode3["APPLICATION_INITIALIZE"] = 109] = "APPLICATION_INITIALIZE";
-    EventCode3[EventCode3["CARDREADER_ONLINE"] = 111] = "CARDREADER_ONLINE";
-    EventCode3[EventCode3["CARDREADER_OFFLINE"] = 112] = "CARDREADER_OFFLINE";
-    EventCode3[EventCode3["CARDREADER_FAILURE"] = 113] = "CARDREADER_FAILURE";
-    EventCode3[EventCode3["CARDREADER_READ"] = 114] = "CARDREADER_READ";
-    EventCode3[EventCode3["ANNOUNCEMENT_ONLINE"] = 115] = "ANNOUNCEMENT_ONLINE";
-    EventCode3[EventCode3["ANNOUNCEMENT_OFFLINE"] = 116] = "ANNOUNCEMENT_OFFLINE";
-    EventCode3[EventCode3["KEYPAD_ONLINE"] = 117] = "KEYPAD_ONLINE";
-    EventCode3[EventCode3["KEYPAD_OFFLINE"] = 118] = "KEYPAD_OFFLINE";
-    EventCode3[EventCode3["ILLUMINATION_ONLINE"] = 119] = "ILLUMINATION_ONLINE";
-    EventCode3[EventCode3["ILLUMINATION_OFFLINE"] = 124] = "ILLUMINATION_OFFLINE";
-    EventCode3[EventCode3["HEADSET_ONLINE"] = 125] = "HEADSET_ONLINE";
-    EventCode3[EventCode3["HEADSET_OFFLINE"] = 126] = "HEADSET_OFFLINE";
-    EventCode3[EventCode3["FEEDER_ONLINE"] = 127] = "FEEDER_ONLINE";
-    EventCode3[EventCode3["FEEDER_OFFLINE"] = 128] = "FEEDER_OFFLINE";
-    EventCode3[EventCode3["DISPENSER_ONLINE"] = 129] = "DISPENSER_ONLINE";
-    EventCode3[EventCode3["DISPENSER_OFFLINE"] = 130] = "DISPENSER_OFFLINE";
-    EventCode3[EventCode3["NO_DOCV"] = 131] = "NO_DOCV";
-    EventCode3[EventCode3["DOCS_VERIFIED_PRINTING_ALLOWED"] = 132] = "DOCS_VERIFIED_PRINTING_ALLOWED";
-    EventCode3[EventCode3["GROUP_BOOKING_NOT_SUPPORTED"] = 135] = "GROUP_BOOKING_NOT_SUPPORTED";
-    EventCode3[EventCode3["ERROR_GENERIC"] = 400] = "ERROR_GENERIC";
-    EventCode3[EventCode3["USER_LOGIN"] = 107] = "USER_LOGIN";
-    EventCode3[EventCode3["TEST_ENV"] = 215] = "TEST_ENV";
-    EventCode3[EventCode3["AGENT_LOGIN_ACTIVATION"] = 200] = "AGENT_LOGIN_ACTIVATION";
-    EventCode3[EventCode3["AGENT_LOGOUT_ACTIVATION"] = 201] = "AGENT_LOGOUT_ACTIVATION";
-    EventCode3[EventCode3["PAX_ACTIVATION_TIME"] = 202] = "PAX_ACTIVATION_TIME";
-    EventCode3[EventCode3["BAG_TAG_NOT_FOUND"] = 204] = "BAG_TAG_NOT_FOUND";
-    EventCode3[EventCode3["EXPIRED_DRIVERS_LICENSE"] = 205] = "EXPIRED_DRIVERS_LICENSE";
-    EventCode3[EventCode3["VALID_DRIVERS_LICENSE"] = 206] = "VALID_DRIVERS_LICENSE";
-    EventCode3[EventCode3["NOT_PART_OF_RESERVATION"] = 207] = "NOT_PART_OF_RESERVATION";
-    EventCode3[EventCode3["ID_MATCH_NOT_FOUND"] = 208] = "ID_MATCH_NOT_FOUND";
-    EventCode3[EventCode3["BAG_ALREADY_ACTIVATED"] = 209] = "BAG_ALREADY_ACTIVATED";
-    EventCode3[EventCode3["UNABLE_TO_ACTIVATE_BAG"] = 210] = "UNABLE_TO_ACTIVATE_BAG";
-    EventCode3[EventCode3["INVALID_BAGTAG"] = 216] = "INVALID_BAGTAG";
-    EventCode3[EventCode3["BOARDED"] = 211] = "BOARDED";
-    EventCode3[EventCode3["BEGIN_BOARDING_FAILED"] = 212] = "BEGIN_BOARDING_FAILED";
-    EventCode3[EventCode3["BOARDING_ENDED"] = 213] = "BOARDING_ENDED";
-    EventCode3[EventCode3["BOARDING_FAILED"] = 214] = "BOARDING_FAILED";
-    EventCode3[EventCode3["INVALID_BOARDING_PASS"] = 217] = "INVALID_BOARDING_PASS";
-    EventCode3[EventCode3["FLIGHT_SCANNED_MISMATCH"] = 218] = "FLIGHT_SCANNED_MISMATCH";
-    EventCode3[EventCode3["SCANNED_WITHOUT_STARTING"] = 219] = "SCANNED_WITHOUT_STARTING";
-    EventCode3[EventCode3["BOARDING_STARTED"] = 220] = "BOARDING_STARTED";
-    EventCode3[EventCode3["ZONING_ATTEMPT_FAILED"] = 221] = "ZONING_ATTEMPT_FAILED";
-    EventCode3[EventCode3["ZONING_CHNAGE"] = 222] = "ZONING_CHNAGE";
-    EventCode3[EventCode3["ZONING_TIME"] = 223] = "ZONING_TIME";
-    EventCode3[EventCode3["FLIGHT_ROOM_JOINED"] = 224] = "FLIGHT_ROOM_JOINED";
-    EventCode3[EventCode3["FLIGHT_ROOM_LEFT"] = 225] = "FLIGHT_ROOM_LEFT";
-    EventCode3[EventCode3["MANIFEST_SUCCESS"] = 226] = "MANIFEST_SUCCESS";
-    EventCode3[EventCode3["MANIFEST_ERROR"] = 227] = "MANIFEST_ERROR";
-    EventCode3[EventCode3["SOCKET_COMMAND"] = 228] = "SOCKET_COMMAND";
-    EventCode3[EventCode3["REQUEST_PROFILING"] = 203] = "REQUEST_PROFILING";
-    EventCode3[EventCode3["FAILED_TO_READ_BAG_TAG"] = 300] = "FAILED_TO_READ_BAG_TAG";
-    EventCode3[EventCode3["BAG_TAG_FOUND"] = 301] = "BAG_TAG_FOUND";
-    EventCode3[EventCode3["BAG_SETTLED"] = 302] = "BAG_SETTLED";
-    EventCode3[EventCode3["BAG_AT_ENTRY"] = 303] = "BAG_AT_ENTRY";
-    EventCode3[EventCode3["BAG_IN_HOLDING_AREA"] = 304] = "BAG_IN_HOLDING_AREA";
-    EventCode3[EventCode3["WAITING_ON_BHS"] = 305] = "WAITING_ON_BHS";
-    EventCode3[EventCode3["INTRUSION_DETECTED"] = 306] = "INTRUSION_DETECTED";
-    EventCode3[EventCode3["NO_BAG_DETECTED"] = 307] = "NO_BAG_DETECTED";
-    EventCode3[EventCode3["TRYING_TO_ACQUIRE_BAG_TAG"] = 308] = "TRYING_TO_ACQUIRE_BAG_TAG";
-    EventCode3[EventCode3["BAG_RELEASED"] = 309] = "BAG_RELEASED";
-    EventCode3[EventCode3["MOVE_TO_HOLDING_AREA"] = 310] = "MOVE_TO_HOLDING_AREA";
-    EventCode3[EventCode3["CANCEL_NEED_INTERVENTION"] = 311] = "CANCEL_NEED_INTERVENTION";
-    EventCode3[EventCode3["CANCEL_PASSENGER_CAN_FIX"] = 312] = "CANCEL_PASSENGER_CAN_FIX";
-    EventCode3[EventCode3["MULTIPLE_BAG_TAGS_ERROR"] = 313] = "MULTIPLE_BAG_TAGS_ERROR";
-    EventCode3[EventCode3["MULTIPLE_BAGS_ERROR"] = 314] = "MULTIPLE_BAGS_ERROR";
-    EventCode3[EventCode3["HOLDING_AREA_FULL"] = 315] = "HOLDING_AREA_FULL";
-    EventCode3[EventCode3["BAG_CANNOT_RELEASE"] = 316] = "BAG_CANNOT_RELEASE";
-    EventCode3[EventCode3["BAG_CANNOT_PROCESS"] = 317] = "BAG_CANNOT_PROCESS";
-    EventCode3[EventCode3["CONVEY_BELT_INOPERABLE"] = 318] = "CONVEY_BELT_INOPERABLE";
-    EventCode3[EventCode3["UNKNOWN_SBD_ERROR"] = 319] = "UNKNOWN_SBD_ERROR";
-    EventCode3[EventCode3["BAG_OVER_LENGTH"] = 320] = "BAG_OVER_LENGTH";
-    EventCode3[EventCode3["BAG_OVER_HEIGHT"] = 321] = "BAG_OVER_HEIGHT";
-    EventCode3[EventCode3["BAG_JAMMED_INSIDE"] = 322] = "BAG_JAMMED_INSIDE";
-    EventCode3[EventCode3["UNEXPECTED_BAG_IN_REAR"] = 323] = "UNEXPECTED_BAG_IN_REAR";
-    EventCode3[EventCode3["BAG_TOO_FLAT"] = 324] = "BAG_TOO_FLAT";
-    EventCode3[EventCode3["BAG_TOO_SHORT"] = 325] = "BAG_TOO_SHORT";
-    EventCode3[EventCode3["BAG_OVERWEIGHT"] = 326] = "BAG_OVERWEIGHT";
-    EventCode3[EventCode3["BAG_UNDERWEIGHT"] = 327] = "BAG_UNDERWEIGHT";
-    EventCode3[EventCode3["BAG_NOT_SETTLED"] = 328] = "BAG_NOT_SETTLED";
-    EventCode3[EventCode3["BAG_NOT_CONVEYABLE"] = 329] = "BAG_NOT_CONVEYABLE";
-    EventCode3[EventCode3["BHS_OFFLINE"] = 330] = "BHS_OFFLINE";
-    EventCode3[EventCode3["BHS_BUSY"] = 331] = "BHS_BUSY";
-    EventCode3[EventCode3["FRONT_BAG_BLOCKING_REAR_RETURN"] = 332] = "FRONT_BAG_BLOCKING_REAR_RETURN";
-    EventCode3[EventCode3["TECHNICAL_ERROR"] = 333] = "TECHNICAL_ERROR";
-    EventCode3[EventCode3["BAG_UNEXPECTEDLY_REMOVED"] = 334] = "BAG_UNEXPECTEDLY_REMOVED";
-    return EventCode3;
+  var EventCode = /* @__PURE__ */ ((EventCode2) => {
+    EventCode2[EventCode2["PNR_RETRIEVAL"] = 1] = "PNR_RETRIEVAL";
+    EventCode2[EventCode2["BAGTAG_PRINT"] = 2] = "BAGTAG_PRINT";
+    EventCode2[EventCode2["PAPER_LOW"] = 3] = "PAPER_LOW";
+    EventCode2[EventCode2["PAPER_OUT"] = 4] = "PAPER_OUT";
+    EventCode2[EventCode2["UPPER_DOOR_OPEN"] = 5] = "UPPER_DOOR_OPEN";
+    EventCode2[EventCode2["UPPER_DOOR_CLOSED"] = 6] = "UPPER_DOOR_CLOSED";
+    EventCode2[EventCode2["LOWER_DOOR_OPEN"] = 7] = "LOWER_DOOR_OPEN";
+    EventCode2[EventCode2["LOWER_DOOR_CLOSED"] = 8] = "LOWER_DOOR_CLOSED";
+    EventCode2[EventCode2["PASS_SCANNED"] = 9] = "PASS_SCANNED";
+    EventCode2[EventCode2["ONLINE"] = 10] = "ONLINE";
+    EventCode2[EventCode2["OFFLINE"] = 11] = "OFFLINE";
+    EventCode2[EventCode2["IN_SERVICE"] = 12] = "IN_SERVICE";
+    EventCode2[EventCode2["OUT_OF_SERVICE"] = 13] = "OUT_OF_SERVICE";
+    EventCode2[EventCode2["PAPER_JAM"] = 14] = "PAPER_JAM";
+    EventCode2[EventCode2["TOO_LATE_FOR_FLIGHT"] = 15] = "TOO_LATE_FOR_FLIGHT";
+    EventCode2[EventCode2["TOO_EARLY_FOR_FLIGHT"] = 16] = "TOO_EARLY_FOR_FLIGHT";
+    EventCode2[EventCode2["INCORRECT_LOCATION"] = 17] = "INCORRECT_LOCATION";
+    EventCode2[EventCode2["RESERVATION_NOT_FOUND"] = 18] = "RESERVATION_NOT_FOUND";
+    EventCode2[EventCode2["BOARDING_PASS_INVALID"] = 19] = "BOARDING_PASS_INVALID";
+    EventCode2[EventCode2["NOT_CHECKED_IN"] = 120] = "NOT_CHECKED_IN";
+    EventCode2[EventCode2["INELIGIBLE"] = 121] = "INELIGIBLE";
+    EventCode2[EventCode2["INTERNATIONAL"] = 122] = "INTERNATIONAL";
+    EventCode2[EventCode2["PREVIOUSLY_PRINTED"] = 123] = "PREVIOUSLY_PRINTED";
+    EventCode2[EventCode2["NO_BAGS"] = 64] = "NO_BAGS";
+    EventCode2[EventCode2["WRONG_AIRLINE"] = 65] = "WRONG_AIRLINE";
+    EventCode2[EventCode2["PRINTER_FAILURE"] = 66] = "PRINTER_FAILURE";
+    EventCode2[EventCode2["UNAUTHORIZED_CROSSING_ENTRANCE"] = 20] = "UNAUTHORIZED_CROSSING_ENTRANCE";
+    EventCode2[EventCode2["UNAUTHORIZED_CROSSING_EXIT"] = 21] = "UNAUTHORIZED_CROSSING_EXIT";
+    EventCode2[EventCode2["FRAUD_CRAWLING"] = 22] = "FRAUD_CRAWLING";
+    EventCode2[EventCode2["FRAUD_JUMP"] = 23] = "FRAUD_JUMP";
+    EventCode2[EventCode2["UNAUTHORIZED_STANDING_AT_ENTRANCE"] = 24] = "UNAUTHORIZED_STANDING_AT_ENTRANCE";
+    EventCode2[EventCode2["UNAUTHORIZED_STANDING_AT_EXIT"] = 25] = "UNAUTHORIZED_STANDING_AT_EXIT";
+    EventCode2[EventCode2["STOP_IN_GATE"] = 26] = "STOP_IN_GATE";
+    EventCode2[EventCode2["ONE_BOARD_ONE_LEFT_ENTRANCE"] = 27] = "ONE_BOARD_ONE_LEFT_ENTRANCE";
+    EventCode2[EventCode2["TWO_BOARDED"] = 28] = "TWO_BOARDED";
+    EventCode2[EventCode2["ONE_BOARDED_ONE_CROSSED"] = 29] = "ONE_BOARDED_ONE_CROSSED";
+    EventCode2[EventCode2["ONE_CROSSED_LEFT_ENTRANCE"] = 30] = "ONE_CROSSED_LEFT_ENTRANCE";
+    EventCode2[EventCode2["ONE_BOARDED_THEN_LEFT_VIA_ENTRANCE"] = 31] = "ONE_BOARDED_THEN_LEFT_VIA_ENTRANCE";
+    EventCode2[EventCode2["BOARDED_WITHOUT_AUTHORIZATION"] = 32] = "BOARDED_WITHOUT_AUTHORIZATION";
+    EventCode2[EventCode2["CROSSING_ENTRANCE_TIMEOUT"] = 33] = "CROSSING_ENTRANCE_TIMEOUT";
+    EventCode2[EventCode2["CROSSING_EXIT_TIMEOUT"] = 34] = "CROSSING_EXIT_TIMEOUT";
+    EventCode2[EventCode2["EXIT_NOT_CLEARED_TIMEOUT"] = 35] = "EXIT_NOT_CLEARED_TIMEOUT";
+    EventCode2[EventCode2["GATE_ENTRY_TIMEOUT"] = 36] = "GATE_ENTRY_TIMEOUT";
+    EventCode2[EventCode2["GATE_CROSSING_TIMEOUT"] = 37] = "GATE_CROSSING_TIMEOUT";
+    EventCode2[EventCode2["MANTRAP_VALIDATION_TIMEOUT"] = 38] = "MANTRAP_VALIDATION_TIMEOUT";
+    EventCode2[EventCode2["EXIT_AREA_CLEAR"] = 39] = "EXIT_AREA_CLEAR";
+    EventCode2[EventCode2["EXIT_AREA_OCCUPIED"] = 40] = "EXIT_AREA_OCCUPIED";
+    EventCode2[EventCode2["SELF_BOARDING_COMPLETE"] = 41] = "SELF_BOARDING_COMPLETE";
+    EventCode2[EventCode2["NO_PASS_FIRST_SENSOR"] = 42] = "NO_PASS_FIRST_SENSOR";
+    EventCode2[EventCode2["NO_PASS_LAST_SENSOR"] = 43] = "NO_PASS_LAST_SENSOR";
+    EventCode2[EventCode2["BOARDING_CANCELED"] = 44] = "BOARDING_CANCELED";
+    EventCode2[EventCode2["SENSOR_FAILURE"] = 45] = "SENSOR_FAILURE";
+    EventCode2[EventCode2["FLAPS_FAILURE"] = 46] = "FLAPS_FAILURE";
+    EventCode2[EventCode2["PAPER_RESTOCK"] = 47] = "PAPER_RESTOCK";
+    EventCode2[EventCode2["SESSION_TIME"] = 48] = "SESSION_TIME";
+    EventCode2[EventCode2["ALARM"] = 49] = "ALARM";
+    EventCode2[EventCode2["EXIT_BLOCKED"] = 50] = "EXIT_BLOCKED";
+    EventCode2[EventCode2["INCORRECT_GATE"] = 51] = "INCORRECT_GATE";
+    EventCode2[EventCode2["GATE_OPEN"] = 52] = "GATE_OPEN";
+    EventCode2[EventCode2["GATE_CLOSED"] = 53] = "GATE_CLOSED";
+    EventCode2[EventCode2["GATE_AUTHORIZED"] = 54] = "GATE_AUTHORIZED";
+    EventCode2[EventCode2["EMERGENCY"] = 55] = "EMERGENCY";
+    EventCode2[EventCode2["MAINTENANCE"] = 56] = "MAINTENANCE";
+    EventCode2[EventCode2["BOARDING_PASS_PREVIOUSLY_USED"] = 57] = "BOARDING_PASS_PREVIOUSLY_USED";
+    EventCode2[EventCode2["GATE_INOPERABLE"] = 58] = "GATE_INOPERABLE";
+    EventCode2[EventCode2["GATE_EMPLOYEE_AUTHORIZED"] = 59] = "GATE_EMPLOYEE_AUTHORIZED";
+    EventCode2[EventCode2["FREESTATE"] = 60] = "FREESTATE";
+    EventCode2[EventCode2["CONTROLSTATE"] = 61] = "CONTROLSTATE";
+    EventCode2[EventCode2["PRMMODE"] = 62] = "PRMMODE";
+    EventCode2[EventCode2["AIRLINE_PASS"] = 63] = "AIRLINE_PASS";
+    EventCode2[EventCode2["BOARDING_PASS_PRINT"] = 68] = "BOARDING_PASS_PRINT";
+    EventCode2[EventCode2["APPLICATION_AVAILABLE"] = 69] = "APPLICATION_AVAILABLE";
+    EventCode2[EventCode2["APPLICATION_UNAVAILABLE"] = 70] = "APPLICATION_UNAVAILABLE";
+    EventCode2[EventCode2["APPLICATION_ACTIVE"] = 71] = "APPLICATION_ACTIVE";
+    EventCode2[EventCode2["APPLICATION_STOP"] = 72] = "APPLICATION_STOP";
+    EventCode2[EventCode2["PASSPORT_SCANNED"] = 73] = "PASSPORT_SCANNED";
+    EventCode2[EventCode2["BAGTAG_PRINTER_ONLINE"] = 74] = "BAGTAG_PRINTER_ONLINE";
+    EventCode2[EventCode2["BAGTAG_PRINTER_OFFLINE"] = 75] = "BAGTAG_PRINTER_OFFLINE";
+    EventCode2[EventCode2["BARCODE_READER_ONLINE"] = 76] = "BARCODE_READER_ONLINE";
+    EventCode2[EventCode2["BARCODE_READER_OFFLINE"] = 77] = "BARCODE_READER_OFFLINE";
+    EventCode2[EventCode2["PASSPORT_READER_ONLINE"] = 78] = "PASSPORT_READER_ONLINE";
+    EventCode2[EventCode2["PASSPORT_READER_OFFLINE"] = 79] = "PASSPORT_READER_OFFLINE";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_ONLINE"] = 90] = "BOARDINGPASS_PRINTER_ONLINE";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_OFFLINE"] = 91] = "BOARDINGPASS_PRINTER_OFFLINE";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_PAPER_OUT"] = 92] = "BOARDINGPASS_PRINTER_PAPER_OUT";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_PAPER_LOW"] = 93] = "BOARDINGPASS_PRINTER_PAPER_LOW";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_PAPER_JAM"] = 94] = "BOARDINGPASS_PRINTER_PAPER_JAM";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_PAPER_RESTOCK"] = 95] = "BOARDINGPASS_PRINTER_PAPER_RESTOCK";
+    EventCode2[EventCode2["BOARDINGPASS_PRINTER_FAILURE"] = 96] = "BOARDINGPASS_PRINTER_FAILURE";
+    EventCode2[EventCode2["CONFIGURATION_REQUESTED"] = 103] = "CONFIGURATION_REQUESTED";
+    EventCode2[EventCode2["CONFIGURATION_COMPLETED"] = 110] = "CONFIGURATION_COMPLETED";
+    EventCode2[EventCode2["PASSENGER_CHECK_IN"] = 104] = "PASSENGER_CHECK_IN";
+    EventCode2[EventCode2["PASSENGER_CHECK_IN_FAILED"] = 105] = "PASSENGER_CHECK_IN_FAILED";
+    EventCode2[EventCode2["BAGTAG_PRINT_FAILURE"] = 106] = "BAGTAG_PRINT_FAILURE";
+    EventCode2[EventCode2["APPLICATION_ACTIVE_ACCESSIBLE"] = 108] = "APPLICATION_ACTIVE_ACCESSIBLE";
+    EventCode2[EventCode2["APPLICATION_INITIALIZE"] = 109] = "APPLICATION_INITIALIZE";
+    EventCode2[EventCode2["CARDREADER_ONLINE"] = 111] = "CARDREADER_ONLINE";
+    EventCode2[EventCode2["CARDREADER_OFFLINE"] = 112] = "CARDREADER_OFFLINE";
+    EventCode2[EventCode2["CARDREADER_FAILURE"] = 113] = "CARDREADER_FAILURE";
+    EventCode2[EventCode2["CARDREADER_READ"] = 114] = "CARDREADER_READ";
+    EventCode2[EventCode2["ANNOUNCEMENT_ONLINE"] = 115] = "ANNOUNCEMENT_ONLINE";
+    EventCode2[EventCode2["ANNOUNCEMENT_OFFLINE"] = 116] = "ANNOUNCEMENT_OFFLINE";
+    EventCode2[EventCode2["KEYPAD_ONLINE"] = 117] = "KEYPAD_ONLINE";
+    EventCode2[EventCode2["KEYPAD_OFFLINE"] = 118] = "KEYPAD_OFFLINE";
+    EventCode2[EventCode2["ILLUMINATION_ONLINE"] = 119] = "ILLUMINATION_ONLINE";
+    EventCode2[EventCode2["ILLUMINATION_OFFLINE"] = 124] = "ILLUMINATION_OFFLINE";
+    EventCode2[EventCode2["HEADSET_ONLINE"] = 125] = "HEADSET_ONLINE";
+    EventCode2[EventCode2["HEADSET_OFFLINE"] = 126] = "HEADSET_OFFLINE";
+    EventCode2[EventCode2["FEEDER_ONLINE"] = 127] = "FEEDER_ONLINE";
+    EventCode2[EventCode2["FEEDER_OFFLINE"] = 128] = "FEEDER_OFFLINE";
+    EventCode2[EventCode2["DISPENSER_ONLINE"] = 129] = "DISPENSER_ONLINE";
+    EventCode2[EventCode2["DISPENSER_OFFLINE"] = 130] = "DISPENSER_OFFLINE";
+    EventCode2[EventCode2["NO_DOCV"] = 131] = "NO_DOCV";
+    EventCode2[EventCode2["DOCS_VERIFIED_PRINTING_ALLOWED"] = 132] = "DOCS_VERIFIED_PRINTING_ALLOWED";
+    EventCode2[EventCode2["GROUP_BOOKING_NOT_SUPPORTED"] = 135] = "GROUP_BOOKING_NOT_SUPPORTED";
+    EventCode2[EventCode2["ERROR_GENERIC"] = 400] = "ERROR_GENERIC";
+    EventCode2[EventCode2["USER_LOGIN"] = 107] = "USER_LOGIN";
+    EventCode2[EventCode2["TEST_ENV"] = 215] = "TEST_ENV";
+    EventCode2[EventCode2["AGENT_LOGIN_ACTIVATION"] = 200] = "AGENT_LOGIN_ACTIVATION";
+    EventCode2[EventCode2["AGENT_LOGOUT_ACTIVATION"] = 201] = "AGENT_LOGOUT_ACTIVATION";
+    EventCode2[EventCode2["PAX_ACTIVATION_TIME"] = 202] = "PAX_ACTIVATION_TIME";
+    EventCode2[EventCode2["BAG_TAG_NOT_FOUND"] = 204] = "BAG_TAG_NOT_FOUND";
+    EventCode2[EventCode2["EXPIRED_DRIVERS_LICENSE"] = 205] = "EXPIRED_DRIVERS_LICENSE";
+    EventCode2[EventCode2["VALID_DRIVERS_LICENSE"] = 206] = "VALID_DRIVERS_LICENSE";
+    EventCode2[EventCode2["NOT_PART_OF_RESERVATION"] = 207] = "NOT_PART_OF_RESERVATION";
+    EventCode2[EventCode2["ID_MATCH_NOT_FOUND"] = 208] = "ID_MATCH_NOT_FOUND";
+    EventCode2[EventCode2["BAG_ALREADY_ACTIVATED"] = 209] = "BAG_ALREADY_ACTIVATED";
+    EventCode2[EventCode2["UNABLE_TO_ACTIVATE_BAG"] = 210] = "UNABLE_TO_ACTIVATE_BAG";
+    EventCode2[EventCode2["INVALID_BAGTAG"] = 216] = "INVALID_BAGTAG";
+    EventCode2[EventCode2["BOARDED"] = 211] = "BOARDED";
+    EventCode2[EventCode2["BEGIN_BOARDING_FAILED"] = 212] = "BEGIN_BOARDING_FAILED";
+    EventCode2[EventCode2["BOARDING_ENDED"] = 213] = "BOARDING_ENDED";
+    EventCode2[EventCode2["BOARDING_FAILED"] = 214] = "BOARDING_FAILED";
+    EventCode2[EventCode2["INVALID_BOARDING_PASS"] = 217] = "INVALID_BOARDING_PASS";
+    EventCode2[EventCode2["FLIGHT_SCANNED_MISMATCH"] = 218] = "FLIGHT_SCANNED_MISMATCH";
+    EventCode2[EventCode2["SCANNED_WITHOUT_STARTING"] = 219] = "SCANNED_WITHOUT_STARTING";
+    EventCode2[EventCode2["BOARDING_STARTED"] = 220] = "BOARDING_STARTED";
+    EventCode2[EventCode2["ZONING_ATTEMPT_FAILED"] = 221] = "ZONING_ATTEMPT_FAILED";
+    EventCode2[EventCode2["ZONING_CHNAGE"] = 222] = "ZONING_CHNAGE";
+    EventCode2[EventCode2["ZONING_TIME"] = 223] = "ZONING_TIME";
+    EventCode2[EventCode2["FLIGHT_ROOM_JOINED"] = 224] = "FLIGHT_ROOM_JOINED";
+    EventCode2[EventCode2["FLIGHT_ROOM_LEFT"] = 225] = "FLIGHT_ROOM_LEFT";
+    EventCode2[EventCode2["MANIFEST_SUCCESS"] = 226] = "MANIFEST_SUCCESS";
+    EventCode2[EventCode2["MANIFEST_ERROR"] = 227] = "MANIFEST_ERROR";
+    EventCode2[EventCode2["SOCKET_COMMAND"] = 228] = "SOCKET_COMMAND";
+    EventCode2[EventCode2["REQUEST_PROFILING"] = 203] = "REQUEST_PROFILING";
+    EventCode2[EventCode2["FAILED_TO_READ_BAG_TAG"] = 300] = "FAILED_TO_READ_BAG_TAG";
+    EventCode2[EventCode2["BAG_TAG_FOUND"] = 301] = "BAG_TAG_FOUND";
+    EventCode2[EventCode2["BAG_SETTLED"] = 302] = "BAG_SETTLED";
+    EventCode2[EventCode2["BAG_AT_ENTRY"] = 303] = "BAG_AT_ENTRY";
+    EventCode2[EventCode2["BAG_IN_HOLDING_AREA"] = 304] = "BAG_IN_HOLDING_AREA";
+    EventCode2[EventCode2["WAITING_ON_BHS"] = 305] = "WAITING_ON_BHS";
+    EventCode2[EventCode2["INTRUSION_DETECTED"] = 306] = "INTRUSION_DETECTED";
+    EventCode2[EventCode2["NO_BAG_DETECTED"] = 307] = "NO_BAG_DETECTED";
+    EventCode2[EventCode2["TRYING_TO_ACQUIRE_BAG_TAG"] = 308] = "TRYING_TO_ACQUIRE_BAG_TAG";
+    EventCode2[EventCode2["BAG_RELEASED"] = 309] = "BAG_RELEASED";
+    EventCode2[EventCode2["MOVE_TO_HOLDING_AREA"] = 310] = "MOVE_TO_HOLDING_AREA";
+    EventCode2[EventCode2["CANCEL_NEED_INTERVENTION"] = 311] = "CANCEL_NEED_INTERVENTION";
+    EventCode2[EventCode2["CANCEL_PASSENGER_CAN_FIX"] = 312] = "CANCEL_PASSENGER_CAN_FIX";
+    EventCode2[EventCode2["MULTIPLE_BAG_TAGS_ERROR"] = 313] = "MULTIPLE_BAG_TAGS_ERROR";
+    EventCode2[EventCode2["MULTIPLE_BAGS_ERROR"] = 314] = "MULTIPLE_BAGS_ERROR";
+    EventCode2[EventCode2["HOLDING_AREA_FULL"] = 315] = "HOLDING_AREA_FULL";
+    EventCode2[EventCode2["BAG_CANNOT_RELEASE"] = 316] = "BAG_CANNOT_RELEASE";
+    EventCode2[EventCode2["BAG_CANNOT_PROCESS"] = 317] = "BAG_CANNOT_PROCESS";
+    EventCode2[EventCode2["CONVEY_BELT_INOPERABLE"] = 318] = "CONVEY_BELT_INOPERABLE";
+    EventCode2[EventCode2["UNKNOWN_SBD_ERROR"] = 319] = "UNKNOWN_SBD_ERROR";
+    EventCode2[EventCode2["BAG_OVER_LENGTH"] = 320] = "BAG_OVER_LENGTH";
+    EventCode2[EventCode2["BAG_OVER_HEIGHT"] = 321] = "BAG_OVER_HEIGHT";
+    EventCode2[EventCode2["BAG_JAMMED_INSIDE"] = 322] = "BAG_JAMMED_INSIDE";
+    EventCode2[EventCode2["UNEXPECTED_BAG_IN_REAR"] = 323] = "UNEXPECTED_BAG_IN_REAR";
+    EventCode2[EventCode2["BAG_TOO_FLAT"] = 324] = "BAG_TOO_FLAT";
+    EventCode2[EventCode2["BAG_TOO_SHORT"] = 325] = "BAG_TOO_SHORT";
+    EventCode2[EventCode2["BAG_OVERWEIGHT"] = 326] = "BAG_OVERWEIGHT";
+    EventCode2[EventCode2["BAG_UNDERWEIGHT"] = 327] = "BAG_UNDERWEIGHT";
+    EventCode2[EventCode2["BAG_NOT_SETTLED"] = 328] = "BAG_NOT_SETTLED";
+    EventCode2[EventCode2["BAG_NOT_CONVEYABLE"] = 329] = "BAG_NOT_CONVEYABLE";
+    EventCode2[EventCode2["BHS_OFFLINE"] = 330] = "BHS_OFFLINE";
+    EventCode2[EventCode2["BHS_BUSY"] = 331] = "BHS_BUSY";
+    EventCode2[EventCode2["FRONT_BAG_BLOCKING_REAR_RETURN"] = 332] = "FRONT_BAG_BLOCKING_REAR_RETURN";
+    EventCode2[EventCode2["TECHNICAL_ERROR"] = 333] = "TECHNICAL_ERROR";
+    EventCode2[EventCode2["BAG_UNEXPECTEDLY_REMOVED"] = 334] = "BAG_UNEXPECTEDLY_REMOVED";
+    return EventCode2;
   })(EventCode || {});
 
   // types/enums/event-mode.ts
@@ -450,31 +450,31 @@ var ElevationCore = (() => {
         };
       }
     }
-    async post(path, data) {
+    post(path, data) {
       return this.makeRequest(path, {
         method: "POST",
         body: JSON.stringify(data)
       });
     }
-    async patch(path, data) {
+    patch(path, data) {
       return this.makeRequest(path, {
         method: "PATCH",
         body: JSON.stringify(data)
       });
     }
-    async get(path, headers) {
+    get(path, headers) {
       return this.makeRequest(path, {
         method: "GET",
         headers
       });
     }
-    async put(path, data) {
+    put(path, data) {
       return this.makeRequest(path, {
         method: "PUT",
         body: JSON.stringify(data)
       });
     }
-    async delete(path) {
+    delete(path) {
       return this.makeRequest(path, {
         method: "DELETE"
       });
@@ -538,10 +538,12 @@ var ElevationCore = (() => {
         const metaData = {};
         if (fullEventData.eventCode)
           metaData.eventCode = fullEventData.eventCode;
-        if (fullEventData.eventData && fullEventData.eventData.airline)
+        if (fullEventData.eventData && fullEventData.eventData.airline) {
           metaData.airline = fullEventData.eventData.airline;
-        if (fullEventData.eventData && fullEventData.eventData.countryCode)
+        }
+        if (fullEventData.eventData && fullEventData.eventData.countryCode) {
           metaData.countryCode = fullEventData.eventData.countryCode;
+        }
         if (fullEventData.ownerID)
           metaData.ownerID = fullEventData.ownerID;
         if (kiosk) {
@@ -569,43 +571,43 @@ var ElevationCore = (() => {
       }
     }
     // Helper methods for different status codes
-    async success(eventData) {
+    success(eventData) {
       return this.send({
         ...eventData,
         statusCode: 200 /* SUCCESS */
       });
     }
-    async failure(eventData) {
+    failure(eventData) {
       return this.send({
         ...eventData,
         statusCode: 400 /* FAILURE */
       });
     }
-    async error(eventData) {
+    error(eventData) {
       return this.send({
         ...eventData,
         statusCode: 400 /* FAILURE */
       });
     }
-    async critical(eventData) {
+    critical(eventData) {
       return this.send({
         ...eventData,
         statusCode: 500 /* CRITICAL_FAILURE */
       });
     }
-    async infraction(eventData) {
+    infraction(eventData) {
       return this.send({
         ...eventData,
         statusCode: 501 /* INFRACTION */
       });
     }
-    async timeout(eventData) {
+    timeout(eventData) {
       return this.send({
         ...eventData,
         statusCode: 502 /* TIMEOUT */
       });
     }
-    async modeChange(eventData) {
+    modeChange(eventData) {
       return this.send({
         ...eventData,
         statusCode: 300 /* MODE_CHANGE */
@@ -717,25 +719,25 @@ var ElevationCore = (() => {
       }
     }
     // Helper methods for different log levels
-    async information(logData) {
+    information(logData) {
       return this.message({
         ...logData,
         level: "INFO" /* INFO */
       });
     }
-    async delayed(logData) {
+    delayed(logData) {
       return this.message({
         ...logData,
         level: "DELAYED" /* DELAYED */
       });
     }
-    async error(logData) {
+    error(logData) {
       return this.message({
         ...logData,
         level: "ERROR" /* ERROR */
       });
     }
-    async critical(logData) {
+    critical(logData) {
       return this.message({
         ...logData,
         level: "CRITICAL" /* CRITICAL */
@@ -1486,18 +1488,18 @@ var ElevationCore = (() => {
 
   // ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/rxjs@7.8.2/node_modules/rxjs/dist/esm5/internal/Observable.js
   var Observable = function() {
-    function Observable3(subscribe) {
+    function Observable2(subscribe) {
       if (subscribe) {
         this._subscribe = subscribe;
       }
     }
-    Observable3.prototype.lift = function(operator) {
-      var observable2 = new Observable3();
+    Observable2.prototype.lift = function(operator) {
+      var observable2 = new Observable2();
       observable2.source = this;
       observable2.operator = operator;
       return observable2;
     };
-    Observable3.prototype.subscribe = function(observerOrNext, error, complete) {
+    Observable2.prototype.subscribe = function(observerOrNext, error, complete) {
       var _this = this;
       var subscriber = isSubscriber(observerOrNext) ? observerOrNext : new SafeSubscriber(observerOrNext, error, complete);
       errorContext(function() {
@@ -1506,14 +1508,14 @@ var ElevationCore = (() => {
       });
       return subscriber;
     };
-    Observable3.prototype._trySubscribe = function(sink) {
+    Observable2.prototype._trySubscribe = function(sink) {
       try {
         return this._subscribe(sink);
       } catch (err) {
         sink.error(err);
       }
     };
-    Observable3.prototype.forEach = function(next, promiseCtor) {
+    Observable2.prototype.forEach = function(next, promiseCtor) {
       var _this = this;
       promiseCtor = getPromiseCtor(promiseCtor);
       return new promiseCtor(function(resolve, reject) {
@@ -1532,21 +1534,21 @@ var ElevationCore = (() => {
         _this.subscribe(subscriber);
       });
     };
-    Observable3.prototype._subscribe = function(subscriber) {
+    Observable2.prototype._subscribe = function(subscriber) {
       var _a;
       return (_a = this.source) === null || _a === void 0 ? void 0 : _a.subscribe(subscriber);
     };
-    Observable3.prototype[observable] = function() {
+    Observable2.prototype[observable] = function() {
       return this;
     };
-    Observable3.prototype.pipe = function() {
+    Observable2.prototype.pipe = function() {
       var operations = [];
       for (var _i = 0; _i < arguments.length; _i++) {
         operations[_i] = arguments[_i];
       }
       return pipeFromArray(operations)(this);
     };
-    Observable3.prototype.toPromise = function(promiseCtor) {
+    Observable2.prototype.toPromise = function(promiseCtor) {
       var _this = this;
       promiseCtor = getPromiseCtor(promiseCtor);
       return new promiseCtor(function(resolve, reject) {
@@ -1560,10 +1562,10 @@ var ElevationCore = (() => {
         });
       });
     };
-    Observable3.create = function(subscribe) {
-      return new Observable3(subscribe);
+    Observable2.create = function(subscribe) {
+      return new Observable2(subscribe);
     };
-    return Observable3;
+    return Observable2;
   }();
   function getPromiseCtor(promiseCtor) {
     var _a;
@@ -2429,8 +2431,8 @@ var ElevationCore = (() => {
     onRestart = new Subject();
     onNavigate = new Subject();
     ws = null;
-    reconnectTimer = null;
-    pingTimer = null;
+    reconnectTimer;
+    pingTimer;
     reconnectAttempts = 0;
     maxReconnectAttempts = 10;
     reconnectDelay = 1e3;
@@ -2748,17 +2750,19 @@ var ElevationCore = (() => {
         throw new Error("ElevatedConfigurationsInfo not set. Call setConfigInfo() first");
       }
     }
-    async getConfig(label) {
+    getConfig(label) {
       this.checkConfiguration();
       this.checkConfigInfo();
-      return this.get(`${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`).then((res) => {
+      return this.get(
+        `${this.coreInfo?.serviceEndpoint}/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`
+      ).then((res) => {
         return res.data || null;
       }).catch((err) => {
         console.error("Error fetching configuration:", err);
         return null;
       });
     }
-    async getConfigs(labels) {
+    getConfigs(labels) {
       return Promise.all(labels.map((label) => this.getConfig(label)));
     }
   };
@@ -2935,7 +2939,7 @@ var ElevationCore = (() => {
      * Get complete TouchPoint information
      * @returns TouchPoint information or null if not found
      */
-    async getInfo() {
+    getInfo() {
       return this.getDeviceByFingerPrint();
     }
     /**
