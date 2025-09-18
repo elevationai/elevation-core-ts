@@ -32,6 +32,7 @@ export class ElevatedConfigurations extends BaseService {
 
     return this.get<ConfigValue>(
       `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
+      { 'Cache-Control': 'no-cache' },
     )
       .then((res) => {
         return res.data || null;

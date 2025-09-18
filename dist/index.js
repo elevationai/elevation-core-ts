@@ -350,7 +350,8 @@ var BaseService = class {
     if (!this.coreInfo)
       return;
     this.headers = new Headers({
-      "Elevated-Auth": btoa(this.coreInfo.token)
+      "Elevated-Auth": btoa(this.coreInfo.token),
+      "Content-Type": "application/json"
     });
   }
   checkConfiguration() {
@@ -2724,7 +2725,8 @@ var ElevatedConfigurations = class extends BaseService {
     this.checkConfiguration();
     this.checkConfigInfo();
     return this.get(
-      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`
+      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
+      { "Cache-Control": "no-cache" }
     ).then((res) => {
       return res.data || null;
     }).catch((err) => {

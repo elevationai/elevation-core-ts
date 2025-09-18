@@ -30,6 +30,7 @@ export abstract class BaseService {
 
     this.headers = new Headers({
       'Elevated-Auth': btoa(this.coreInfo.token),
+      'Content-Type': 'application/json',
     });
   }
 
