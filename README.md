@@ -1,12 +1,13 @@
-# Elevation Lib Core
+# Elevation Core
 
 <div align="center">
   <h3>🚀 Comprehensive TypeScript SDK for Elevated Platform Services</h3>
   <p>Real-time reporting, bidirectional communication, and remote logging for touchpoint devices</p>
   
-  [![npm version](https://img.shields.io/npm/v/@elevationai/elevation-core-ts.svg)](https://www.npmjs.com/package/@elevationai/elevation-core-ts)
+  [![npm version](https://img.shields.io/npm/v/@eai/elevation-core-ts.svg)](https://www.npmjs.com/package/@eai/elevation-core-ts)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-  [![License](https://img.shields.io/npm/l/@elevationai/elevation-core-ts.svg)](LICENSE)
+  [![Deno](https://img.shields.io/badge/Deno-1.40+-green)](https://deno.com/)
+  [![License](https://img.shields.io/npm/l/@eai/elevation-core-ts.svg)](LICENSE)
 </div>
 
 ---
@@ -15,8 +16,9 @@
 
 - [Overview](#overview)
 - [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
+- [Installation & Quick Start](#installation--quick-start)
+  - [Node.js/NPM](#nodejs--npm)
+  - [Deno](#deno)
 - [Core Modules](#core-modules)
   - [Logging](#logging)
   - [Events](#events)
@@ -25,12 +27,14 @@
   - [Configuration Management](#configuration-management)
 - [API Documentation](#api-documentation)
 - [Examples](#examples)
-- [Change Log](#change-log)
+- [Development](#development)
 - [Support](#support)
 
 ## Overview
 
-The **Elevation Lib Core** library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. In order to interact with the library, developers must acquire an organization token and a service endpoint. For more information, please contact Elevation Software at [blndspt.com](https://www.blndspt.com/reach-out/).
+The **Elevation Core** library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. Available for both **Node.js/NPM** and **Deno** environments.
+
+To interact with the library, developers must acquire an organization token and service endpoint. For more information, please contact Elevation Software at info@elevationsoftware.com.
 
 🏢 **Admin Dashboard Interface**
 
@@ -41,30 +45,96 @@ The **Elevation Lib Core** library provides comprehensive access to all Elevated
 - **📝 Centralized Logging**: Remote log aggregation with multiple severity levels
 - **🔐 Device Enrollment**: Secure device registration and authentication
 - **⚙️ Configuration Management**: Dynamic configuration updates with location/device overrides
-- **🎯 Debouncing**: Built-in event and log debouncing to prevent flooding
+- **🎯 Smart Debouncing**: Built-in event and log debouncing to prevent flooding
+- **🔄 Auto-retry Logic**: Automatic retry for failed requests
+- **💾 Intelligent Caching**: In-memory caching for configuration values
 
 ## Features
 
-Within the core library exists 5 different sub-libraries created to provide access and assist with the communication of the core Elevated Platform Services (EPS):
+The core library consists of 5 different modules providing comprehensive access to the Elevated Platform Services (EPS):
 
 - **[Logging](#logging)** - Centralized log aggregation and monitoring
-- **[Events](#events)** - Event tracking and analytics
+- **[Events](#events)** - Event tracking and analytics  
 - **[IOT](#iot)** - Real-time bidirectional communication
 - **[Device Enrollment](#device-enrollment)** - Device registration and configuration
 - **[Configuration Management](#configuration-management)** - Dynamic configuration with overrides
 
-## Installation
+## Installation & Quick Start
 
-In order to install the @elevationai/elevation-core-ts you are going to need npm access. If you have all the required configuration files, just run the installation command from the working directory.
+### Node.js / NPM
 
-### NPM
+#### Installation
 ```bash
-npm install @elevationai/elevation-core-ts
+# NPM
+npm i @jsr/eai__elevation-core-ts
 ```
 
-### Yarn
+#### Quick Start
+```typescript
+import { elogs, events, CoreInfo } from '@jsr/eai__elevation-core-ts';
+
+const coreInfo: CoreInfo = {
+    token: '<Tenant_Access_Token>',
+    serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com'
+};
+
+// Configure services
+elogs.config(coreInfo);
+events.config(coreInfo);
+
+// Send a log
+await elogs.information({ message: 'Application started' });
+
+// Send an event
+await events.success({ eventCode: EventCode.APP_START });
+```
+
+### Deno
+
+#### Quick Start
+```typescript
+import {
+  events,
+  elogs,
+  iot,
+  CoreInfo,
+  EventCode,
+  LogLevel
+} from './index.ts'; // Local development
+
+const coreInfo: CoreInfo = {
+  token: 'your-token',
+  serviceEndpoint: 'https://api-endpoint',
+  fingerPrint: 'device-id'
+};
+
+// Configure services
+events.config(coreInfo);
+elogs.config(coreInfo);
+
+// Send an event
+await events.success({
+  eventCode: EventCode.APP_START,
+  eventData: { version: '1.0.0' }
+});
+
+// Send a log
+await elogs.information({
+  message: 'Application started'
+});
+```
+
+#### Deno Development Tasks
 ```bash
-yarn add @elevationai/elevation-core-ts
+# Type check
+deno task check
+
+# Run example
+deno task example
+
+# Format & lint
+deno task fmt
+deno task lint
 ```
 
 ## Core Communication
@@ -84,7 +154,7 @@ interface CoreInfo {
 ### Defining CoreInfo in code
 
 ```typescript
-import { CoreInfo } from '@elevationai/elevation-core-ts';
+import { CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -119,7 +189,7 @@ In order to start interacting with the library, you first need to configure the 
 The singleton instance is the most common way a developer will interact with the library.
 
 ```typescript
-import { elogs, CoreInfo } from '@elevationai/elevation-core-ts';
+import { elogs, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -135,7 +205,7 @@ elogs.config(coreInfo);
 In rare occasions, a developer could have multiple services endpoints and they will want the facility to simultaneously send logs to all available environments. For that particular case, you can instantiate multiple instances of the log library.
 
 ```typescript
-import { ElevatedLogs, CoreInfo } from '@elevationai/elevation-core-ts';
+import { ElevatedLogs, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo1: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -174,7 +244,7 @@ export interface LogData {
 Now in order to send logs, you just use the message function.
 
 ```typescript
-import { elogs, CoreInfo, LogLevel } from '@elevationai/elevation-core-ts';
+import { elogs, CoreInfo, LogLevel } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -213,7 +283,7 @@ export enum LogLevel {
 In order to improve productivity during the development process, you can set the value of properties that don't change often when you are sending log messages to EPS. For that particular case, you can make use of the setDefaults function. This function allows you to avoid setting values every time you need to send a log message.
 
 ```typescript
-import { elogs, CoreInfo, LogLevel, LogOptions } from '@elevationai/elevation-core-ts';
+import { elogs, CoreInfo, LogLevel, LogOptions } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -263,7 +333,7 @@ elogs.critical({ message: 'Unable to connect to db' });
 In many occasions a particular situation would trigger the firing of a vast amount of logs to the EPS, making the process of searching a specific issue much more difficult. That is why you have the ability to define a debounce value in milliseconds. By setting a debounce value, you will prevent the logs library from sending multiple log messages within the constraint of the debounce time chosen.
 
 ```typescript
-import { elogs, CoreInfo, LogLevel, LogOptions } from '@elevationai/elevation-core-ts';
+import { elogs, CoreInfo, LogLevel, LogOptions } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -318,7 +388,7 @@ In order to start interacting with the library, you first need to configure the 
 The singleton instance is the most common way a developer will interact with the library.
 
 ```typescript
-import { events, CoreInfo } from '@elevationai/elevation-core-ts';
+import { events, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -334,7 +404,7 @@ events.config(coreInfo);
 In rare occasions, a developer could have multiple services endpoints and they will want the facility to simultaneously send events to all available environments. For that particular case, you can instantiate multiple instances of the event library.
 
 ```typescript
-import { ElevatedEvents, CoreInfo } from '@elevationai/elevation-core-ts';
+import { ElevatedEvents, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo1: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -379,7 +449,7 @@ import {
     EventType,
     EventMode,
     StatusCode
-} from '@elevationai/elevation-core-ts';
+} from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -424,7 +494,7 @@ There are many situations when developers want to streamline the consumption of 
 Most of the time the values that rarely change are eventMode, eventType, and ownerID.
 
 ```typescript 
-import { EventOptions, CoreInfo, events, EventType, EventMode } from '@elevationai/elevation-core-ts';
+import { EventOptions, CoreInfo, events, EventType, EventMode } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -474,7 +544,7 @@ events.timeout({ eventCode: EventCode.RESERVATION_NOT_FOUND });
 In many occasions a particular situation would trigger the firing of a vast amount of events to the EPS, making the process of reporting much more difficult and in some cases inaccurate. That is why you have the ability to define a debounce value in milliseconds on a per eventCode basis. By setting a debounce value, you will prevent the event library from sending multiple events of the specified event-code within the constraint of the debounce time chosen.
 
 ```typescript 
-import { EventOptions, CoreInfo, events, EventType, EventMode, EventCode } from '@elevationai/elevation-core-ts';
+import { EventOptions, CoreInfo, events, EventType, EventMode, EventCode } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -544,7 +614,7 @@ In order to associate events and logs to specific devices anywhere in the world,
 There is a helper function in the core library that facilitates the creation of GUID, and it can be accessed directly.
 
 ```typescript
-import { uuid } from '@elevationai/elevation-core-ts';
+import { uuid } from '@eai/elevation-core-ts';
 
 console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 ```
@@ -557,7 +627,7 @@ In order to start interacting with the library, you first need to configure the 
 The singleton instance is the most common way developers will interact with the library.
 
 ```typescript
-import { iot, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { iot, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -591,7 +661,7 @@ iot.onConfigRequired.subscribe(() => {
 In rare occasions, developers could have multiple services endpoints and they will want the facility to simultaneously connect to all available IOT environments. For that particular case, you can instantiate multiple instances of the IOT library.
 
 ```typescript
-import { ElevatedIOT, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { ElevatedIOT, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 const coreInfo1: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -648,7 +718,7 @@ There are 4 major events in the IOT lifecycle; and it is important to understand
 This rxjs subscription gets triggered as soon as the application is able to validate that it is correctly configured on the Administrator UI and it has the correct credentials with the appropriate volume license. After you receive this subscription, your application is ready to start receiving communications from the outside world.
 
 ```typescript
-import { iot, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { iot, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 ...
 
@@ -662,7 +732,7 @@ iot.onConnected.subscribe(() => {
 This rxjs subscription gets triggered when the network connection between the application and the EPS IOT service gets disrupted.
 
 ```typescript
-import { iot, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { iot, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 ...
 
@@ -676,7 +746,7 @@ iot.onDisconnect.subscribe(() => {
 This rxjs subscription gets triggered when the application connects with a fingerprint never seen before by the IOT service. At this point, the application must go through a configuration process either from the Administrator UI or from the use of the subscription library.
 
 ```typescript
-import { iot, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { iot, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 ...
 
@@ -698,7 +768,7 @@ This rxjs subscription enables the communication between the developer's applica
 To handle commands in code, just subscribe to onCommand subject.
 
 ```typescript
-import { iot, CoreInfo, IOTInfo } from '@elevationai/elevation-core-ts';
+import { iot, CoreInfo, IOTInfo } from '@eai/elevation-core-ts';
 
 ....
 
@@ -737,7 +807,7 @@ Similar to the IOT library, in order to configure an instance of the enrollment 
 
 The core library provides a helper function to generate GUIDs
 ```typescript
-import { uuid } from '@elevationai/elevation-core-ts';
+import { uuid } from '@eai/elevation-core-ts';
 
 console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 ```
@@ -747,7 +817,7 @@ In order to start interacting with the library, you first need to configure the 
 
 ### Enrollment Singleton Instance
 ```typescript
-import { enrollment, CoreInfo } from '@elevationai/elevation-core-ts';
+import { enrollment, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -763,7 +833,7 @@ enrollment.config(coreInfo);
 In rare occasions, developers could have multiple services endpoints and they will want the facility to simultaneously enroll applications/devices to all available environments. 
 
 ```typescript
-import { ElevatedEnrollment, CoreInfo } from '@elevationai/elevation-core-ts';
+import { ElevatedEnrollment, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo1: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -794,7 +864,7 @@ import {
     Specification,
     DeviceInfo,
     enrollDevice 
-} from '@elevationai/elevation-core-ts';
+} from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -833,7 +903,7 @@ Promise.all([
 In order to avoid confusion in the Administrator UI, the library enforces that each enrolled device would have a unique name/label. To avoid errors during the enrollDevice call, the library provides a way to validate if the label or device name is available for use.
 
 ```typescript
-import { enrollment, CoreInfo } from '@elevationai/elevation-core-ts';
+import { enrollment, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -876,7 +946,7 @@ In order to start interacting with the library, you first need to configure the 
 
 ### Configuration Singleton Instance
 ```typescript
-import { configMgmt, CoreInfo, ConfigMgmtInfo } from '@elevationai/elevation-core-ts';
+import { configMgmt, CoreInfo, ConfigMgmtInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -896,7 +966,7 @@ configMgmt.config(coreInfo, configMgmtInfo);
 In rare occasions, developers could have multiple services endpoints and they will want the facility to simultaneously connect to all available configuration management environments.
 
 ```typescript
-import { ConfigMgmt, CoreInfo, ConfigMgmtInfo } from '@elevationai/elevation-core-ts';
+import { ConfigMgmt, CoreInfo, ConfigMgmtInfo } from '@eai/elevation-core-ts';
 
 const coreInfo1: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -923,7 +993,7 @@ const configMgmt2 = new ConfigMgmt(coreInfo2, configMgmtInfo);
 To retrieve configurations, you will need to provide the configuration key that you want to retrieve. The configurations can be set up as global, location or device specific configurations through the optional use of overrides within the configuration UI.
 
 ```typescript
-import { configMgmt, CoreInfo } from '@elevationai/elevation-core-ts';
+import { configMgmt, CoreInfo } from '@eai/elevation-core-ts';
 
 const coreInfo: CoreInfo = {
     token: '<Tenant_Access_Token>',
@@ -1023,7 +1093,7 @@ interface ConfigMgmtInfo {
 
 ## Examples
 
-### Complete Integration Example
+### Node.js Complete Integration Example
 
 ```typescript
 import { 
@@ -1034,7 +1104,7 @@ import {
   EventCode, 
   EventType, 
   EventMode 
-} from '@elevationai/elevation-core-ts';
+} from '@eai/elevation-core-ts';
 
 class ElevatedService {
   private coreInfo: CoreInfo;
@@ -1066,7 +1136,7 @@ class ElevatedService {
 
     elogs.setDefaults({
       deviceId: this.coreInfo.fingerPrint!,
-      application: 'CheckinApp'
+      applicationName: 'CheckinApp'
     });
 
     // Subscribe to IOT events
@@ -1095,17 +1165,146 @@ class ElevatedService {
 }
 ```
 
+### Deno Complete Integration Example
+
+```typescript
+import {
+  events,
+  elogs,
+  iot,
+  enrollment,
+  configMgmt,
+  CoreInfo,
+  EventCode,
+  EventType,
+  EventMode,
+  LogLevel,
+  IOTInfo,
+  ConfigMgmtInfo
+} from './index.ts';
+
+async function main() {
+  const coreInfo: CoreInfo = {
+    token: Deno.env.get('ELEVATION_TOKEN')!,
+    serviceEndpoint: Deno.env.get('ELEVATION_SERVICE_ENDPOINT')!,
+    iotEndpoint: Deno.env.get('ELEVATION_IOT_ENDPOINT'),
+    fingerPrint: Deno.env.get('ELEVATION_FINGERPRINT'),
+  };
+
+  // Configure all services
+  events.config(coreInfo);
+  elogs.config(coreInfo);
+  
+  // Set defaults
+  events.setDefaults({
+    eventType: EventType.CHECKIN_KIOSK,
+    eventMode: EventMode.NATIVE,
+    ownerID: coreInfo.fingerPrint
+  });
+
+  elogs.setDefaults({
+    deviceId: coreInfo.fingerPrint!,
+    applicationName: 'MyKioskApp'
+  });
+
+  // Configure IOT if available
+  if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
+    iot.config(coreInfo, {
+      appName: 'MyKioskApp',
+      appVersion: '1.0.0'
+    });
+
+    iot.onConnected.subscribe(() => {
+      console.log('IOT Connected');
+      events.success({ eventCode: EventCode.ONLINE });
+    });
+
+    iot.onCommand.subscribe((command) => {
+      console.log('Received command:', command);
+      if (command.refresh) {
+        // Handle refresh command
+        console.log('Refreshing application...');
+      }
+    });
+  }
+
+  // Send startup events and logs
+  await events.success({ 
+    eventCode: EventCode.APP_START,
+    eventData: { version: '1.0.0' }
+  });
+
+  await elogs.information({ 
+    message: 'Application started successfully' 
+  });
+
+  // Check enrollment
+  if (coreInfo.fingerPrint) {
+    enrollment.config(coreInfo);
+    const isEnrolled = await enrollment.isEnrolled();
+    
+    if (!isEnrolled) {
+      console.log('Device not enrolled');
+    }
+  }
+
+  console.log('Elevation library initialized successfully!');
+}
+
+// Run with error handling
+main().catch(console.error);
+```
+
+### Advanced Features Examples
+
+#### Event Debouncing
+```typescript
+// Both Node.js and Deno
+events.setDefaults({
+  debounceEvent: [
+    { eventCode: EventCode.PAPER_JAM, debounce: 60000 },
+    { eventCode: EventCode.NETWORK_ERROR, debounce: 30000 }
+  ],
+  debounceOnce: [
+    { eventCode: EventCode.IN_SERVICE, debounce: 60000 }
+  ]
+});
+```
+
+#### Configuration Management with Overrides
+```typescript
+// Deno example
+const config = await configMgmt.getConfig('theme_settings');
+const resolvedValue = configMgmt.getResolvedValue(config);
+// Resolves priority: device > location > global
+```
+
+#### Real-time Configuration Watching
+```typescript
+// Watch for configuration changes
+const stopWatching = configMgmt.watchConfig(
+  'feature_flags',
+  (value) => console.log('Feature flags updated:', value),
+  10000 // Poll every 10 seconds
+);
+
+// Stop watching later
+setTimeout(stopWatching, 60000);
+```
+
 ---
 
 
 ## Development
 
-### Building the Library
+### Node.js/NPM Development
+
+#### Building the Library
 ```bash
 npm run build
 ```
 
-### Generating Documentation
+#### Generating Documentation
 ```bash
 # TypeDoc
 npm run typedoc
@@ -1117,9 +1316,54 @@ npm run doc
 npm run docs
 ```
 
-### Testing
+#### Testing
 ```bash
 npm test
+```
+
+### Deno Development
+
+#### Project Structure
+```
+elevation-core-ts/
+├── lib/              # Core library modules
+│   ├── shared/       # Base classes & utilities
+│   ├── events/       # Event tracking
+│   ├── logs/         # Centralized logging
+│   ├── iot/          # WebSocket communication
+│   ├── enrollment/   # Device registration
+│   └── config/       # Configuration management
+├── types/            # TypeScript definitions & enums
+├── examples/         # Usage examples
+├── index.ts          # Main library exports
+└── deno.json         # Deno configuration
+```
+
+#### Development Tasks
+```bash
+# Type check
+deno task check
+
+# Run example
+deno task example
+
+# Format code
+deno task fmt
+
+# Lint code
+deno task lint
+
+# Run tests
+deno task test
+```
+
+#### Environment Setup
+Create a `.env` file for local development:
+```env
+ELEVATION_TOKEN=your_tenant_access_token
+ELEVATION_SERVICE_ENDPOINT=https://api-kiosk-elevation.herokuapp.com
+ELEVATION_IOT_ENDPOINT=wss://iot-elevation.herokuapp.com
+ELEVATION_FINGERPRINT=device-unique-id
 ```
 
 ---

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@elevationai/elevation-core-ts - Complete Documentation</title>
-    <meta name="description" content="Complete documentation for @elevationai/elevation-core-ts - TypeScript SDK for Elevated Platform Services">
+    <title>@eai/elevation-core-ts - Complete Documentation</title>
+    <meta name="description" content="Complete documentation for @eai/elevation-core-ts - TypeScript SDK for Elevated Platform Services">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -327,7 +327,7 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <a href="index.html" class="logo">@elevationai/elevation-core-ts</a>
+            <a href="index.html" class="logo">@eai/elevation-core-ts</a>
             <nav class="nav-links">
                 <a href="index.html">Home</a>
                 <a href="#overview">Overview</a>
@@ -373,7 +373,7 @@
                         
                         <div class="emoji-header">🏢 <strong>Admin Dashboard Interface</strong></div>
                         
-                        <p>The <strong>@elevationai/elevation-core-ts</strong> library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. In order to interact with the library, developers must acquire an organization token and a service endpoint. For more information, please contact Elevation Software at <a href="https://www.blndspt.com/reach-out/">blndspt.com</a>.</p>
+                        <p>The <strong>@eai/elevation-core-ts</strong> library provides comprehensive access to all Elevated Platform core services, enabling seamless integration with the Elevated ecosystem for device management, monitoring, and analytics. In order to interact with the library, developers must acquire an organization token and a service endpoint. For more information, please contact Elevation Software at <a href="https://www.blndspt.com/reach-out/">blndspt.com</a>.</p>
 
                         <h3>Key Capabilities</h3>
                         <ul>
@@ -401,13 +401,13 @@
                     <section id="installation" class="section">
                         <h2>Installation</h2>
                         
-                        <p>In order to install the @elevationai/elevation-core-ts you are going to need npm access. If you have all the required configuration files, just run the installation command from the working directory.</p>
+                        <p>In order to install the @eai/elevation-core-ts you are going to need npm access. If you have all the required configuration files, just run the installation command from the working directory.</p>
 
                         <h3>NPM</h3>
-                        <pre><code>npm install @elevationai/elevation-core-ts</code></pre>
+                        <pre><code>npm install @eai/elevation-core-ts</code></pre>
 
                         <h3>Yarn</h3>
-                        <pre><code>yarn add @elevationai/elevation-core-ts</code></pre>
+                        <pre><code>yarn add @eai/elevation-core-ts</code></pre>
                     </section>
 
                     <section id="core-communication" class="section">
@@ -424,7 +424,7 @@
 }</code></pre>
 
                         <h3>Defining CoreInfo in code</h3>
-                        <pre><code><span class="keyword">import</span> { <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -458,7 +458,7 @@
                         <h4>Log Singleton Instance</h4>
                         <p>The singleton instance is the most common way a developer will interact with the library.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -471,7 +471,7 @@
                         <h4>Log Class Instantiation</h4>
                         <p>In rare occasions, a developer could have multiple services endpoints and they will want the facility to simultaneously send logs to all available environments. For that particular case, you can instantiate multiple instances of the log library.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">ElevatedLogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">ElevatedLogs</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo1</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -503,7 +503,7 @@
 
                         <p>Now in order to send logs, you just use the message function.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -537,7 +537,7 @@
                         <h4>Setting logs defaults</h4>
                         <p>In order to improve productivity during the development process, you can set the value of properties that don't change often when you are sending log messages to EPS. For that particular case, you can make use of the setDefaults function.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span>, <span class="variable">LogOptions</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">elogs</span>, <span class="variable">CoreInfo</span>, <span class="variable">LogLevel</span>, <span class="variable">LogOptions</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">logDefaults</span>: <span class="variable">LogOptions</span> = {
     <span class="variable">debounce</span>: <span class="number">1000</span> * <span class="number">10</span>, <span class="comment">// 10 seconds debounce time</span>
@@ -605,7 +605,7 @@
                         <h4>Events Singleton Instance</h4>
                         <p>The singleton instance is the most common way a developer will interact with the library.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">events</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">events</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -686,7 +686,7 @@
 
                         <p>There is a helper function in the core library that facilitates the creation of GUID, and it can be accessed directly.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="function">console</span>.<span class="function">log</span>(<span class="function">uuid</span>()); <span class="comment">// example response: e91f29b3-3559-491c-ab43-05c63ddc08f9</span></code></pre>
 
@@ -707,7 +707,7 @@
                         <h4>IOT onCommand</h4>
                         <p>This rxjs subscription enables the communication between the developer's application and the EPS IOT services, by making available a customizable set of device configuration values. Such configurations can be sent down to the applications from either the Administrator UI or external API.</p>
 
-                        <pre><code><span class="keyword">import</span> { <span class="variable">iot</span>, <span class="variable">CoreInfo</span>, <span class="variable">IOTInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">iot</span>, <span class="variable">CoreInfo</span>, <span class="variable">IOTInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>: <span class="variable">Commands</span>) => {
     <span class="keyword">if</span> (<span class="variable">command</span>.<span class="variable">showBagWaiver</span>) {
@@ -731,7 +731,7 @@
                         <p>Similar to the IOT library, in order to configure an instance of the enrollment service, developers must define a unique fingerprint that would identify a particular instance of an application or a physical device anywhere in the world. Many applications would take the MAC Address of a device as a good fingerprint value, or an auto generated GUID that gets saved to the operating system.</p>
 
                         <p>The core library provides a helper function to generate GUIDs:</p>
-                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">uuid</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="function">console</span>.<span class="function">log</span>(<span class="function">uuid</span>()); <span class="comment">// example response: e91f29b3-3559-491c-ab43-05c63ddc08f9</span></code></pre>
 
@@ -745,7 +745,7 @@
     <span class="variable">DeviceLocation</span>,
     <span class="variable">Specification</span>,
     <span class="variable">DeviceInfo</span>
-} <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+} <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="variable">enrollment</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
 
@@ -790,7 +790,7 @@
                         <p>In order to start interacting with the library, you first need to configure the core information data and configuration management specific information, using a singleton instance of the library or an instantiated instance from the main class.</p>
 
                         <h4>Configuration Singleton Instance</h4>
-                        <pre><code><span class="keyword">import</span> { <span class="variable">configMgmt</span>, <span class="variable">CoreInfo</span>, <span class="variable">ConfigMgmtInfo</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">configMgmt</span>, <span class="variable">CoreInfo</span>, <span class="variable">ConfigMgmtInfo</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'&lt;Tenant_Access_Token&gt;'</span>,
@@ -828,7 +828,7 @@
                         <p>The CMS (Content Management System) module provides multi-language support with fallback to default language (en-US). It allows you to manage localized strings and configuration data that can be retrieved dynamically by your applications.</p>
 
                         <h3>Basic Usage</h3>
-                        <pre><code><span class="keyword">import</span> { <span class="variable">cms</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">cms</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
@@ -859,7 +859,7 @@
                         <p>TouchPoint class provides functionality for managing device/touchpoint information and service states. It allows you to retrieve device information and manage service status.</p>
 
                         <h3>Basic Usage</h3>
-                        <pre><code><span class="keyword">import</span> { <span class="variable">touchPoint</span> } <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+                        <pre><code><span class="keyword">import</span> { <span class="variable">touchPoint</span> } <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">const</span> <span class="variable">coreInfo</span> = {
     <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
@@ -948,7 +948,7 @@
   <span class="variable">EventCode</span>, 
   <span class="variable">EventType</span>, 
   <span class="variable">EventMode</span> 
-} <span class="keyword">from</span> <span class="string">'@elevationai/elevation-core-ts'</span>;
+} <span class="keyword">from</span> <span class="string">'@eai/elevation-core-ts'</span>;
 
 <span class="keyword">class</span> <span class="variable">ElevatedService</span> {
   <span class="keyword">private</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span>;
