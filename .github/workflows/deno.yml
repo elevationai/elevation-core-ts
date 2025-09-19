@@ -22,6 +22,16 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Check for lint rule exclusions
+        run: |
+          if grep -q '"lint"' deno.json* 2>/dev/null && grep -A 20 '"lint"' deno.json* | grep -q '"exclude"'; then
+            echo "❌ Error: Lint rule exclusions are not allowed in deno.json"
+            echo "Found exclude in lint.rules configuration:"
+            grep -A 5 '"lint"' deno.json* | grep -B 2 -A 2 '"exclude"'
+            exit 1
+          fi
+          echo "✅ No lint rule exclusions found"
+
       - name: Verify formatting
         run: deno fmt --check
 
