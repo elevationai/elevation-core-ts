@@ -13,15 +13,15 @@ export class ElevatedIOT extends BaseService {
   public onDisconnect: Subject<void> = new Subject<void>();
   public onConfigurationRequired: Subject<void> = new Subject<void>();
   public onCommand: Subject<Commands> = new Subject<Commands>();
-  public onFlightInfo: Subject<any> = new Subject<any>();
+  public onFlightInfo: Subject<unknown> = new Subject<unknown>();
   public onRefresh: Subject<void> = new Subject<void>();
-  public onPrint: Subject<any> = new Subject<any>();
+  public onPrint: Subject<unknown> = new Subject<unknown>();
   public onRestart: Subject<void> = new Subject<void>();
   public onEvent: Subject<EventData> = new Subject<EventData>();
-  public onToast: Subject<any> = new Subject<any>();
+  public onToast: Subject<unknown> = new Subject<unknown>();
   public onlineKiosks: Subject<OnlineKiosk[]> = new Subject<OnlineKiosk[]>();
 
-  private reconnectTimer: any;
+  private reconnectTimer: number | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
   private reconnectDelay = 1000;
@@ -105,7 +105,7 @@ export class ElevatedIOT extends BaseService {
       }
     });
 
-    this.socket.on('connect_error', (error: any) => {
+    this.socket.on('connect_error', (error: Error) => {
       console.error('IOT Socket.io connection error:', error.message);
 
       // Check for configuration errors
@@ -120,19 +120,19 @@ export class ElevatedIOT extends BaseService {
     });
 
     // Custom events from server
-    this.socket.on('command', (data: any) => {
+    this.socket.on('command', (data: Commands) => {
       this.onCommand.next(data);
     });
 
-    this.socket.on('flightinfo', (data: any) => {
+    this.socket.on('flightinfo', (data: unknown) => {
       this.onFlightInfo.next(data);
     });
 
-    this.socket.on('event', (data: any) => {
+    this.socket.on('event', (data: EventData) => {
       this.onEvent.next(data);
     });
 
-    this.socket.on('toast', (data: any) => {
+    this.socket.on('toast', (data: unknown) => {
       this.onToast.next(data);
     });
 
@@ -140,11 +140,11 @@ export class ElevatedIOT extends BaseService {
       this.onRefresh.next();
     });
 
-    this.socket.on('onlineKiosks', (data: any) => {
+    this.socket.on('onlineKiosks', (data: OnlineKiosk[]) => {
       this.onlineKiosks.next(data);
     });
 
-    this.socket.on('print', (data: any) => {
+    this.socket.on('print', (data: unknown) => {
       this.onPrint.next(data);
     });
 
@@ -153,11 +153,11 @@ export class ElevatedIOT extends BaseService {
     });
 
     // Handle disconnect reasons from server
-    this.socket.on('error', (error: any) => {
+    this.socket.on('error', (error: WebSocketError) => {
       console.error('IOT Socket.io error:', error);
 
       if (typeof error === 'object' && error !== null) {
-        const errorMessage = (error as any).message || (error as any).reason || '';
+        const errorMessage = error.message || error.reason || '';
         if (errorMessage.includes('Configuration') || errorMessage.includes('5000') || errorMessage.includes('5001')) {
           this.onConfigurationRequired.next();
           this.disconnect(true);
@@ -195,7 +195,7 @@ export class ElevatedIOT extends BaseService {
     }, delay);
   }
 
-  public send(data: any): void {
+  public send(data: { type: string; data: unknown }): void {
     if (this.socket && this.socket.connected) {
       // For Socket.io, we emit events rather than sending raw data
       if (data.type) {
@@ -208,7 +208,7 @@ export class ElevatedIOT extends BaseService {
     }
   }
 
-  public sendMessage(type: string, data: any): void {
+  public sendMessage(type: string, data: unknown): void {
     if (this.socket && this.socket.connected) {
       this.socket.emit(type, data);
     } else {

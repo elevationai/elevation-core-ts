@@ -1,6 +1,6 @@
 {
   "name": "@eai/elevation-core-ts",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "license": "UNLICENSED",
   "exports": "./index.ts",
   "tasks": {
@@ -20,11 +20,6 @@
   "fmt": {
     "lineWidth": 120,
     "singleQuote": true
-  },
-  "lint": {
-    "rules": {
-      "exclude": ["no-explicit-any"]
-    }
   },
   "exclude": [
     "dist/",

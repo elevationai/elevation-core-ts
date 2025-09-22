@@ -1,5 +1,5 @@
 import { BaseService } from '../shared/base.ts';
-import type { ApiResponse, DebouncedEvent, EventData, EventOptions } from '../../types/index.ts';
+import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from '../../types/index.ts';
 import { type EventCode, StatusCode } from '../../types/index.ts';
 
 export class ElevatedEvents extends BaseService {
@@ -58,7 +58,7 @@ export class ElevatedEvents extends BaseService {
     return false;
   }
 
-  public async send(eventData: Partial<EventData>, kiosk: any = null): Promise<ApiResponse> {
+  public async send(eventData: Partial<EventData>, kiosk: Device | null = null): Promise<ApiResponse> {
     this.checkConfiguration();
 
     // Apply defaults
@@ -73,20 +73,20 @@ export class ElevatedEvents extends BaseService {
 
     // MetaData validation and auto-population (from reference library)
     if (!fullEventData.metaData) {
-      const metaData: any = {};
+      const metaData: EventMetadata = {} as EventMetadata;
       if (fullEventData.eventCode) metaData.eventCode = fullEventData.eventCode;
       if (fullEventData.eventData && fullEventData.eventData.airline) {
-        metaData.airline = fullEventData.eventData.airline;
+        metaData.airline = fullEventData.eventData.airline as string;
       }
       if (fullEventData.eventData && fullEventData.eventData.countryCode) {
-        metaData.countryCode = fullEventData.eventData.countryCode;
+        metaData.countryCode = fullEventData.eventData.countryCode as string;
       }
       if (fullEventData.ownerID) metaData.ownerID = fullEventData.ownerID;
 
       if (kiosk) {
         metaData.tags = kiosk.tags || [];
-        metaData.location = kiosk.location || null;
-        metaData.testDevice = !!kiosk.metadata.testDevice;
+        metaData.location = kiosk.location || undefined;
+        metaData.testDevice = !!kiosk.metadata?.testDevice;
       }
 
       fullEventData.metaData = metaData;

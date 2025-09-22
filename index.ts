@@ -4,7 +4,7 @@
 export * from './types/index.ts';
 
 // Export shared utilities
-export { uuid, Debouncer, Cache } from './lib/shared/utils.ts';
+export { Cache, Debouncer, uuid } from './lib/shared/utils.ts';
 
 // Export service modules and classes
 export { ElevatedEvents, events } from './lib/events/index.ts';
@@ -42,12 +42,12 @@ export class ElevationService {
     this.enrollment.config(coreInfo);
     this.cms.config(coreInfo);
     this.touchPoint.config(coreInfo);
-    
+
     // IOT requires additional setup
     if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
       this.iot.config(coreInfo);
     }
-    
+
     // Config management requires additional info
     // This should be set separately when needed
   }

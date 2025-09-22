@@ -49,7 +49,7 @@ export abstract class BaseService {
     return headersObj;
   }
 
-  protected async makeRequest<T = any>(
+  protected async makeRequest<T = unknown>(
     path: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
@@ -106,35 +106,35 @@ export abstract class BaseService {
     }
   }
 
-  protected post<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected post<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  protected patch<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected patch<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
   }
 
-  protected get<T = any>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
+  protected get<T = unknown>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'GET',
       headers,
     });
   }
 
-  protected put<T = any>(path: string, data: any): Promise<ApiResponse<T>> {
+  protected put<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  protected delete<T = any>(path: string): Promise<ApiResponse<T>> {
+  protected delete<T = unknown>(path: string): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
       method: 'DELETE',
     });

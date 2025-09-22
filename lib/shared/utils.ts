@@ -4,6 +4,7 @@ export function uuid(): string {
 }
 
 // Debounce helper
+// deno-lint-ignore no-explicit-any
 export class Debouncer<T extends (...args: any[]) => any> {
   private timeoutId: number | null = null;
   private lastCall = 0;
@@ -131,21 +132,21 @@ export function deepClone<T>(obj: T): T {
   }
 
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as any;
+    return new Date(obj.getTime()) as T;
   }
 
   if (obj instanceof Array) {
-    return obj.map((item) => deepClone(item)) as any;
+    return obj.map((item) => deepClone(item)) as T;
   }
 
   if (obj instanceof Object) {
-    const clonedObj: any = {};
+    const clonedObj: { [key: string]: unknown } = {};
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         clonedObj[key] = deepClone(obj[key]);
       }
     }
-    return clonedObj;
+    return clonedObj as T;
   }
 
   return obj;

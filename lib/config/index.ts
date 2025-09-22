@@ -1,5 +1,5 @@
 import { BaseService } from '../shared/base.ts';
-import type { ConfigValue, CoreInfo, ElevatedConfigurationsInfo } from '../../types/index.ts';
+import type { CoreInfo, ElevatedConfigurationsInfo } from '../../types/index.ts';
 
 export class ElevatedConfigurations extends BaseService {
   private configInfo: ElevatedConfigurationsInfo | null = null;
@@ -26,11 +26,11 @@ export class ElevatedConfigurations extends BaseService {
     }
   }
 
-  public getConfig(label: string): Promise<ConfigValue | null> {
+  public getConfig(label: string): Promise<unknown> {
     this.checkConfiguration();
     this.checkConfigInfo();
 
-    return this.get<ConfigValue>(
+    return this.get<unknown>(
       `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
       { 'Cache-Control': 'no-cache' },
     )
@@ -42,7 +42,7 @@ export class ElevatedConfigurations extends BaseService {
       });
   }
 
-  public getConfigs(labels: string[]): Promise<(ConfigValue | null)[]> {
+  public getConfigs(labels: string[]): Promise<(unknown)[]> {
     return Promise.all(labels.map((label: string) => this.getConfig(label)));
   }
 }

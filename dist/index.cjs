@@ -556,8 +556,8 @@ var ElevatedEvents = class extends BaseService {
         metaData.ownerID = fullEventData.ownerID;
       if (kiosk) {
         metaData.tags = kiosk.tags || [];
-        metaData.location = kiosk.location || null;
-        metaData.testDevice = !!kiosk.metadata.testDevice;
+        metaData.location = kiosk.location || void 0;
+        metaData.testDevice = !!kiosk.metadata?.testDevice;
       }
       fullEventData.metaData = metaData;
     }
@@ -2473,7 +2473,7 @@ var ElevatedIOT = class extends BaseService {
   onEvent = new Subject();
   onToast = new Subject();
   onlineKiosks = new Subject();
-  reconnectTimer;
+  reconnectTimer = null;
   reconnectAttempts = 0;
   maxReconnectAttempts = 10;
   reconnectDelay = 1e3;

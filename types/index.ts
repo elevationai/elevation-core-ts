@@ -73,7 +73,7 @@ export interface Device {
 
 export interface DeviceSettings {
   code?: string;
-  values?: any;
+  values?: unknown;
 }
 
 export interface DeviceSchedule {
@@ -102,13 +102,27 @@ export interface EventData {
   eventCode?: EventCode | number;
   eventType?: EventType;
   eventMode?: EventMode;
-  eventData: any;
+  eventData: EventEventData;
   ownerID?: string;
   statusCode?: StatusCode;
   created?: Date;
-  metaData?: any;
+  metaData?: EventMetadata;
   tid?: string; // Transaction ID
   organization?: string; // Organization field
+}
+
+export interface EventEventData {
+  [key: string]: unknown;
+}
+
+export interface EventMetadata {
+  eventCode?: number;
+  location?: string;
+  ownerID?: string;
+  tags?: string[];
+  testDevice?: boolean;
+  airline?: string;
+  countryCode?: string;
 }
 
 export interface LogData {
@@ -190,26 +204,22 @@ export interface LogOptions {
 
 // IoT Command interface
 export interface Commands {
-  [key: string]: any;
+  [key: string]: unknown;
   refresh?: boolean;
-  print?: any;
-  flightInfo?: any;
+  print?: unknown;
+  flightInfo?: unknown;
   showBagWaiver?: boolean;
   navigate?: string;
   restart?: boolean;
-  config?: any;
+  config?: unknown;
 }
 
 // Response interfaces
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
   message?: string;
-}
-
-export interface ConfigValue {
-  [key: string]: any;
 }
 
 // Utility type for debouncing
