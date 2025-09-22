@@ -15,7 +15,7 @@ export class ElevatedEnrollment extends BaseService {
   public async start(): Promise<Device> {
     this.checkConfiguration();
 
-    const response = await this.get(`/devices/key`);
+    const response = await this.get<Device[]>(`/devices/key/${this.coreInfo?.fingerPrint}`);
 
     if (response.success && response.data) {
       const device = response.data[0] as Device;
@@ -116,7 +116,7 @@ export class ElevatedEnrollment extends BaseService {
       return false;
     }
 
-    const response = await this.get(`/devices/label/${label}`, {});
+    const response = await this.get<Device[]>(`/devices/label/${label}`, {});
 
     if (response.success && response.data) {
       return response.data.length === 0;

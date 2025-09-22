@@ -2664,7 +2664,7 @@ var ElevatedEnrollment = class extends BaseService {
   }
   async start() {
     this.checkConfiguration();
-    const response = await this.get(`/devices/key`);
+    const response = await this.get(`/devices/key/${this.coreInfo?.fingerPrint}`);
     if (response.success && response.data) {
       const device = response.data[0];
       if (device.metadata?.configured) {
