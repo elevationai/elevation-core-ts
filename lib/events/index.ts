@@ -1,6 +1,6 @@
-import { BaseService } from '../shared/base.ts';
-import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from '../../types/index.ts';
-import { type EventCode, StatusCode } from '../../types/index.ts';
+import { BaseService } from "../shared/base.ts";
+import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../../types/index.ts";
+import { type EventCode, StatusCode } from "../../types/index.ts";
 
 export class ElevatedEvents extends BaseService {
   private defaults: EventOptions = {};
@@ -96,19 +96,20 @@ export class ElevatedEvents extends BaseService {
     if (fullEventData.eventCode && this.shouldDebounce(fullEventData.eventCode)) {
       return {
         success: true,
-        message: 'Event debounced',
+        message: "Event debounced",
       };
     }
 
     // Send event directly to /events endpoint
     try {
-      const response = await this.post('/events', fullEventData);
+      const response = await this.post("/events", fullEventData);
       return response;
-    } catch (error) {
-      console.error('Failed to send event:', error);
+    }
+    catch (error) {
+      console.error("Failed to send event:", error);
       return {
         success: false,
-        error: 'Failed to send event',
+        error: "Failed to send event",
       };
     }
   }

@@ -1,5 +1,5 @@
-import type { Device } from '../../types/index.ts';
-import { BaseService } from '../shared/base.ts';
+import type { Device } from "../../types/index.ts";
+import { BaseService } from "../shared/base.ts";
 
 export class TouchPoint extends BaseService {
   private touchPointId: string | null = null;
@@ -8,7 +8,7 @@ export class TouchPoint extends BaseService {
     this.checkConfiguration();
 
     if (!this.coreInfo?.fingerPrint) {
-      throw new Error('Device fingerprint is required for TouchPoint service');
+      throw new Error("Device fingerprint is required for TouchPoint service");
     }
 
     return this.get<Device[]>(`/devices/key/${this.coreInfo.fingerPrint}`)
@@ -42,7 +42,7 @@ export class TouchPoint extends BaseService {
     this.checkConfiguration();
 
     if (!this.coreInfo?.fingerPrint) {
-      throw new Error('Device fingerprint is required for TouchPoint service');
+      throw new Error("Device fingerprint is required for TouchPoint service");
     }
 
     try {
@@ -58,7 +58,8 @@ export class TouchPoint extends BaseService {
         state,
         reason,
       });
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Unable to transition to state: ${state} ${error}`);
     }
   }

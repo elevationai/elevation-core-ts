@@ -127,7 +127,7 @@ export function isValidEmail(email: string): boolean {
 
 // Deep clone object
 export function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') {
+  if (obj === null || typeof obj !== "object") {
     return obj;
   }
 

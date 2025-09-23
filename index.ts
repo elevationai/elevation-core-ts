@@ -1,29 +1,29 @@
 // Main export file for Elevation Deno Service
 
 // Export all types
-export * from './types/index.ts';
+export * from "./types/index.ts";
 
 // Export shared utilities
-export { Cache, Debouncer, uuid } from './lib/shared/utils.ts';
+export { Cache, Debouncer, uuid } from "./lib/shared/utils.ts";
 
 // Export service modules and classes
-export { ElevatedEvents, events } from './lib/events/index.ts';
-export { ElevatedLogs, elogs } from './lib/logs/index.ts';
-export { ElevatedIOT, iot } from './lib/iot/index.ts';
-export { ElevatedEnrollment, enrollment } from './lib/enrollment/index.ts';
-export { ElevatedConfigurations, elevatedConfigurations } from './lib/config/index.ts';
-export { CMS, cms } from './lib/cms/index.ts';
-export { TouchPoint, touchPoint } from './lib/touchpoint/index.ts';
+export { ElevatedEvents, events } from "./lib/events/index.ts";
+export { ElevatedLogs, elogs } from "./lib/logs/index.ts";
+export { ElevatedIOT, iot } from "./lib/iot/index.ts";
+export { ElevatedEnrollment, enrollment } from "./lib/enrollment/index.ts";
+export { ElevatedConfigurations, elevatedConfigurations } from "./lib/config/index.ts";
+export { CMS, cms } from "./lib/cms/index.ts";
+export { TouchPoint, touchPoint } from "./lib/touchpoint/index.ts";
 
 // Import the singleton instances for the convenience class
-import { events } from './lib/events/index.ts';
-import { elogs } from './lib/logs/index.ts';
-import { iot } from './lib/iot/index.ts';
-import { enrollment } from './lib/enrollment/index.ts';
-import { elevatedConfigurations } from './lib/config/index.ts';
-import { cms } from './lib/cms/index.ts';
-import { touchPoint } from './lib/touchpoint/index.ts';
-import type { CoreInfo } from './types/index.ts';
+import { events } from "./lib/events/index.ts";
+import { elogs } from "./lib/logs/index.ts";
+import { iot } from "./lib/iot/index.ts";
+import { enrollment } from "./lib/enrollment/index.ts";
+import { elevatedConfigurations } from "./lib/config/index.ts";
+import { cms } from "./lib/cms/index.ts";
+import { touchPoint } from "./lib/touchpoint/index.ts";
+import type { CoreInfo } from "./types/index.ts";
 
 // Export a convenience class that combines all services
 export class ElevationService {

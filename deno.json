@@ -18,8 +18,10 @@
     "noUnusedParameters": true
   },
   "fmt": {
-    "lineWidth": 120,
-    "singleQuote": true
+    "lineWidth": 140,
+    "proseWrap": "preserve",
+    "nextControlFlowPosition": "nextLine",
+    "exclude": ["dist/**"]
   },
   "exclude": [
     "dist/",

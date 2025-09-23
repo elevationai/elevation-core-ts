@@ -1,10 +1,10 @@
 // Core interfaces and types for Elevation Deno Service
 
 // Export enums
-export * from './enums/event-code.ts';
-export * from './enums/event-mode.ts';
-export * from './enums/event-type.ts';
-export * from './enums/status-codes.ts';
+export * from "./enums/event-code.ts";
+export * from "./enums/event-mode.ts";
+export * from "./enums/event-type.ts";
+export * from "./enums/status-codes.ts";
 
 export interface CoreInfo {
   token: string;
@@ -92,10 +92,10 @@ export interface DeviceMetadata {
 }
 
 // Import enums for use in interfaces
-import type { EventCode } from './enums/event-code.ts';
-import type { EventType } from './enums/event-type.ts';
-import type { EventMode } from './enums/event-mode.ts';
-import type { StatusCode } from './enums/status-codes.ts';
+import type { EventCode } from "./enums/event-code.ts";
+import type { EventType } from "./enums/event-type.ts";
+import type { EventMode } from "./enums/event-mode.ts";
+import type { StatusCode } from "./enums/status-codes.ts";
 
 // Data structures
 export interface EventData {
@@ -179,10 +179,10 @@ export interface DeviceInfo {
 }
 
 export enum LogLevel {
-  INFO = 'INFO',
-  DELAYED = 'DELAYED',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL',
+  INFO = "INFO",
+  DELAYED = "DELAYED",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL",
 }
 
 // Options interfaces

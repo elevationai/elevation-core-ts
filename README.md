@@ -74,11 +74,11 @@ npm i @jsr/eai__elevation-core-ts
 #### Quick Start
 
 ```typescript
-import { CoreInfo, elogs, events } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs, events } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com',
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
 };
 
 // Configure services
@@ -86,7 +86,7 @@ elogs.config(coreInfo);
 events.config(coreInfo);
 
 // Send a log
-await elogs.information({ message: 'Application started' });
+await elogs.information({ message: "Application started" });
 
 // Send an event
 await events.success({ eventCode: EventCode.APP_START });
@@ -97,12 +97,12 @@ await events.success({ eventCode: EventCode.APP_START });
 #### Quick Start
 
 ```typescript
-import { CoreInfo, elogs, EventCode, events, iot, LogLevel } from '@eai/elevation-core-ts';
+import { CoreInfo, elogs, EventCode, events, iot, LogLevel } from "@eai/elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: 'your-token',
-  serviceEndpoint: 'https://api-endpoint',
-  fingerPrint: 'device-id',
+  token: "your-token",
+  serviceEndpoint: "https://api-endpoint",
+  fingerPrint: "device-id",
 };
 
 // Configure services
@@ -112,12 +112,12 @@ elogs.config(coreInfo);
 // Send an event
 await events.success({
   eventCode: EventCode.APP_START,
-  eventData: { version: '1.0.0' },
+  eventData: { version: "1.0.0" },
 });
 
 // Send a log
 await elogs.information({
-  message: 'Application started',
+  message: "Application started",
 });
 ```
 
@@ -152,11 +152,11 @@ interface CoreInfo {
 ### Defining CoreInfo in code
 
 ```typescript
-import { CoreInfo } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 ```
 
@@ -192,11 +192,11 @@ instance of the library or an instantiated instance from the main class.
 The singleton instance is the most common way a developer will interact with the library.
 
 ```typescript
-import { CoreInfo, elogs } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 // passing connection data to the library before calling any method
@@ -210,16 +210,16 @@ send logs to all available environments. For that particular case, you can insta
 library.
 
 ```typescript
-import { CoreInfo, ElevatedLogs } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, ElevatedLogs } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo1: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 const coreInfo2: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://<prod-url>', // Prod Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<prod-url>", // Prod Endpoint
 };
 
 // passing connection data to the library before calling any method
@@ -253,26 +253,26 @@ export interface LogData {
 Now in order to send logs, you just use the message function.
 
 ```typescript
-import { CoreInfo, elogs, LogLevel } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs, LogLevel } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 // passing connection data to the library before calling any method
 elogs.config(coreInfo);
 
 elogs.message({
-  applicationName: 'MyAwesomeApp',
+  applicationName: "MyAwesomeApp",
   level: LogLevel.INFO,
-  message: 'Application started',
-  deviceId: '<Device-GUID>',
-  url: 'Your App url', // optional
-  body: 'Request Body', // optional
+  message: "Application started",
+  deviceId: "<Device-GUID>",
+  url: "Your App url", // optional
+  body: "Request Body", // optional
   statusCode: 0, // optional
 })
-  .then(() => console.log('Log message sent'));
+  .then(() => console.log("Log message sent"));
 ```
 
 ### Log Levels
@@ -297,17 +297,17 @@ often when you are sending log messages to EPS. For that particular case, you ca
 This function allows you to avoid setting values every time you need to send a log message.
 
 ```typescript
-import { CoreInfo, elogs, LogLevel, LogOptions } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs, LogLevel, LogOptions } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 const logDefaults: LogOptions = {
   debounce: 1000 * 10, // 10 seconds debounce time
-  deviceId: '<Device-GUID>', // Optional
-  applicationName: 'MyAwesomeApp', // Optional
+  deviceId: "<Device-GUID>", // Optional
+  applicationName: "MyAwesomeApp", // Optional
   statusCode: 0, // Optional
 };
 
@@ -320,9 +320,9 @@ elogs.setDefaults(logDefaults);
 // now only pass the information that is not part of the defaults
 elogs.message({
   level: LogLevel.INFO,
-  message: 'Application started',
+  message: "Application started",
 })
-  .then(() => console.log('Log message sent'));
+  .then(() => console.log("Log message sent"));
 ```
 
 ### Log helpers
@@ -332,16 +332,16 @@ In conjunction with default values, the log helpers are incredibly useful during
 helper function for each LogLevel in the library.
 
 ```typescript
-elogs.information({ message: 'Application started' });
+elogs.information({ message: "Application started" });
 
 elogs.delayed({
-  url: 'https://app_api/submit',
-  message: 'Request took longer than default values',
+  url: "https://app_api/submit",
+  message: "Request took longer than default values",
 });
 
-elogs.error({ message: 'Unable to submit request' });
+elogs.error({ message: "Unable to submit request" });
 
-elogs.critical({ message: 'Unable to connect to db' });
+elogs.critical({ message: "Unable to connect to db" });
 ```
 
 ### Log Debounce
@@ -352,17 +352,17 @@ in milliseconds. By setting a debounce value, you will prevent the logs library 
 within the constraint of the debounce time chosen.
 
 ```typescript
-import { CoreInfo, elogs, LogLevel, LogOptions } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs, LogLevel, LogOptions } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 const logDefaults: LogOptions = {
   debounce: 1000 * 10, // 10 seconds debounce time
-  deviceId: '<Device-GUID>', // Optional
-  applicationName: 'MyAwesomeApp', // Optional
+  deviceId: "<Device-GUID>", // Optional
+  applicationName: "MyAwesomeApp", // Optional
   statusCode: 0, // Optional
 };
 
@@ -373,10 +373,10 @@ elogs.config(coreInfo);
 elogs.setDefaults(logDefaults);
 
 // This is going to be sent
-elogs.information({ message: 'Sending message' });
+elogs.information({ message: "Sending message" });
 
 // This won't reach the server
-elogs.information({ message: 'Never is going to reach the EPS' });
+elogs.information({ message: "Never is going to reach the EPS" });
 ```
 
 ---
@@ -412,11 +412,11 @@ instance of the library or an instantiated instance from the main class.
 The singleton instance is the most common way a developer will interact with the library.
 
 ```typescript
-import { CoreInfo, events } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, events } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 // passing connection data to the library before calling any method
@@ -430,16 +430,16 @@ send events to all available environments. For that particular case, you can ins
 library.
 
 ```typescript
-import { CoreInfo, ElevatedEvents } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, ElevatedEvents } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo1: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 const coreInfo2: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://<prod-url>', // Prod Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<prod-url>", // Prod Endpoint
 };
 
 // passing connection data to the library before calling any method
@@ -469,11 +469,11 @@ export interface EventData {
 Now you are ready to send an event to EPS.
 
 ```typescript
-import { CoreInfo, EventCode, EventMode, events, EventType, StatusCode } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, EventCode, EventMode, events, EventType, StatusCode } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 // passing connection data to the library before calling any method
@@ -483,11 +483,11 @@ events.send({
   eventCode: EventCode.BAGTAG_PRINT,
   eventType: EventType.CHECKIN_KIOSK,
   eventMode: EventMode.CUSS,
-  eventData: { PNR: 'ABC123', airline: 'AA' },
-  ownerID: 'xxxx-xxxx-xxxx-xxxx', // Device GUID
+  eventData: { PNR: "ABC123", airline: "AA" },
+  ownerID: "xxxx-xxxx-xxxx-xxxx", // Device GUID
   statusCode: StatusCode.SUCCESS,
 })
-  .then(() => console.log('Event sent'));
+  .then(() => console.log("Event sent"));
 ```
 
 ### Event Codes
@@ -521,17 +521,17 @@ why you can define default values that are not likely to change when you are sen
 Most of the time the values that rarely change are eventMode, eventType, and ownerID.
 
 ```typescript
-import { CoreInfo, EventMode, EventOptions, events, EventType } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, EventMode, EventOptions, events, EventType } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 const defaultValues: EventOptions = {
   eventType: EventType.CHECKIN_KIOSK, // Optional
   eventMode: EventMode.CUSS, // Optional
-  ownerID: 'xxxx-xxxx-xxxx-xxxx', // Device GUID, optional
+  ownerID: "xxxx-xxxx-xxxx-xxxx", // Device GUID, optional
 };
 
 // passing connection data to the library before calling any method
@@ -543,10 +543,10 @@ events.setDefaults(defaultValues);
 // Now just pass what is not in the default values
 events.send({
   eventCode: EventCode.BAGTAG_PRINT,
-  eventData: { PNR: 'ABC123', airline: 'AA' },
+  eventData: { PNR: "ABC123", airline: "AA" },
   statusCode: StatusCode.SUCCESS,
 })
-  .then(() => console.log('Event sent'));
+  .then(() => console.log("Event sent"));
 ```
 
 ### Event Helpers
@@ -575,11 +575,11 @@ debounce value in milliseconds on a per eventCode basis. By setting a debounce v
 from sending multiple events of the specified event-code within the constraint of the debounce time chosen.
 
 ```typescript
-import { CoreInfo, EventCode, EventMode, EventOptions, events, EventType } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, EventCode, EventMode, EventOptions, events, EventType } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
 };
 
 // Debouncing all paper jams to 1 minute
@@ -587,7 +587,7 @@ const defaultValues: EventOptions = {
   debounceEvent: [{ eventCode: EventCode.PAPER_JAM, debounce: 1000 * 60 }], // Optional
   eventType: EventType.CHECKIN_KIOSK, // Optional
   eventMode: EventMode.CUSS, // Optional
-  ownerID: 'xxxx-xxxx-xxxx-xxxx', // Device GUID, optional
+  ownerID: "xxxx-xxxx-xxxx-xxxx", // Device GUID, optional
 };
 
 // passing connection data to the library before calling any method
@@ -653,7 +653,7 @@ establishes a bidirectional channel.
 There is a helper function in the core library that facilitates the creation of GUID, and it can be accessed directly.
 
 ```typescript
-import { uuid } from '@jsr/eai__elevation-core-ts';
+import { uuid } from "@jsr/eai__elevation-core-ts";
 
 console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 ```
@@ -672,20 +672,20 @@ Administrator UI.
 The singleton instance is the most common way developers will interact with the library.
 
 ```typescript
-import { CoreInfo, iot, IOTInfo } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, iot, IOTInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  iotEndpoint: 'https://<app-iot-endpoint>',
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  iotEndpoint: "https://<app-iot-endpoint>",
+  fingerPrint: "<App-GUID>", // unique per touchpoint
   secondary: false, // Optional
 };
 
 // optional information
 const iotInfo: IOTInfo = {
-  appName: 'airlineCheckinApp',
-  appVersion: '0.1.0',
+  appName: "airlineCheckinApp",
+  appVersion: "0.1.0",
 };
 
 // passing connection data to the library before calling any method
@@ -693,12 +693,12 @@ iot.config(coreInfo, iotInfo);
 
 // successfully connected to EPS IOT services
 iot.onConnected.subscribe(() => {
-  console.log('Connection succeeded');
+  console.log("Connection succeeded");
 });
 
 // Device configuration is required
 iot.onConfigRequired.subscribe(() => {
-  console.log('App configuration must be completed to connect');
+  console.log("App configuration must be completed to connect");
 });
 ```
 
@@ -709,28 +709,28 @@ connect to all available IOT environments. For that particular case, you can ins
 library.
 
 ```typescript
-import { CoreInfo, ElevatedIOT, IOTInfo } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, ElevatedIOT, IOTInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo1: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  iotEndpoint: 'https://<app-iot-endpoint>',
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  iotEndpoint: "https://<app-iot-endpoint>",
+  fingerPrint: "<App-GUID>", // unique per touchpoint
   secondary: false, // Optional
 };
 
 const coreInfo2: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://<api-2-endpoint>', // Test Endpoint
-  iotEndpoint: 'https://<app-iot-endpoint2>',
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<api-2-endpoint>", // Test Endpoint
+  iotEndpoint: "https://<app-iot-endpoint2>",
+  fingerPrint: "<App-GUID>", // unique per touchpoint
   secondary: false, // Optional
 };
 
 // optional information
 const iotInfo: IOTInfo = {
-  appName: 'airlineCheckinApp',
-  appVersion: '0.1.0',
+  appName: "airlineCheckinApp",
+  appVersion: "0.1.0",
 };
 
 // passing connection data to the library before calling any method
@@ -739,18 +739,18 @@ const iot2 = new ElevatedIOT(coreInfo2);
 
 // successfully connected to EPS IOT services
 iot1.onConnected.subscribe(() => {
-  console.log('Connection 1 succeeded');
+  console.log("Connection 1 succeeded");
 });
 iot2.onConnected.subscribe(() => {
-  console.log('Connection 2 succeeded');
+  console.log("Connection 2 succeeded");
 });
 
 // Device configuration is required
 iot1.onConfigRequired.subscribe(() => {
-  console.log('App configuration 1 must be completed to connect');
+  console.log("App configuration 1 must be completed to connect");
 });
 iot2.onConfigRequired.subscribe(() => {
-  console.log('App configuration 2 must be completed to connect');
+  console.log("App configuration 2 must be completed to connect");
 });
 ```
 
@@ -876,7 +876,7 @@ saved to the operating system.
 The core library provides a helper function to generate GUIDs
 
 ```typescript
-import { uuid } from '@jsr/eai__elevation-core-ts';
+import { uuid } from "@jsr/eai__elevation-core-ts";
 
 console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 ```
@@ -889,12 +889,12 @@ instance of the library or an instantiated instance from the main class.
 ### Enrollment Singleton Instance
 
 ```typescript
-import { CoreInfo, enrollment } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, enrollment } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 // passing connection data to the library before calling any method
@@ -907,18 +907,18 @@ In rare occasions, developers could have multiple services endpoints and they wi
 enroll applications/devices to all available environments.
 
 ```typescript
-import { CoreInfo, ElevatedEnrollment } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, ElevatedEnrollment } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo1: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 const coreInfo2: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://<api2-url>', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<api2-url>", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 // passing connection data to the library before calling any method
@@ -983,22 +983,22 @@ name/label. To avoid errors during the enrollDevice call, the library provides a
 name is available for use.
 
 ```typescript
-import { CoreInfo, enrollment } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, enrollment } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 // passing connection data to the library before calling any method
 enrollment.config(coreInfo);
 
 // Checking for label availability
-enrollment.isLabelAvailable('DENKIOSK001')
+enrollment.isLabelAvailable("DENKIOSK001")
   .then((isAvailable: boolean) => {
     if (isAvailable) {
-      console.log('It is ok to use that label');
+      console.log("It is ok to use that label");
     }
   });
 ```
@@ -1035,17 +1035,17 @@ class.
 ### Configuration Singleton Instance
 
 ```typescript
-import { configMgmt, ConfigMgmtInfo, CoreInfo } from '@jsr/eai__elevation-core-ts';
+import { configMgmt, ConfigMgmtInfo, CoreInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 const configMgmtInfo: ConfigMgmtInfo = {
-  deviceId: '<Device-GUID>',
-  locationId: '<Location-GUID>',
+  deviceId: "<Device-GUID>",
+  locationId: "<Location-GUID>",
 };
 
 configMgmt.config(coreInfo, configMgmtInfo);
@@ -1057,23 +1057,23 @@ In rare occasions, developers could have multiple services endpoints and they wi
 connect to all available configuration management environments.
 
 ```typescript
-import { ConfigMgmt, ConfigMgmtInfo, CoreInfo } from '@jsr/eai__elevation-core-ts';
+import { ConfigMgmt, ConfigMgmtInfo, CoreInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo1: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 const coreInfo2: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://<api2-url>',
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<api2-url>",
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 const configMgmtInfo: ConfigMgmtInfo = {
-  deviceId: '<Device-GUID>',
-  locationId: '<Location-GUID>',
+  deviceId: "<Device-GUID>",
+  locationId: "<Location-GUID>",
 };
 
 const configMgmt1 = new ConfigMgmt(coreInfo1, configMgmtInfo);
@@ -1087,26 +1087,26 @@ can be set up as global, location or device specific configurations through the 
 configuration UI.
 
 ```typescript
-import { configMgmt, CoreInfo } from '@jsr/eai__elevation-core-ts';
+import { configMgmt, CoreInfo } from "@jsr/eai__elevation-core-ts";
 
 const coreInfo: CoreInfo = {
-  token: '<Tenant_Access_Token>',
-  serviceEndpoint: 'https://api-kiosk-elevation.herokuapp.com', // Test Endpoint
-  fingerPrint: '<App-GUID>', // unique per touchpoint
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com", // Test Endpoint
+  fingerPrint: "<App-GUID>", // unique per touchpoint
 };
 
 const configMgmtInfo: ConfigMgmtInfo = {
-  deviceId: '<Device-GUID>',
-  locationId: '<Location-GUID>',
+  deviceId: "<Device-GUID>",
+  locationId: "<Location-GUID>",
 };
 
 configMgmt.config(coreInfo, configMgmtInfo);
 
 // Retrieve a single configuration
-const config = await configMgmt.getConfig('config-key');
+const config = await configMgmt.getConfig("config-key");
 
 // Retrieve a list of configurations
-const configs = await configMgmt.getConfigs(['config-key-1', 'config-key-2']);
+const configs = await configMgmt.getConfigs(["config-key-1", "config-key-2"]);
 
 // Retrieve all configurations
 const allConfigs = await configMgmt.getAllConfigs();
@@ -1196,7 +1196,7 @@ interface ConfigMgmtInfo {
 ### Node.js Complete Integration Example
 
 ```typescript
-import { CoreInfo, elogs, EventCode, EventMode, events, EventType, iot } from '@jsr/eai__elevation-core-ts';
+import { CoreInfo, elogs, EventCode, EventMode, events, EventType, iot } from "@jsr/eai__elevation-core-ts";
 
 class ElevatedService {
   private coreInfo: CoreInfo;
@@ -1215,8 +1215,8 @@ class ElevatedService {
     events.config(this.coreInfo);
     elogs.config(this.coreInfo);
     iot.config(this.coreInfo, {
-      appName: 'CheckinApp',
-      appVersion: '1.0.0',
+      appName: "CheckinApp",
+      appVersion: "1.0.0",
     });
 
     // Set defaults
@@ -1228,7 +1228,7 @@ class ElevatedService {
 
     elogs.setDefaults({
       deviceId: this.coreInfo.fingerPrint!,
-      applicationName: 'CheckinApp',
+      applicationName: "CheckinApp",
     });
 
     // Subscribe to IOT events
@@ -1237,7 +1237,7 @@ class ElevatedService {
 
   private setupIOTListeners() {
     iot.onConnected.subscribe(() => {
-      elogs.information({ message: 'IOT Connected' });
+      elogs.information({ message: "IOT Connected" });
       events.success({ eventCode: EventCode.ONLINE });
     });
 
@@ -1248,7 +1248,7 @@ class ElevatedService {
 
   private getDeviceId(): string {
     // Implementation to get unique device ID
-    return 'device-unique-id';
+    return "device-unique-id";
   }
 
   private handleCommand(command: any) {
@@ -1273,14 +1273,14 @@ import {
   iot,
   IOTInfo,
   LogLevel,
-} from '@eai/elevation-core-ts';
+} from "@eai/elevation-core-ts";
 
 async function main() {
   const coreInfo: CoreInfo = {
-    token: Deno.env.get('ELEVATION_TOKEN')!,
-    serviceEndpoint: Deno.env.get('ELEVATION_SERVICE_ENDPOINT')!,
-    iotEndpoint: Deno.env.get('ELEVATION_IOT_ENDPOINT'),
-    fingerPrint: Deno.env.get('ELEVATION_FINGERPRINT'),
+    token: Deno.env.get("ELEVATION_TOKEN")!,
+    serviceEndpoint: Deno.env.get("ELEVATION_SERVICE_ENDPOINT")!,
+    iotEndpoint: Deno.env.get("ELEVATION_IOT_ENDPOINT"),
+    fingerPrint: Deno.env.get("ELEVATION_FINGERPRINT"),
   };
 
   // Configure all services
@@ -1296,26 +1296,26 @@ async function main() {
 
   elogs.setDefaults({
     deviceId: coreInfo.fingerPrint!,
-    applicationName: 'MyKioskApp',
+    applicationName: "MyKioskApp",
   });
 
   // Configure IOT if available
   if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
     iot.config(coreInfo, {
-      appName: 'MyKioskApp',
-      appVersion: '1.0.0',
+      appName: "MyKioskApp",
+      appVersion: "1.0.0",
     });
 
     iot.onConnected.subscribe(() => {
-      console.log('IOT Connected');
+      console.log("IOT Connected");
       events.success({ eventCode: EventCode.ONLINE });
     });
 
     iot.onCommand.subscribe((command) => {
-      console.log('Received command:', command);
+      console.log("Received command:", command);
       if (command.refresh) {
         // Handle refresh command
-        console.log('Refreshing application...');
+        console.log("Refreshing application...");
       }
     });
   }
@@ -1323,11 +1323,11 @@ async function main() {
   // Send startup events and logs
   await events.success({
     eventCode: EventCode.APP_START,
-    eventData: { version: '1.0.0' },
+    eventData: { version: "1.0.0" },
   });
 
   await elogs.information({
-    message: 'Application started successfully',
+    message: "Application started successfully",
   });
 
   // Check enrollment
@@ -1336,11 +1336,11 @@ async function main() {
     const isEnrolled = await enrollment.isEnrolled();
 
     if (!isEnrolled) {
-      console.log('Device not enrolled');
+      console.log("Device not enrolled");
     }
   }
 
-  console.log('Elevation library initialized successfully!');
+  console.log("Elevation library initialized successfully!");
 }
 
 // Run with error handling
@@ -1368,7 +1368,7 @@ events.setDefaults({
 
 ```typescript
 // Deno example
-const config = await configMgmt.getConfig('theme_settings');
+const config = await configMgmt.getConfig("theme_settings");
 const resolvedValue = configMgmt.getResolvedValue(config);
 // Resolves priority: device > location > global
 ```
@@ -1378,8 +1378,8 @@ const resolvedValue = configMgmt.getResolvedValue(config);
 ```typescript
 // Watch for configuration changes
 const stopWatching = configMgmt.watchConfig(
-  'feature_flags',
-  (value) => console.log('Feature flags updated:', value),
+  "feature_flags",
+  (value) => console.log("Feature flags updated:", value),
   10000, // Poll every 10 seconds
 );
 

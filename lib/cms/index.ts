@@ -1,22 +1,22 @@
-import { BaseService } from '../shared/base.ts';
-import { EMPTY, firstValueFrom, from, type Observable, of } from 'rxjs';
-import { catchError, map, share, tap } from 'rxjs/operators';
+import { BaseService } from "../shared/base.ts";
+import { EMPTY, firstValueFrom, from, type Observable, of } from "rxjs";
+import { catchError, map, share, tap } from "rxjs/operators";
 
 // CMS Interfaces matching the reference library
 export interface LanguageVersion {
   name: string;
-  'date-created': string;
-  'display-date': [
+  "date-created": string;
+  "display-date": [
     {
-      'start-date': null | string;
-      'end-date': null | string;
+      "start-date": null | string;
+      "end-date": null | string;
     },
   ];
   order: number;
   author: null | string;
   published: boolean;
   string: string;
-  'last-updated': string;
+  "last-updated": string;
 }
 
 export interface Language {
@@ -37,7 +37,7 @@ export class CMS extends BaseService {
 
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
-  private reqHeaderNoCache = { 'Cache-Control': 'no-cache' };
+  private reqHeaderNoCache = { "Cache-Control": "no-cache" };
 
   /**
    * Get a specific key from CMS
@@ -62,9 +62,10 @@ export class CMS extends BaseService {
       // Subscribe to loadAllStrings and wait for completion
       try {
         await firstValueFrom(this.loadAllStrings(isConfig));
-      } catch (error) {
+      }
+      catch (error) {
         // If loading fails, continue with empty cache
-        console.error('Failed to load strings for key lookup:', error);
+        console.error("Failed to load strings for key lookup:", error);
       }
 
       // Check cache again after loading
@@ -117,7 +118,7 @@ export class CMS extends BaseService {
     ).pipe(
       map((response) => {
         if (!response.success || !response.data) {
-          throw new Error('Failed to load CMS strings');
+          throw new Error("Failed to load CMS strings");
         }
         return response.data as ICMS[];
       }),
@@ -127,7 +128,7 @@ export class CMS extends BaseService {
         this.updateCacheFromStrings(this.allStrings);
       }),
       catchError((error) => {
-        console.error('Failed to load CMS strings:', error);
+        console.error("Failed to load CMS strings:", error);
         // Clear the loading observable on error
         this.stringsObservable = null;
         return EMPTY;

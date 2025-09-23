@@ -1,5 +1,5 @@
-import { BaseService } from '../shared/base.ts';
-import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from '../../types/index.ts';
+import { BaseService } from "../shared/base.ts";
+import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from "../../types/index.ts";
 
 export class ElevatedEnrollment extends BaseService {
   private started = false;
@@ -8,7 +8,7 @@ export class ElevatedEnrollment extends BaseService {
     super.config(coreInfo);
 
     if (!coreInfo.fingerPrint) {
-      throw new Error('fingerPrint is required in CoreInfo for Enrollment service');
+      throw new Error("fingerPrint is required in CoreInfo for Enrollment service");
     }
   }
 
@@ -20,14 +20,15 @@ export class ElevatedEnrollment extends BaseService {
     if (response.success && response.data) {
       const device = response.data[0] as Device;
       if (device.metadata?.configured) {
-        throw new Error('Device is already enrolled');
-      } else {
+        throw new Error("Device is already enrolled");
+      }
+      else {
         this.started = true;
         return device;
       }
     }
 
-    throw new Error(response.error || 'Failed to start enrollment');
+    throw new Error(response.error || "Failed to start enrollment");
   }
 
   public async getLocations(): Promise<DeviceLocation[]> {
@@ -39,7 +40,7 @@ export class ElevatedEnrollment extends BaseService {
       return response.data;
     }
 
-    throw new Error(response.error || 'Failed to get locations');
+    throw new Error(response.error || "Failed to get locations");
   }
 
   public async getSpecification(): Promise<Specification[]> {
@@ -51,35 +52,35 @@ export class ElevatedEnrollment extends BaseService {
       return response.data;
     }
 
-    throw new Error(response.error || 'Failed to get specifications');
+    throw new Error(response.error || "Failed to get specifications");
   }
 
   public async enrollDevice(info: DeviceInfo): Promise<ApiResponse> {
     this.checkConfiguration();
 
     if (!this.started) {
-      throw new Error('start subscription first');
+      throw new Error("start subscription first");
     }
 
     // Validate device info
     if (!info.label) {
-      throw new Error('Device label is required');
+      throw new Error("Device label is required");
     }
 
     if (!info.device?._id) {
-      throw new Error('Missing Device information');
+      throw new Error("Missing Device information");
     }
 
     if (!info.location?._id) {
-      throw new Error('Location is required');
+      throw new Error("Location is required");
     }
 
     if (!info.terminal?._id) {
-      throw new Error('Terminal is required');
+      throw new Error("Terminal is required");
     }
 
     if (!info.specification?.id) {
-      throw new Error('Specification is required');
+      throw new Error("Specification is required");
     }
 
     // Check if label is available

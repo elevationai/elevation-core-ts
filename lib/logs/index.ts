@@ -1,7 +1,7 @@
-import { BaseService } from '../shared/base.ts';
-import { Debouncer } from '../shared/utils.ts';
-import type { ApiResponse, LogData, LogOptions } from '../../types/index.ts';
-import { LogLevel } from '../../types/index.ts';
+import { BaseService } from "../shared/base.ts";
+import { Debouncer } from "../shared/utils.ts";
+import type { ApiResponse, LogData, LogOptions } from "../../types/index.ts";
+import { LogLevel } from "../../types/index.ts";
 
 export class ElevatedLogs extends BaseService {
   private defaults: LogOptions = {};
@@ -47,28 +47,28 @@ export class ElevatedLogs extends BaseService {
 
     // Apply defaults
     const fullLogData: LogData = {
-      deviceId: this.defaults.deviceId || '',
+      deviceId: this.defaults.deviceId || "",
       applicationName: this.defaults.applicationName,
       statusCode: this.defaults.statusCode,
       level: LogLevel.INFO,
       ...logData,
-      message: logData.message || '',
+      message: logData.message || "",
     };
 
     // Validate required fields
     if (!fullLogData.deviceId) {
-      throw new Error('deviceId is required for logging');
+      throw new Error("deviceId is required for logging");
     }
 
     if (!fullLogData.message) {
-      throw new Error('message is required for logging');
+      throw new Error("message is required for logging");
     }
 
     // Check debouncing
     if (this.shouldDebounce(fullLogData)) {
       return {
         success: true,
-        message: 'Log debounced',
+        message: "Log debounced",
       };
     }
 
@@ -80,11 +80,12 @@ export class ElevatedLogs extends BaseService {
     try {
       const response = await this.post(`/logs`, data);
       return response;
-    } catch (error) {
-      console.error('Failed to send log:', error);
+    }
+    catch (error) {
+      console.error("Failed to send log:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -135,18 +136,20 @@ export class ElevatedLogs extends BaseService {
           success: true,
           message: `Successfully sent ${logs.length} logs`,
         };
-      } else {
+      }
+      else {
         return {
           success: false,
           error: `Failed to send ${failures.length} of ${logs.length} logs`,
           data: { failures },
         };
       }
-    } catch (error) {
-      console.error('Failed to send batch logs:', error);
+    }
+    catch (error) {
+      console.error("Failed to send batch logs:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }

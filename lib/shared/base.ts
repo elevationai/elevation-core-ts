@@ -1,4 +1,4 @@
-import type { ApiResponse, CoreInfo } from '../../types/index.ts';
+import type { ApiResponse, CoreInfo } from "../../types/index.ts";
 
 export abstract class BaseService {
   protected coreInfo: CoreInfo | null = null;
@@ -18,10 +18,10 @@ export abstract class BaseService {
 
   protected validateCoreInfo(coreInfo: CoreInfo): void {
     if (!coreInfo.token) {
-      throw new Error('Token is required in CoreInfo');
+      throw new Error("Token is required in CoreInfo");
     }
     if (!coreInfo.serviceEndpoint) {
-      throw new Error('Service endpoint is required in CoreInfo');
+      throw new Error("Service endpoint is required in CoreInfo");
     }
   }
 
@@ -29,14 +29,14 @@ export abstract class BaseService {
     if (!this.coreInfo) return;
 
     this.headers = new Headers({
-      'Elevated-Auth': btoa(this.coreInfo.token),
-      'Content-Type': 'application/json',
+      "Elevated-Auth": btoa(this.coreInfo.token),
+      "Content-Type": "application/json",
     });
   }
 
   protected checkConfiguration(): void {
     if (!this.configured || !this.coreInfo) {
-      throw new Error('Service not configured. Call config() first with CoreInfo');
+      throw new Error("Service not configured. Call config() first with CoreInfo");
     }
   }
 
@@ -82,14 +82,15 @@ export abstract class BaseService {
         success: true,
         data,
       };
-    } catch (error) {
+    }
+    catch (error) {
       clearTimeout(timeoutId);
 
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
+        if (error.name === "AbortError") {
           return {
             success: false,
-            error: 'Request timeout',
+            error: "Request timeout",
             message: `Request timed out after ${timeout}ms`,
           };
         }
@@ -101,42 +102,42 @@ export abstract class BaseService {
 
       return {
         success: false,
-        error: 'Unknown error occurred',
+        error: "Unknown error occurred",
       };
     }
   }
 
   protected post<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
     });
   }
 
   protected patch<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     });
   }
 
   protected get<T = unknown>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'GET',
+      method: "GET",
       headers,
     });
   }
 
   protected put<T = unknown>(path: string, data: unknown): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
   protected delete<T = unknown>(path: string): Promise<ApiResponse<T>> {
     return this.makeRequest<T>(path, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 }
