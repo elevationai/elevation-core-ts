@@ -1,0 +1,8 @@
+export enum StatusCode {
+  SUCCESS = 200,
+  MODE_CHANGE = 300,
+  FAILURE = 400,
+  CRITICAL_FAILURE = 500,
+  INFRACTION = 501,
+  TIMEOUT = 502,
+}

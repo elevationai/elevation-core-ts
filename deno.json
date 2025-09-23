@@ -1,0 +1,30 @@
+{
+  "name": "@eai/elevation-core-ts",
+  "version": "0.1.17",
+  "license": "UNLICENSED",
+  "exports": "./index.ts",
+  "tasks": {
+    "build": "deno run --allow-read --allow-write --allow-env --allow-run --allow-net scripts/build.ts",
+    "test": "deno test --allow-net --allow-env --allow-read"
+  },
+  "imports": {
+    "@std/testing": "https://deno.land/std@0.224.0/testing/mod.ts",
+    "rxjs": "npm:rxjs@^7.8.1",
+    "rxjs/operators": "npm:rxjs@^7.8.1/operators",
+    "socket.io-client": "npm:socket.io-client@^4.8.1"
+  },
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "fmt": {
+    "lineWidth": 140,
+    "proseWrap": "preserve",
+    "nextControlFlowPosition": "nextLine",
+    "exclude": ["dist/**"]
+  },
+  "exclude": [
+    "dist/",
+    ".temp/"
+  ]
+}

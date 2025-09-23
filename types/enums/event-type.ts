@@ -1,0 +1,11 @@
+export enum EventType {
+  TAGGING_KIOSK = 1,
+  CHECKIN_KIOSK = 2,
+  GATE = 3,
+  ADMIN_PANEL = 4,
+  HUB = 5,
+  CUSTOM_APP = 6,
+  PLATFORM = 7,
+  PROXY = 8,
+  EXTERNAL_API = 9,
+}
