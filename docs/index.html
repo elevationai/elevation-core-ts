@@ -655,30 +655,37 @@
 
           <div class="code-content" id="cms">
             <pre>
-<code><span class="keyword">import</span> { <span class="variable">cms</span> } <span class="keyword">from</span> <span class="string">'@jsr/eai__elevation-core-ts'</span>;
+<code><span class="keyword">import</span> { <span class="variable">cms</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@jsr/eai__elevation-core-ts'</span>;
+<span class="keyword">import</span> { <span class="variable">firstValueFrom</span> } <span class="keyword">from</span> <span class="string">'rxjs'</span>;
 
-<span class="comment">// Configure CMS service</span>
-<span class="keyword">const</span> <span class="variable">coreInfo</span> = {
+<span class="comment">// Configure CMS with version and draft mode</span>
+<span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
   <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
-  <span class="variable">serviceEndpoint</span>: <span class="string">'https://api.example.com'</span>
+  <span class="variable">serviceEndpoint</span>: <span class="string">'https://api.example.com'</span>,
+  <span class="variable">version</span>: <span class="string">'v2.0'</span>, <span class="comment">// Optional: content version</span>
+  <span class="variable">isDraft</span>: <span class="keyword">false</span> <span class="comment">// Optional: use published content</span>
 };
 
 <span class="variable">cms</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
 
-<span class="comment">// Get localized strings</span>
-<span class="keyword">const</span> <span class="variable">welcomeMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(<span class="string">'welcome_message'</span>, <span class="string">'en-US'</span>);
-<span class="keyword">const</span> <span class="variable">spanishMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(<span class="string">'welcome_message'</span>, <span class="string">'es-ES'</span>);
+<span class="comment">// Get localized strings (with auto-fallback to en-US)</span>
+<span class="keyword">const</span> <span class="variable">welcomeMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getString</span>(<span class="string">'welcome_message'</span>, <span class="string">'en-US'</span>);
+<span class="keyword">const</span> <span class="variable">spanishMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getString</span>(<span class="string">'welcome_message'</span>, <span class="string">'es-ES'</span>);
 
-<span class="comment">// Get configuration objects</span>
-<span class="keyword">const</span> <span class="variable">appConfig</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKey</span>(
-  <span class="string">'app_theme_config'</span>, 
-  <span class="string">'en-US'</span>, 
-  <span class="keyword">true</span> <span class="comment">// parse as JSON</span>
-);
+<span class="comment">// Get configuration objects (automatically parsed JSON)</span>
+<span class="keyword">const</span> <span class="variable">themeConfig</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getConfig</span>(<span class="string">'app_theme_config'</span>, <span class="string">'en-US'</span>);
+<span class="function">console</span>.<span class="function">log</span>(<span class="variable">themeConfig</span>.<span class="variable">primaryColor</span>); <span class="comment">// "#007bff"</span>
 
-<span class="function">console</span>.<span class="function">log</span>(<span class="string">'Welcome:'</span>, <span class="variable">welcomeMsg</span>);
-<span class="function">console</span>.<span class="function">log</span>(<span class="string">'Bienvenido:'</span>, <span class="variable">spanishMsg</span>);
-<span class="function">console</span>.<span class="function">log</span>(<span class="string">'Config:'</span>, <span class="variable">appConfig</span>);</code></pre>
+<span class="comment">// Pre-load all CMS content</span>
+<span class="keyword">await</span> <span class="function">firstValueFrom</span>(<span class="variable">cms</span>.<span class="function">loadAllStrings</span>());
+
+<span class="comment">// Cache management</span>
+<span class="keyword">const</span> <span class="variable">stats</span> = <span class="variable">cms</span>.<span class="function">getCacheStats</span>();
+<span class="function">console</span>.<span class="function">log</span>(<span class="string">`Cache has ${<span class="variable">stats</span>.<span class="variable">size</span>} entries`</span>);
+
+<span class="comment">// Clear cache and force fresh data</span>
+<span class="variable">cms</span>.<span class="function">clearCache</span>();
+<span class="keyword">const</span> <span class="variable">freshMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getString</span>(<span class="string">'welcome_message'</span>, <span class="string">'en-US'</span>, <span class="keyword">false</span>);</code></pre>
           </div>
 
           <div class="code-content" id="touchpoint">

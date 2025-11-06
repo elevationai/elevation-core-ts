@@ -14,6 +14,8 @@ export interface CoreInfo {
   fingerPrint?: string;
   secondary?: boolean;
   timeout?: number;
+  version?: string;
+  isDraft?: boolean;
 }
 
 export interface IOTInfo {
