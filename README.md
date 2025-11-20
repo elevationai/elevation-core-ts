@@ -59,6 +59,7 @@ The core library consists of 5 different modules providing comprehensive access 
 - **[IOT](#iot)** - Real-time bidirectional communication
 - **[Device Enrollment](#device-enrollment)** - Device registration and configuration
 - **[Configuration Management](#configuration-management)** - Dynamic configuration with overrides
+- **[Content Management System (CMS)](#content-management-system-cms)** - Multi-language content with versioning
 
 ## Installation & Quick Start
 
@@ -1114,6 +1115,262 @@ const allConfigs = await configMgmt.getAllConfigs();
 
 ---
 
+# Content Management System (CMS)
+
+The CMS module provides a powerful content management system with multi-language support, versioning, scheduled content delivery, and intelligent caching. This enables applications to retrieve localized strings and configuration objects dynamically from the Elevated Platform.
+
+## Content
+
+- [CMS Overview](#cms-overview)
+- [Configuration](#cms-configuration)
+- [CMS Singleton Instance](#cms-singleton-instance)
+- [CMS Class Instantiation](#cms-class-instantiation)
+- [Getting Content](#getting-content)
+- [Content Strings](#content-strings)
+- [Configuration Objects](#configuration-objects)
+- [Language Fallback](#language-fallback)
+- [Cache Management](#cache-management)
+- [Version Support](#version-support)
+- [Draft Mode](#draft-mode)
+
+## CMS Overview
+
+The CMS module enables applications to:
+
+- **Multi-language Support**: Retrieve content in multiple languages with automatic fallback
+- **Content Versioning**: Support for base and custom versions with scheduled display dates
+- **Configuration Storage**: Store and retrieve JSON configuration objects
+- **Intelligent Caching**: In-memory caching with cache control
+- **Draft/Published States**: Support for draft and published content workflows
+- **Scheduled Content**: Display content based on date ranges
+
+## CMS Configuration
+
+Configure the CMS service with your CoreInfo credentials. The CMS can optionally use version and draft mode settings.
+
+### CMS Singleton Instance
+
+The singleton instance is the most common way to interact with the CMS.
+
+```typescript
+import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
+
+const coreInfo: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
+  version: "v2.0", // Optional: specify content version
+  isDraft: false, // Optional: use draft or published content
+};
+
+// Configure the CMS service
+cms.config(coreInfo);
+```
+
+### CMS Class Instantiation
+
+For applications that need to access multiple CMS environments simultaneously:
+
+```typescript
+import { CMS, CoreInfo } from "@jsr/eai__elevation-core-ts";
+
+const coreInfo1: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
+};
+
+const coreInfo2: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://<prod-url>",
+};
+
+const cms1 = new CMS(coreInfo1);
+const cms2 = new CMS(coreInfo2);
+```
+
+## Getting Content
+
+The CMS provides multiple methods for retrieving content based on your needs.
+
+### Content Strings
+
+Use `getString()` or `getKey()` to retrieve localized text strings:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Get a localized string
+const welcomeMsg = await cms.getString("welcome_message", "en-US");
+console.log(welcomeMsg); // "Welcome to our service"
+
+// Get string in Spanish
+const spanishMsg = await cms.getString("welcome_message", "es-ES");
+console.log(spanishMsg); // "Bienvenido a nuestro servicio"
+
+// Get string without cache (force fresh data)
+const freshMsg = await cms.getString("welcome_message", "en-US", false);
+```
+
+### Configuration Objects
+
+Use `getConfig()` to retrieve JSON configuration objects that are automatically parsed:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Get a configuration object (automatically parsed from JSON)
+const themeConfig = await cms.getConfig("app_theme_config", "en-US");
+console.log(themeConfig);
+// {
+//   primaryColor: "#007bff",
+//   secondaryColor: "#6c757d",
+//   fontSize: 16
+// }
+
+// Get feature flags configuration
+const features = await cms.getConfig("feature_flags", "en-US");
+if (features.enableBetaFeatures) {
+  // Enable beta features
+}
+```
+
+### Language Fallback
+
+The CMS automatically falls back to `en-US` when content is not available in the requested language:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Request content in French
+const frenchMsg = await cms.getString("welcome_message", "fr-FR");
+// If French version doesn't exist, returns en-US version automatically
+```
+
+## Cache Management
+
+The CMS includes built-in caching for improved performance. You can manage the cache programmatically:
+
+### Loading All Strings
+
+Pre-load all CMS strings into memory:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+import { firstValueFrom } from "rxjs";
+
+// Load all strings with caching
+await firstValueFrom(cms.loadAllStrings());
+
+// Force reload without cache
+await firstValueFrom(cms.loadAllStrings(true));
+```
+
+### Cache Statistics
+
+Get information about the current cache state:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+const stats = cms.getCacheStats();
+console.log(`Cache has ${stats.size} entries`);
+console.log(`Cache keys:`, stats.keys);
+```
+
+### Clearing Cache
+
+Clear the cache to force fresh data retrieval:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Clear all cached content
+cms.clearCache();
+
+// Get fresh data after clearing cache
+const freshContent = await cms.getString("welcome_message", "en-US", false);
+```
+
+### Getting All Strings
+
+Access all loaded strings directly:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+const allStrings = cms.getAllStrings();
+if (allStrings) {
+  console.log(`Loaded ${allStrings.length} CMS entries`);
+}
+```
+
+## Version Support
+
+The CMS supports content versioning, allowing you to maintain multiple versions of content and switch between them:
+
+```typescript
+import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
+
+// Configure with specific version
+const coreInfo: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
+  version: "holiday-2024", // Use holiday-themed content
+};
+
+cms.config(coreInfo);
+
+// Content will be retrieved from "holiday-2024" version
+const holidayMsg = await cms.getString("welcome_message", "en-US");
+```
+
+### Scheduled Content
+
+Versions can have display date ranges. Content is automatically selected based on the current date:
+
+- If a version has `displayDates` defined, content is only shown within the specified date range
+- If current date is outside the range, falls back to base version
+- This enables time-based content scheduling without code changes
+
+## Draft Mode
+
+Support for draft content allows testing changes before publishing:
+
+```typescript
+import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
+
+// Configure to use draft content
+const coreInfo: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
+  version: "v2.0",
+  isDraft: true, // Use draft content instead of published
+};
+
+cms.config(coreInfo);
+
+// Retrieves draft content from the specified version
+const draftContent = await cms.getString("welcome_message", "en-US");
+```
+
+### Draft vs Published
+
+- **Draft Mode (`isDraft: true`)**: Returns the latest draft version of content
+- **Published Mode (`isDraft: false` or omitted)**: Returns the last published version
+- Useful for content review workflows and testing before going live
+
+### Cleanup
+
+When done with the CMS service, clean up resources:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Clean up CMS resources
+cms.destroy();
+```
+
+---
+
 ## API Documentation
 
 ### Core Interfaces
@@ -1127,6 +1384,9 @@ interface CoreInfo {
   iotEndpoint?: string; // IOT service endpoint
   fingerPrint?: string; // Unique device identifier
   secondary?: boolean; // Secondary app flag
+  timeout?: number; // Request timeout in milliseconds
+  version?: string; // CMS content version
+  isDraft?: boolean; // Use draft content (CMS)
 }
 ```
 

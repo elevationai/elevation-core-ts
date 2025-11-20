@@ -2858,10 +2858,28 @@ var CMS = class extends BaseService {
   updateCacheFromStrings(strings) {
     for (const cms2 of strings) {
       for (const [langCode, langData] of Object.entries(cms2.languages)) {
-        const publishedVersion = langData.versions.find((v) => v.published) || langData.versions[0];
-        if (publishedVersion) {
-          const cacheKey = `${cms2.element}-${langCode}`;
-          this.cmsCache.set(cacheKey, publishedVersion.string);
+        const cacheKey = `${cms2.element}-${langCode}`;
+        try {
+          const baseVersion = langData.versions.find((v) => v.name === "base");
+          let selectedVersion = this.coreInfo?.version ? langData.versions.find((v) => v.name === this.coreInfo?.version) : void 0;
+          if (selectedVersion && selectedVersion.displayDates?.length) {
+            const match = selectedVersion.displayDates.find(
+              (range) => (range.startDate === null || new Date(range.startDate).getTime() < (/* @__PURE__ */ new Date()).getTime()) && (range.endDate === null || new Date(range.endDate).getTime() > (/* @__PURE__ */ new Date()).getTime())
+            );
+            if (!match)
+              selectedVersion = void 0;
+          }
+          if (this.coreInfo?.isDraft) {
+            const draft = selectedVersion || baseVersion;
+            if (draft)
+              this.cmsCache.set(cacheKey, draft.string);
+          } else {
+            const lastPublish = selectedVersion?.publishes?.[0] || baseVersion?.publishes?.[0];
+            if (lastPublish)
+              this.cmsCache.set(cacheKey, lastPublish?.string);
+          }
+        } catch (err) {
+          console.error("Failed to update cache", err);
         }
       }
     }

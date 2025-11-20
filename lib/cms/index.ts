@@ -3,26 +3,6 @@ import { EMPTY, firstValueFrom, from, type Observable, of } from "rxjs";
 import { catchError, map, share, tap } from "rxjs/operators";
 
 // CMS Interfaces matching the reference library
-export interface LanguageVersion {
-  name: string;
-  "date-created": string;
-  "display-date": [
-    {
-      "start-date": null | string;
-      "end-date": null | string;
-    },
-  ];
-  order: number;
-  author: null | string;
-  published: boolean;
-  string: string;
-  "last-updated": string;
-}
-
-export interface Language {
-  versions: LanguageVersion[];
-}
-
 export interface ICMS {
   _id: string;
   area: string;
@@ -30,6 +10,34 @@ export interface ICMS {
   element: string;
   languages: { [languageCode: string]: Language };
   organization: string;
+}
+
+export interface Language {
+  versions: LanguageVersion[];
+}
+export interface LanguageVersion {
+  name: string;
+  created: Date;
+  displayDates: DisplayDate[];
+  order: number;
+  string: string;
+  modified: Date;
+  publishes: Publish[];
+}
+
+export interface Publish {
+  published: Date;
+  string: string;
+  author: {
+    id: string;
+    displayName: string;
+    email: string;
+  };
+}
+
+export interface DisplayDate {
+  startDate: Date | null;
+  endDate: Date | null;
 }
 
 export class CMS extends BaseService {
@@ -178,12 +186,34 @@ export class CMS extends BaseService {
   private updateCacheFromStrings(strings: ICMS[]): void {
     for (const cms of strings) {
       for (const [langCode, langData] of Object.entries(cms.languages)) {
-        // Get the latest published version
-        const publishedVersion = langData.versions.find((v) => v.published) || langData.versions[0];
+        const cacheKey = `${cms.element}-${langCode}`;
 
-        if (publishedVersion) {
-          const cacheKey = `${cms.element}-${langCode}`;
-          this.cmsCache.set(cacheKey, publishedVersion.string);
+        try {
+          // Get the base and selected version
+          const baseVersion = langData.versions.find((v) => v.name === "base");
+          let selectedVersion = this.coreInfo?.version ? langData.versions.find((v) => v.name === this.coreInfo?.version) : undefined;
+          if (selectedVersion && selectedVersion.displayDates?.length) {
+            // if the version has schedule, then check it's in range
+            const match = selectedVersion.displayDates.find((range) =>
+              (range.startDate === null || new Date(range.startDate).getTime() < new Date().getTime()) &&
+              (range.endDate === null || new Date(range.endDate).getTime() > new Date().getTime())
+            );
+
+            // it's out of range, clear selectedVersion
+            if (!match) selectedVersion = undefined;
+          }
+
+          if (this.coreInfo?.isDraft) {
+            const draft = selectedVersion || baseVersion;
+            if (draft) this.cmsCache.set(cacheKey, draft.string);
+          }
+          else {
+            const lastPublish = selectedVersion?.publishes?.[0] || baseVersion?.publishes?.[0];
+            if (lastPublish) this.cmsCache.set(cacheKey, lastPublish?.string);
+          }
+        }
+        catch (err) {
+          console.error("Failed to update cache", err);
         }
       }
     }
