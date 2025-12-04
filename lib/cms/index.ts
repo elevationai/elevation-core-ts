@@ -87,6 +87,47 @@ export class CMS extends BaseService {
   }
 
   /**
+   * Get multiple keys from CMS
+   * @param keys - The array of CMS keys to retrieve
+   * @param lan - Language code (e.g., 'en', 'es', 'fr')
+   * @param allowCache - Whether to allow cached values
+   * @returns Array of CMS strings or null for each key if not found
+   */
+  async getKeys(keys: string[], lan: string, allowCache = true): Promise<(string | null)[]> {
+    this.checkConfiguration();
+
+    // If cache is allowed and cache exists, return from cache
+    if (allowCache && this.allStrings?.length) {
+      return keys.map((key) => {
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        return cached !== undefined ? cached : cachedLangFallback !== undefined ? cachedLangFallback : null;
+      });
+    }
+
+    // If cache is not allowed or cache is not loaded, load all strings
+    if (!allowCache || !this.allStrings?.length) {
+      // Subscribe to loadAllStrings and wait for completion
+      try {
+        await firstValueFrom(this.loadAllStrings(!allowCache));
+      }
+      catch (error) {
+        // If loading fails, continue with empty cache
+        console.error("Failed to load strings for keys lookup:", error);
+      }
+
+      // Check cache again after loading
+      return keys.map((key) => {
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        return cached !== undefined ? cached : cachedLangFallback !== undefined ? cachedLangFallback : null;
+      });
+    }
+
+    return keys.map(() => null);
+  }
+
+  /**
    * Get a string value directly (convenience method)
    */
   getString(key: string, lan: string, allowCache = true): Promise<string | null> {
@@ -98,6 +139,38 @@ export class CMS extends BaseService {
    */
   getConfig(key: string, lan: string, allowCache = true): Promise<string | null> {
     return this.getKey(key, lan, true, allowCache);
+  }
+
+  /**
+   * Get all unique language codes from CMS
+   * @param allowCache - Whether to allow cached values
+   * @returns Array of unique language codes
+   */
+  async getLangs(allowCache = true): Promise<string[]> {
+    this.checkConfiguration();
+
+    // If cache is not allowed or cache is not loaded, load all strings
+    if (!allowCache || !this.allStrings?.length) {
+      try {
+        await firstValueFrom(this.loadAllStrings(!allowCache));
+      }
+      catch (error) {
+        console.error("Failed to load strings for getLangs:", error);
+        return [];
+      }
+    }
+
+    // Iterate through all strings and collect unique language codes
+    const langSet = new Set<string>();
+    if (this.allStrings) {
+      for (const cms of this.allStrings) {
+        for (const langCode of Object.keys(cms.languages)) {
+          langSet.add(langCode);
+        }
+      }
+    }
+
+    return Array.from(langSet);
   }
 
   /**

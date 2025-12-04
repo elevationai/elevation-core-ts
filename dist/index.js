@@ -2775,6 +2775,36 @@ var CMS = class extends BaseService {
     return null;
   }
   /**
+   * Get multiple keys from CMS
+   * @param keys - The array of CMS keys to retrieve
+   * @param lan - Language code (e.g., 'en', 'es', 'fr')
+   * @param allowCache - Whether to allow cached values
+   * @returns Array of CMS strings or null for each key if not found
+   */
+  async getKeys(keys, lan, allowCache = true) {
+    this.checkConfiguration();
+    if (allowCache && this.allStrings?.length) {
+      return keys.map((key) => {
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        return cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
+      });
+    }
+    if (!allowCache || !this.allStrings?.length) {
+      try {
+        await firstValueFrom(this.loadAllStrings(!allowCache));
+      } catch (error) {
+        console.error("Failed to load strings for keys lookup:", error);
+      }
+      return keys.map((key) => {
+        const cached = this.cmsCache.get(`${key}-${lan}`);
+        const cachedLangFallback = this.cmsCache.get(`${key}-en-US`);
+        return cached !== void 0 ? cached : cachedLangFallback !== void 0 ? cachedLangFallback : null;
+      });
+    }
+    return keys.map(() => null);
+  }
+  /**
    * Get a string value directly (convenience method)
    */
   getString(key, lan, allowCache = true) {
@@ -2785,6 +2815,31 @@ var CMS = class extends BaseService {
    */
   getConfig(key, lan, allowCache = true) {
     return this.getKey(key, lan, true, allowCache);
+  }
+  /**
+   * Get all unique language codes from CMS
+   * @param allowCache - Whether to allow cached values
+   * @returns Array of unique language codes
+   */
+  async getLangs(allowCache = true) {
+    this.checkConfiguration();
+    if (!allowCache || !this.allStrings?.length) {
+      try {
+        await firstValueFrom(this.loadAllStrings(!allowCache));
+      } catch (error) {
+        console.error("Failed to load strings for getLangs:", error);
+        return [];
+      }
+    }
+    const langSet = /* @__PURE__ */ new Set();
+    if (this.allStrings) {
+      for (const cms2 of this.allStrings) {
+        for (const langCode of Object.keys(cms2.languages)) {
+          langSet.add(langCode);
+        }
+      }
+    }
+    return Array.from(langSet);
   }
   /**
    * Load all CMS strings for the organization
