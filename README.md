@@ -1210,6 +1210,39 @@ console.log(spanishMsg); // "Bienvenido a nuestro servicio"
 const freshMsg = await cms.getString("welcome_message", "en-US", false);
 ```
 
+### Multiple Content Strings
+
+Use `getKeys()` to retrieve multiple localized strings in a single call:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Get multiple localized strings at once
+const keys = ["welcome_message", "goodbye_message", "error_message"];
+const messages = await cms.getKeys(keys, "en-US");
+
+console.log(messages);
+// ["Welcome to our service", "Goodbye!", "An error occurred"]
+
+// Get multiple strings without cache
+const freshMessages = await cms.getKeys(keys, "en-US", false);
+```
+
+### Available Languages
+
+Use `getLangs()` to retrieve all available language codes from the CMS:
+
+```typescript
+import { cms } from "@jsr/eai__elevation-core-ts";
+
+// Get all available language codes
+const languages = await cms.getLangs();
+console.log(languages); // ["en-US", "es-ES", "fr-FR", "de-DE"]
+
+// Get languages without cache (force fresh data)
+const freshLanguages = await cms.getLangs(false);
+```
+
 ### Configuration Objects
 
 Use `getConfig()` to retrieve JSON configuration objects that are automatically parsed:
@@ -1305,7 +1338,11 @@ if (allStrings) {
 
 ## Version Support
 
-The CMS supports content versioning, allowing you to maintain multiple versions of content and switch between them:
+The CMS supports content versioning, allowing you to maintain multiple versions of content and switch between them. By default, the CMS uses the "base" version, but you can specify a different version using `coreInfo.version`.
+
+### Configuring a Specific Version
+
+Set `coreInfo.version` to use content from a specific named version:
 
 ```typescript
 import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
@@ -1323,6 +1360,14 @@ cms.config(coreInfo);
 const holidayMsg = await cms.getString("welcome_message", "en-US");
 ```
 
+### Version Fallback Behavior
+
+When a specific version is configured:
+
+1. The CMS first looks for the specified version (e.g., "holiday-2024")
+2. If the version exists but is outside its scheduled display dates, falls back to "base" version
+3. If the version doesn't exist for a particular key, falls back to "base" version
+
 ### Scheduled Content
 
 Versions can have display date ranges. Content is automatically selected based on the current date:
@@ -1333,7 +1378,9 @@ Versions can have display date ranges. Content is automatically selected based o
 
 ## Draft Mode
 
-Support for draft content allows testing changes before publishing:
+Support for draft content allows testing changes before publishing. Set `coreInfo.isDraft` to `true` to retrieve draft (unpublished) content instead of published content.
+
+### Configuring Draft Mode
 
 ```typescript
 import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
@@ -1342,7 +1389,7 @@ import { cms, CoreInfo } from "@jsr/eai__elevation-core-ts";
 const coreInfo: CoreInfo = {
   token: "<Tenant_Access_Token>",
   serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  version: "v2.0",
+  version: "v2.0", // Optional: combine with specific version
   isDraft: true, // Use draft content instead of published
 };
 
@@ -1354,9 +1401,28 @@ const draftContent = await cms.getString("welcome_message", "en-US");
 
 ### Draft vs Published
 
-- **Draft Mode (`isDraft: true`)**: Returns the latest draft version of content
-- **Published Mode (`isDraft: false` or omitted)**: Returns the last published version
+- **Draft Mode (`isDraft: true`)**: Returns the latest draft version string directly from the version data
+- **Published Mode (`isDraft: false` or omitted)**: Returns the last published version from the `publishes` array
 - Useful for content review workflows and testing before going live
+
+### Combining Version and Draft Mode
+
+You can use both `version` and `isDraft` together:
+
+```typescript
+const coreInfo: CoreInfo = {
+  token: "<Tenant_Access_Token>",
+  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
+  version: "holiday-2024", // Use specific version
+  isDraft: true, // Get draft content from that version
+};
+
+cms.config(coreInfo);
+
+// Gets draft content from "holiday-2024" version
+// Falls back to draft content from "base" if version not found
+const draftHolidayMsg = await cms.getString("welcome_message", "en-US");
+```
 
 ### Cleanup
 

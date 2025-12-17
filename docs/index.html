@@ -450,7 +450,7 @@
             </div>
             <h3>Content Management</h3>
             <p>
-              Multi-language content support with fallback to default language and configuration parsing capabilities.
+              Multi-language content with versioning, scheduled delivery, draft/published workflows, and automatic language fallback.
             </p>
           </div>
         </div>
@@ -662,8 +662,8 @@
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
   <span class="variable">token</span>: <span class="string">'your-access-token'</span>,
   <span class="variable">serviceEndpoint</span>: <span class="string">'https://api.example.com'</span>,
-  <span class="variable">version</span>: <span class="string">'v2.0'</span>, <span class="comment">// Optional: content version</span>
-  <span class="variable">isDraft</span>: <span class="keyword">false</span> <span class="comment">// Optional: use published content</span>
+  <span class="variable">version</span>: <span class="string">'v2.0'</span>, <span class="comment">// Optional: use specific content version</span>
+  <span class="variable">isDraft</span>: <span class="keyword">false</span> <span class="comment">// Optional: use published content (default)</span>
 };
 
 <span class="variable">cms</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>);
@@ -671,6 +671,14 @@
 <span class="comment">// Get localized strings (with auto-fallback to en-US)</span>
 <span class="keyword">const</span> <span class="variable">welcomeMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getString</span>(<span class="string">'welcome_message'</span>, <span class="string">'en-US'</span>);
 <span class="keyword">const</span> <span class="variable">spanishMsg</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getString</span>(<span class="string">'welcome_message'</span>, <span class="string">'es-ES'</span>);
+
+<span class="comment">// Get multiple localized strings at once</span>
+<span class="keyword">const</span> <span class="variable">keys</span> = [<span class="string">'welcome_message'</span>, <span class="string">'goodbye_message'</span>, <span class="string">'error_message'</span>];
+<span class="keyword">const</span> <span class="variable">messages</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getKeys</span>(<span class="variable">keys</span>, <span class="string">'en-US'</span>);
+
+<span class="comment">// Get all available language codes</span>
+<span class="keyword">const</span> <span class="variable">languages</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getLangs</span>();
+<span class="function">console</span>.<span class="function">log</span>(<span class="variable">languages</span>); <span class="comment">// ["en-US", "es-ES", "fr-FR"]</span>
 
 <span class="comment">// Get configuration objects (automatically parsed JSON)</span>
 <span class="keyword">const</span> <span class="variable">themeConfig</span> = <span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">getConfig</span>(<span class="string">'app_theme_config'</span>, <span class="string">'en-US'</span>);
