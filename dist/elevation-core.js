@@ -2986,7 +2986,7 @@ var ElevationCore = (() => {
                 if (this.coreInfo?.textReplaces?.length) {
                   for (const { find, replace } of this.coreInfo.textReplaces) {
                     try {
-                      value = value.replace(find, replace);
+                      value = value.replace(new RegExp(find, "g"), replace);
                     } catch (e) {
                       console.error("Failed to apply text replace", e);
                     }
@@ -3001,7 +3001,7 @@ var ElevationCore = (() => {
                 if (this.coreInfo?.textReplaces?.length) {
                   for (const { find, replace } of this.coreInfo.textReplaces) {
                     try {
-                      value = value.replace(find, replace);
+                      value = value.replace(new RegExp(find, "g"), replace);
                     } catch (e) {
                       console.error("Failed to apply text replace", e);
                     }

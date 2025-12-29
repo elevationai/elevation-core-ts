@@ -16,7 +16,7 @@ export interface CoreInfo {
   timeout?: number;
   version?: string;
   pageName?: string;
-  textReplaces?: { find: RegExp; replace: string }[];
+  textReplaces?: { find: string; replace: string }[];
   isDraft?: boolean;
 }
 
