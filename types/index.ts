@@ -15,6 +15,8 @@ export interface CoreInfo {
   secondary?: boolean;
   timeout?: number;
   version?: string;
+  pageName?: string;
+  textReplaces?: { find: string; replace: string }[];
   isDraft?: boolean;
 }
 
@@ -31,6 +33,7 @@ export interface OnlineKiosk {
 export interface ElevatedConfigurationsInfo {
   deviceId: string;
   locationId: string;
+  version?: string;
 }
 
 export interface Software {

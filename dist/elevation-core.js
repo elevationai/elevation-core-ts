@@ -2779,7 +2779,8 @@ var ElevationCore = (() => {
       this.checkConfiguration();
       this.checkConfigInfo();
       return this.get(
-        `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}`,
+        `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}
+      ${this.configInfo?.version ? `?version=${this.configInfo?.version}` : ""}`,
         { "Cache-Control": "no-cache" }
       ).then((res) => {
         return res.data || null;
@@ -2909,7 +2910,7 @@ var ElevationCore = (() => {
       }
       this.stringsObservable = from(
         this.get(
-          `/strings`,
+          this.coreInfo?.pageName ? `/strings/page/${this.coreInfo?.pageName}` : `/strings`,
           disableCache ? this.reqHeaderNoCache : void 0
         )
       ).pipe(
@@ -2980,12 +2981,34 @@ var ElevationCore = (() => {
             }
             if (this.coreInfo?.isDraft) {
               const draft = selectedVersion || baseVersion;
-              if (draft)
-                this.cmsCache.set(cacheKey, draft.string);
+              if (draft) {
+                let value = draft.string;
+                if (this.coreInfo?.textReplaces?.length) {
+                  for (const { find, replace } of this.coreInfo.textReplaces) {
+                    try {
+                      value = value.replace(new RegExp(find, "g"), replace);
+                    } catch (e) {
+                      console.error("Failed to apply text replace", e);
+                    }
+                  }
+                }
+                this.cmsCache.set(cacheKey, value);
+              }
             } else {
               const lastPublish = selectedVersion?.publishes?.[0] || baseVersion?.publishes?.[0];
-              if (lastPublish)
-                this.cmsCache.set(cacheKey, lastPublish?.string);
+              if (lastPublish) {
+                let value = lastPublish.string;
+                if (this.coreInfo?.textReplaces?.length) {
+                  for (const { find, replace } of this.coreInfo.textReplaces) {
+                    try {
+                      value = value.replace(new RegExp(find, "g"), replace);
+                    } catch (e) {
+                      console.error("Failed to apply text replace", e);
+                    }
+                  }
+                }
+                this.cmsCache.set(cacheKey, value);
+              }
             }
           } catch (err) {
             console.error("Failed to update cache", err);
