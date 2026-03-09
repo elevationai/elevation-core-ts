@@ -1,9 +1,9 @@
 // Build script to create browser-compatible JavaScript bundles
-import { ensureDir } from "https://deno.land/std/fs/mod.ts";
-import * as path from "https://deno.land/std/path/mod.ts";
-import * as esbuild from "npm:esbuild@0.20.2";
-import { denoPlugins } from "jsr:@luca/esbuild-deno-loader@^0.11.1";
-import { parse } from "jsr:@std/jsonc";
+import { ensureDir } from "@std/fs";
+import * as path from "@std/path";
+import * as esbuild from "esbuild";
+import { denoPlugins } from "@luca/esbuild-deno-loader";
+import { parse } from "@std/jsonc";
 
 const outDir = "./dist";
 const tempDir = "./.temp";
