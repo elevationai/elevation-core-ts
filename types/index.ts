@@ -227,6 +227,26 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
+export interface ConfigFetchOptions {
+  /** The configuration label to fetch */
+  label: string;
+  /** The file path to write the .jsonc configuration to */
+  filePath: string;
+  /** Force a write even if the configuration has not changed */
+  force?: boolean;
+  /** Number of backup files to keep (default: 3, set to 0 to disable) */
+  maxBackups?: number;
+}
+
+export interface ConfigFetchResult<T = unknown> {
+  /** Whether the configuration was written to disk (changed, forced, or first fetch) */
+  updated: boolean;
+  /** Whether this is the first time this label has been fetched (no prior cache) */
+  firstFetch: boolean;
+  /** The configuration data */
+  data: T;
+}
+
 // Utility type for debouncing
 export interface DebouncedEvent {
   eventCode: EventCode | number;
