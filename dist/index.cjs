@@ -2748,6 +2748,255 @@ var ElevatedEnrollment = class extends BaseService {
 };
 var enrollment = new ElevatedEnrollment();
 
+// https://jsr.io/@std/jsonc/1.0.2/parse.ts
+function parse(text) {
+  if (new.target) {
+    throw new TypeError(
+      "Cannot create an instance: parse is not a constructor"
+    );
+  }
+  return new JsoncParser(text).parse();
+}
+var JsoncParser = class {
+  #whitespace = new Set(" 	\r\n");
+  #numberEndToken = /* @__PURE__ */ new Set([..."[]{}:,/", ...this.#whitespace]);
+  #text;
+  #length;
+  #tokenized;
+  constructor(text) {
+    this.#text = `${text}`;
+    this.#length = this.#text.length;
+    this.#tokenized = this.#tokenize();
+  }
+  parse() {
+    const token = this.#getNext();
+    const res = this.#parseJsonValue(token);
+    const { done, value } = this.#tokenized.next();
+    if (!done) {
+      throw new SyntaxError(buildErrorMessage(value));
+    }
+    return res;
+  }
+  /** Read the next token. If the token is read to the end, it throws a SyntaxError. */
+  #getNext() {
+    const { done, value } = this.#tokenized.next();
+    if (done) {
+      throw new SyntaxError(
+        "Cannot parse JSONC: unexpected end of JSONC input"
+      );
+    }
+    return value;
+  }
+  /** Split the JSONC string into token units. Whitespace and comments are skipped. */
+  *#tokenize() {
+    for (let i = 0; i < this.#length; i++) {
+      if (this.#whitespace.has(this.#text[i])) {
+        continue;
+      }
+      if (this.#text[i] === "/" && this.#text[i + 1] === "*") {
+        i += 2;
+        let hasEndOfComment = false;
+        for (; i < this.#length; i++) {
+          if (this.#text[i] === "*" && this.#text[i + 1] === "/") {
+            hasEndOfComment = true;
+            break;
+          }
+        }
+        if (!hasEndOfComment) {
+          throw new SyntaxError(
+            "Cannot parse JSONC: unexpected end of JSONC input"
+          );
+        }
+        i++;
+        continue;
+      }
+      if (this.#text[i] === "/" && this.#text[i + 1] === "/") {
+        i += 2;
+        for (; i < this.#length; i++) {
+          if (this.#text[i] === "\n" || this.#text[i] === "\r") {
+            break;
+          }
+        }
+        continue;
+      }
+      switch (this.#text[i]) {
+        case "{":
+          yield { type: "BeginObject", position: i };
+          break;
+        case "}":
+          yield { type: "EndObject", position: i };
+          break;
+        case "[":
+          yield { type: "BeginArray", position: i };
+          break;
+        case "]":
+          yield { type: "EndArray", position: i };
+          break;
+        case ":":
+          yield { type: "NameSeparator", position: i };
+          break;
+        case ",":
+          yield { type: "ValueSeparator", position: i };
+          break;
+        case '"': {
+          const startIndex = i;
+          let shouldEscapeNext = false;
+          i++;
+          for (; i < this.#length; i++) {
+            if (this.#text[i] === '"' && !shouldEscapeNext) {
+              break;
+            }
+            shouldEscapeNext = this.#text[i] === "\\" && !shouldEscapeNext;
+          }
+          yield {
+            type: "String",
+            sourceText: this.#text.substring(startIndex, i + 1),
+            position: startIndex
+          };
+          break;
+        }
+        default: {
+          const startIndex = i;
+          for (; i < this.#length; i++) {
+            if (this.#numberEndToken.has(this.#text[i])) {
+              break;
+            }
+          }
+          i--;
+          yield {
+            type: "NullOrTrueOrFalseOrNumber",
+            sourceText: this.#text.substring(startIndex, i + 1),
+            position: startIndex
+          };
+        }
+      }
+    }
+  }
+  #parseJsonValue(value) {
+    switch (value.type) {
+      case "BeginObject":
+        return this.#parseObject();
+      case "BeginArray":
+        return this.#parseArray();
+      case "NullOrTrueOrFalseOrNumber":
+        return this.#parseNullOrTrueOrFalseOrNumber(value);
+      case "String":
+        return this.#parseString(value);
+      default:
+        throw new SyntaxError(buildErrorMessage(value));
+    }
+  }
+  #parseObject() {
+    const target = {};
+    while (true) {
+      const token1 = this.#getNext();
+      if (token1.type === "EndObject") {
+        return target;
+      }
+      if (token1.type !== "String") {
+        throw new SyntaxError(buildErrorMessage(token1));
+      }
+      const key = this.#parseString(token1);
+      const token2 = this.#getNext();
+      if (token2.type !== "NameSeparator") {
+        throw new SyntaxError(buildErrorMessage(token2));
+      }
+      const token3 = this.#getNext();
+      Object.defineProperty(target, key, {
+        value: this.#parseJsonValue(token3),
+        writable: true,
+        enumerable: true,
+        configurable: true
+      });
+      const token4 = this.#getNext();
+      if (token4.type === "EndObject") {
+        return target;
+      }
+      if (token4.type !== "ValueSeparator") {
+        throw new SyntaxError(buildErrorMessage(token4));
+      }
+    }
+  }
+  #parseArray() {
+    const target = [];
+    while (true) {
+      const token1 = this.#getNext();
+      if (token1.type === "EndArray") {
+        return target;
+      }
+      target.push(this.#parseJsonValue(token1));
+      const token2 = this.#getNext();
+      if (token2.type === "EndArray") {
+        return target;
+      }
+      if (token2.type !== "ValueSeparator") {
+        throw new SyntaxError(buildErrorMessage(token2));
+      }
+    }
+  }
+  #parseString(value) {
+    let parsed;
+    try {
+      parsed = JSON.parse(value.sourceText);
+    } catch {
+      throw new SyntaxError(buildErrorMessage(value));
+    }
+    if (typeof parsed !== "string") {
+      throw new TypeError(`Parsed value is not a string: ${parsed}`);
+    }
+    return parsed;
+  }
+  #parseNullOrTrueOrFalseOrNumber(value) {
+    if (value.sourceText === "null") {
+      return null;
+    }
+    if (value.sourceText === "true") {
+      return true;
+    }
+    if (value.sourceText === "false") {
+      return false;
+    }
+    let parsed;
+    try {
+      parsed = JSON.parse(value.sourceText);
+    } catch {
+      throw new SyntaxError(buildErrorMessage(value));
+    }
+    if (typeof parsed !== "number") {
+      throw new TypeError(`Parsed value is not a number: ${parsed}`);
+    }
+    return parsed;
+  }
+};
+function buildErrorMessage({ type, sourceText, position }) {
+  let token = "";
+  switch (type) {
+    case "BeginObject":
+      token = "{";
+      break;
+    case "EndObject":
+      token = "}";
+      break;
+    case "BeginArray":
+      token = "[";
+      break;
+    case "EndArray":
+      token = "]";
+      break;
+    case "NameSeparator":
+      token = ":";
+      break;
+    case "ValueSeparator":
+      token = ",";
+      break;
+    case "NullOrTrueOrFalseOrNumber":
+    case "String":
+      token = 30 < sourceText.length ? `${sourceText.slice(0, 30)}...` : sourceText;
+      break;
+  }
+  return `Cannot parse JSONC: unexpected token "${token}" in JSONC at position ${position}`;
+}
+
 // lib/config/index.ts
 var ElevatedConfigurations = class extends BaseService {
   configInfo = null;
@@ -2784,6 +3033,66 @@ var ElevatedConfigurations = class extends BaseService {
   }
   getConfigs(labels) {
     return Promise.all(labels.map((label) => this.getConfig(label)));
+  }
+  /**
+   * Fetches a configuration by label, compares it against the local .jsonc file,
+   * and writes the result to disk if the configuration has changed.
+   * Comments in an existing local .jsonc file are ignored during comparison.
+   */
+  async fetchAndCacheConfig(options) {
+    const { label, filePath, force } = options;
+    const configData = await this.getConfig(label);
+    if (!configData) {
+      throw new Error(`Configuration "${label}" returned null - config may not exist or request failed`);
+    }
+    const remoteContent = JSON.stringify(configData, null, 2);
+    let localContent = null;
+    let firstFetch = true;
+    try {
+      const localFileContent = await Deno.readTextFile(filePath);
+      const parsed = parse(localFileContent);
+      localContent = JSON.stringify(parsed, null, 2);
+      firstFetch = false;
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        throw error;
+      }
+    }
+    const changed = localContent === null || localContent.trim() !== remoteContent.trim();
+    if (changed || force) {
+      const maxBackups = options.maxBackups ?? 3;
+      if (maxBackups > 0 && !firstFetch) {
+        await this.rotateBackups(filePath, maxBackups);
+      }
+      await Deno.writeTextFile(filePath, remoteContent);
+      return { updated: true, firstFetch, data: configData };
+    }
+    return { updated: false, firstFetch, data: configData };
+  }
+  async rotateBackups(filePath, maxBackups) {
+    try {
+      await Deno.remove(`${filePath}.bak.${maxBackups}`);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        throw error;
+      }
+    }
+    for (let i = maxBackups - 1; i >= 1; i--) {
+      try {
+        await Deno.rename(`${filePath}.bak.${i}`, `${filePath}.bak.${i + 1}`);
+      } catch (error) {
+        if (!(error instanceof Deno.errors.NotFound)) {
+          throw error;
+        }
+      }
+    }
+    try {
+      await Deno.rename(filePath, `${filePath}.bak.1`);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        throw error;
+      }
+    }
   }
 };
 var elevatedConfigurations = new ElevatedConfigurations();
