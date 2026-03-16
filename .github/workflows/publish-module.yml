@@ -1,0 +1,111 @@
+# Triggered by `deno task publish` (see publish.ts).
+# Checks out the exact commit, runs CI checks, then dispatches to
+# code.cuss2.app for bundling and publishing.
+#
+# Required secret: CI_TOKEN (GitHub PAT with repo + workflow scope)
+
+name: Publish Module
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: "Module path (e.g., packages/my-lib or . for repo root)"
+        required: true
+        type: string
+      sha:
+        description: "Exact commit SHA to publish"
+        required: true
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout at SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.sha }}
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run checks
+        run: |
+          MODULE="${{ github.event.inputs.module }}"
+          echo "Running checks for module at: $MODULE"
+
+          # Type check
+          if [ -f "$MODULE/index.ts" ]; then
+            deno check "$MODULE/index.ts"
+          fi
+
+          # Lint
+          deno lint "$MODULE"
+
+      - name: Read module config
+        id: config
+        run: |
+          MODULE="${{ github.event.inputs.module }}"
+
+          CONFIG_FILE="${MODULE}/deno.json"
+          if [ ! -f "$CONFIG_FILE" ]; then
+            CONFIG_FILE="${MODULE}/deno.jsonc"
+          fi
+
+          if [ ! -f "$CONFIG_FILE" ]; then
+            echo "::error::No deno.json or deno.jsonc found at ${MODULE}"
+            exit 1
+          fi
+
+          NAME=$(deno eval "
+            import { parse } from 'jsr:@std/jsonc@1.0.1';
+            const c = parse(Deno.readTextFileSync('${CONFIG_FILE}'));
+            console.log(c.name);
+          ")
+          VERSION=$(deno eval "
+            import { parse } from 'jsr:@std/jsonc@1.0.1';
+            const c = parse(Deno.readTextFileSync('${CONFIG_FILE}'));
+            console.log(c.version);
+          ")
+
+          echo "NAME=$NAME" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing $NAME@$VERSION from $MODULE"
+
+      - name: Dispatch to code.cuss2.app
+        env:
+          CI_TOKEN: ${{ secrets.CI_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          SHA="${{ github.event.inputs.sha }}"
+          MODULE="${{ github.event.inputs.module }}"
+
+          echo "Dispatching publish for $REPO @ $SHA (module: $MODULE)"
+
+          BODY=$(jq -n \
+            --arg ref "main" \
+            --arg repo "$REPO" \
+            --arg sha "$SHA" \
+            --arg module "$MODULE" \
+            '{"ref": $ref, "inputs": {"repo": $repo, "sha": $sha, "module_path": $module}}')
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token $CI_TOKEN" \
+            "https://api.github.com/repos/elevationai/code.cuss2.app/actions/workflows/publish-package.yml/dispatches" \
+            -d "$BODY")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "::error::Dispatch failed (HTTP $HTTP_CODE): $RESPONSE_BODY"
+            exit 1
+          fi
+
+          echo "Dispatch sent successfully (HTTP $HTTP_CODE)"
+          echo "Monitor at: https://github.com/elevationai/code.cuss2.app/actions/workflows/publish-package.yml"
