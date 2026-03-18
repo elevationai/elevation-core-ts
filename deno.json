@@ -1,7 +1,7 @@
 {
   "name": "@eai/elevation-core-ts",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "BUSL-1.1",
   "exports": {
     ".": "./mod.ts",
     "./types": "./types/mod.ts",
