@@ -98,7 +98,7 @@ describe("ElevatedEnrollment", () => {
   });
 
   describe("getSpecification()", () => {
-    it("should GET /speficiations (with typo) and return data", async () => {
+    it("should GET /specifications and return data", async () => {
       svc.config(createCoreInfo());
       const specs = [createSpecification()];
       mockFetch.queueResponse(specs);
@@ -106,7 +106,7 @@ describe("ElevatedEnrollment", () => {
       const result = await svc.getSpecification();
 
       assertEquals(result, specs);
-      assertEquals(mockFetch.lastUrl, "https://api.test.com/speficiations");
+      assertEquals(mockFetch.lastUrl, "https://api.test.com/specifications");
     });
   });
 

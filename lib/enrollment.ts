@@ -46,7 +46,7 @@ export class ElevatedEnrollment extends BaseService {
   public async getSpecification(): Promise<Specification[]> {
     this.checkConfiguration();
 
-    const response = await this.get<Specification[]>(`/speficiations`);
+    const response = await this.get<Specification[]>(`/specifications`);
 
     if (response.success && response.data) {
       return response.data;
