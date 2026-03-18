@@ -1,4 +1,4 @@
-import type { ApiResponse, CoreInfo } from "../../types/index.ts";
+import type { ApiResponse, CoreInfo } from "@eai/elevation-types";
 
 export abstract class BaseService {
   protected coreInfo: CoreInfo | null = null;

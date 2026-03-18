@@ -1,7 +1,7 @@
 import { BaseService } from "../shared/base.ts";
 import { Debouncer } from "../shared/utils.ts";
-import type { ApiResponse, LogData, LogOptions } from "../../types/index.ts";
-import { LogLevel } from "../../types/index.ts";
+import type { ApiResponse, LogData, LogOptions } from "@eai/elevation-types";
+import { LogLevel } from "@eai/elevation-types";
 
 export class ElevatedLogs extends BaseService {
   private defaults: LogOptions = {};

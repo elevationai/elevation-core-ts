@@ -1,7 +1,7 @@
 import { BaseService } from "../shared/base.ts";
 import { BehaviorSubject, Subject } from "rxjs";
 import { io, type Socket } from "socket.io-client";
-import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "../../types/index.ts";
+import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "@eai/elevation-types";
 
 export class ElevatedIOT extends BaseService {
   private socket: Socket | null = null;

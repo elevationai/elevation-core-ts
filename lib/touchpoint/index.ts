@@ -1,4 +1,4 @@
-import type { Device } from "../../types/index.ts";
+import type { Device } from "@eai/elevation-types";
 import { BaseService } from "../shared/base.ts";
 
 export class TouchPoint extends BaseService {

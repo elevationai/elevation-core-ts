@@ -1,6 +1,6 @@
 import { parse as parseJsonc } from "@std/jsonc";
 import { BaseService } from "../shared/base.ts";
-import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "../../types/index.ts";
+import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "@eai/elevation-types";
 
 export class ElevatedConfigurations extends BaseService {
   private configInfo: ElevatedConfigurationsInfo | null = null;

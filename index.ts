@@ -1,8 +1,5 @@
 // Main export file for Elevation Deno Service
 
-// Export all types
-export * from "./types/index.ts";
-
 // Export shared utilities
 export { Cache, Debouncer, uuid } from "./lib/shared/utils.ts";
 
@@ -23,7 +20,7 @@ import { enrollment } from "./lib/enrollment/index.ts";
 import { elevatedConfigurations } from "./lib/config/index.ts";
 import { cms } from "./lib/cms/index.ts";
 import { touchPoint } from "./lib/touchpoint/index.ts";
-import type { CoreInfo } from "./types/index.ts";
+import type { CoreInfo } from "@eai/elevation-types";
 
 // Export a convenience class that combines all services
 export class ElevationService {

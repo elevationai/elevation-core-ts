@@ -206,7 +206,7 @@ export class CMS extends BaseService {
       tap((data) => {
         this.allStrings = data;
         // Update cache with loaded strings
-        this.updateCacheFromStrings(this.allStrings);
+        this.updateCacheFromStrings(data);
       }),
       catchError((error) => {
         console.error("Failed to load CMS strings:", error);

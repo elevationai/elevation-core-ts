@@ -1,5 +1,5 @@
 import { BaseService } from "../shared/base.ts";
-import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from "../../types/index.ts";
+import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from "@eai/elevation-types";
 
 export class ElevatedEnrollment extends BaseService {
   private started = false;
