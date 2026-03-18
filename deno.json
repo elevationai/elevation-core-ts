@@ -41,5 +41,15 @@
   "exclude": [
     "dist/",
     ".temp/"
-  ]
+  ],
+  "publish": {
+    "exclude": [
+      "tests/",
+      "images/",
+      ".github/",
+      ".vscode/",
+      "tsconfig.json",
+      "v1_MIGRATION.md"
+    ]
+  }
 }
