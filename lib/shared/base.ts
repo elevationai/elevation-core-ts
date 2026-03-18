@@ -1,4 +1,4 @@
-import type { ApiResponse, CoreInfo } from "../../types/index.ts";
+import type { ApiResponse, CoreInfo } from "../../types/mod.ts";
 
 export abstract class BaseService {
   protected coreInfo: CoreInfo | null = null;

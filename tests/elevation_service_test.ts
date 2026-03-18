@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertNotEquals } from "@std/assert";
-import { ElevationService } from "../index.ts";
+import { ElevationService } from "../mod.ts";
 import { createCoreInfo, MockFetch } from "./_mock.ts";
 
 describe("ElevationService", () => {

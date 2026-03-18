@@ -2,9 +2,7 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { ElevatedEvents } from "../lib/events.ts";
-import { StatusCode } from "../types/index.ts";
-import { EventType } from "../types/index.ts";
-import { EventMode } from "../types/index.ts";
+import { EventMode, EventType, StatusCode } from "../types/mod.ts";
 import { createCoreInfo, createDevice, MockFetch } from "./_mock.ts";
 
 describe("ElevatedEvents", () => {

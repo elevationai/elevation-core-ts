@@ -1,4 +1,4 @@
-import type { CoreInfo, Device, DeviceInfo, DeviceLocation, Specification, Terminal } from "../types/index.ts";
+import type { CoreInfo, Device, DeviceInfo, DeviceLocation, Specification, Terminal } from "../types/mod.ts";
 
 // --- MockFetch ---
 

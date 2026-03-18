@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { ElevatedLogs } from "../lib/logs.ts";
-import { LogLevel } from "../types/index.ts";
+import { LogLevel } from "../types/mod.ts";
 import { createCoreInfo, MockFetch } from "./_mock.ts";
 
 describe("ElevatedLogs", () => {

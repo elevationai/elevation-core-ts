@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "license": "UNLICENSED",
   "exports": {
-    ".": "./index.ts",
-    "./types": "./types/index.ts",
+    ".": "./mod.ts",
+    "./types": "./types/mod.ts",
     "./events": "./lib/events.ts",
     "./logs": "./lib/logs.ts",
     "./iot": "./lib/iot.ts",

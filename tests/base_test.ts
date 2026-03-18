@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertThrows } from "@std/assert";
 import { createCoreInfo, MockFetch } from "./_mock.ts";
 import { BaseService } from "../lib/shared/base.ts";
-import type { ApiResponse } from "../types/index.ts";
+import type { ApiResponse } from "../types/mod.ts";
 
 class TestService extends BaseService {
   public testGet<T>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {

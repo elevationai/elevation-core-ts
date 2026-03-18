@@ -1759,7 +1759,7 @@ elevation-core-ts/
 │   ├── cms.ts        # Content management
 │   └── touchpoint.ts # Device service state
 ├── types/            # TypeScript definitions & enums
-├── index.ts          # Main library exports
+├── mod.ts            # Main library exports
 └── deno.json         # Deno configuration
 ```
 

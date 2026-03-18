@@ -1,6 +1,6 @@
 import { AwaitableEmitter } from "@eai/models/AwaitableEmitter";
 import { io, type Socket } from "socket.io-client";
-import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "../types/index.ts";
+import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "../types/mod.ts";
 
 interface WebSocketError {
   message?: string;
