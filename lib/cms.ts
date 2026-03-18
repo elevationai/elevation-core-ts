@@ -42,7 +42,7 @@ export class CMS extends BaseService {
   private loadingPromise: Promise<ICMS[]> | null = null;
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
-  private reqHeaderNoCache = { "Cache-Control": "no-cache" };
+  private readonly reqHeaderNoCache = { "Cache-Control": "no-cache" };
 
   /**
    * Get a specific key from CMS

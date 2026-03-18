@@ -1,13 +1,17 @@
 import type { ApiResponse, CoreInfo } from "../../types/mod.ts";
 
 export abstract class BaseService {
-  protected coreInfo: CoreInfo | null = null;
-  protected configured = false;
-  protected headers: Headers = new Headers();
+  private _coreInfo: CoreInfo | null = null;
+  private configured = false;
+  private headers: Headers = new Headers();
+
+  protected get coreInfo(): CoreInfo | null {
+    return this._coreInfo;
+  }
 
   public config(coreInfo: CoreInfo): void {
     this.validateCoreInfo(coreInfo);
-    this.coreInfo = coreInfo;
+    this._coreInfo = coreInfo;
     this.setupHeaders();
     this.configured = true;
   }
@@ -26,16 +30,16 @@ export abstract class BaseService {
   }
 
   protected setupHeaders(): void {
-    if (!this.coreInfo) return;
+    if (!this._coreInfo) return;
 
     this.headers = new Headers({
-      "Elevated-Auth": btoa(this.coreInfo.token),
+      "Elevated-Auth": btoa(this._coreInfo.token),
       "Content-Type": "application/json",
     });
   }
 
   protected checkConfiguration(): void {
-    if (!this.configured || !this.coreInfo) {
+    if (!this.configured || !this._coreInfo) {
       throw new Error("Service not configured. Call config() first with CoreInfo");
     }
   }
@@ -55,8 +59,8 @@ export abstract class BaseService {
   ): Promise<ApiResponse<T>> {
     this.checkConfiguration();
 
-    const url = `${this.coreInfo!.serviceEndpoint}${path}`;
-    const timeout = this.coreInfo!.timeout || 30000;
+    const url = `${this._coreInfo!.serviceEndpoint}${path}`;
+    const timeout = this._coreInfo!.timeout || 30000;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);

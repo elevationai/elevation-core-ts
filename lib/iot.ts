@@ -14,8 +14,8 @@ export class ElevatedIOT extends AwaitableEmitter {
 
   private reconnectTimer: number | null = null;
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 10;
-  private reconnectDelay = 1000;
+  private readonly maxReconnectAttempts = 10;
+  private readonly reconnectDelay = 1000;
   private iotInfo: IOTInfo = { appName: "ElevationDenoService" };
 
   get socket(): Socket | null {

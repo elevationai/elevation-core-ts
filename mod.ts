@@ -27,13 +27,13 @@ import type { CoreInfo } from "./types/mod.ts";
 
 // Export a convenience class that combines all services
 export class ElevationService {
-  public events = events;
-  public logs = elogs;
-  public iot = iot;
-  public enrollment = enrollment;
-  public config = elevatedConfigurations;
-  public cms = cms;
-  public touchPoint = touchPoint;
+  public readonly events = events;
+  public readonly logs = elogs;
+  public readonly iot = iot;
+  public readonly enrollment = enrollment;
+  public readonly config = elevatedConfigurations;
+  public readonly cms = cms;
+  public readonly touchPoint = touchPoint;
 
   public initialize(coreInfo: CoreInfo): void {
     // Configure all services
