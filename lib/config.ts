@@ -1,6 +1,6 @@
 import { parse as parseJsonc } from "@std/jsonc";
-import { BaseService } from "../shared/base.ts";
-import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "../../types/index.ts";
+import { BaseService } from "./shared/base.ts";
+import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "../types/index.ts";
 
 export class ElevatedConfigurations extends BaseService {
   private configInfo: ElevatedConfigurationsInfo | null = null;
@@ -32,8 +32,9 @@ export class ElevatedConfigurations extends BaseService {
     this.checkConfigInfo();
 
     return this.get<unknown>(
-      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}
-      ${this.configInfo?.version ? `?version=${this.configInfo?.version}` : ""}`,
+      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}${
+        this.configInfo?.version ? `?version=${this.configInfo?.version}` : ""
+      }`,
       { "Cache-Control": "no-cache" },
     )
       .then((res) => {

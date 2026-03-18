@@ -1,6 +1,4 @@
-import { BaseService } from "../shared/base.ts";
-import { EMPTY, firstValueFrom, from, type Observable, of } from "rxjs";
-import { catchError, map, share, tap } from "rxjs/operators";
+import { BaseService } from "./shared/base.ts";
 
 // CMS Interfaces matching the reference library
 export interface ICMS {
@@ -41,8 +39,7 @@ export interface DisplayDate {
 }
 
 export class CMS extends BaseService {
-  public stringsObservable: Observable<ICMS[]> | null = null;
-
+  private loadingPromise: Promise<ICMS[]> | null = null;
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
   private reqHeaderNoCache = { "Cache-Control": "no-cache" };
@@ -67,12 +64,10 @@ export class CMS extends BaseService {
 
     // If cache is not allowed or cache is not loaded, load all strings
     if (!allowCache || !this.allStrings?.length) {
-      // Subscribe to loadAllStrings and wait for completion
       try {
-        await firstValueFrom(this.loadAllStrings(isConfig));
+        await this.loadAllStrings(!allowCache);
       }
       catch (error) {
-        // If loading fails, continue with empty cache
         console.error("Failed to load strings for key lookup:", error);
       }
 
@@ -107,12 +102,10 @@ export class CMS extends BaseService {
 
     // If cache is not allowed or cache is not loaded, load all strings
     if (!allowCache || !this.allStrings?.length) {
-      // Subscribe to loadAllStrings and wait for completion
       try {
-        await firstValueFrom(this.loadAllStrings(!allowCache));
+        await this.loadAllStrings(!allowCache);
       }
       catch (error) {
-        // If loading fails, continue with empty cache
         console.error("Failed to load strings for keys lookup:", error);
       }
 
@@ -149,10 +142,9 @@ export class CMS extends BaseService {
   async getLangs(allowCache = true): Promise<string[]> {
     this.checkConfiguration();
 
-    // If cache is not allowed or cache is not loaded, load all strings
     if (!allowCache || !this.allStrings?.length) {
       try {
-        await firstValueFrom(this.loadAllStrings(!allowCache));
+        await this.loadAllStrings(!allowCache);
       }
       catch (error) {
         console.error("Failed to load strings for getLangs:", error);
@@ -160,7 +152,6 @@ export class CMS extends BaseService {
       }
     }
 
-    // Iterate through all strings and collect unique language codes
     const langSet = new Set<string>();
     if (this.allStrings) {
       for (const cms of this.allStrings) {
@@ -174,59 +165,48 @@ export class CMS extends BaseService {
   }
 
   /**
-   * Load all CMS strings for the organization
-   * Returns an Observable that is shared when called multiple times rapidly
+   * Load all CMS strings for the organization.
+   * Uses a cached Promise for request deduplication — multiple concurrent
+   * callers share the same in-flight request.
    */
-  loadAllStrings(disableCache = false): Observable<ICMS[]> {
+  async loadAllStrings(disableCache = false): Promise<ICMS[]> {
     this.checkConfiguration();
 
-    // If already loading and not forcing refresh, return the existing observable
-    if (!disableCache && this.stringsObservable) {
-      return this.stringsObservable;
+    // If already loading and not forcing refresh, return the existing promise
+    if (!disableCache && this.loadingPromise) {
+      return this.loadingPromise;
     }
 
-    // If we have cached data and not forcing refresh, return it as an observable
+    // If we have cached data and not forcing refresh, return it
     if (!disableCache && this.allStrings && this.allStrings.length > 0) {
-      return of(this.allStrings);
+      return this.allStrings;
     }
 
-    // Create new loading observable
-    this.stringsObservable = from(
-      this.get(
-        this.coreInfo?.pageName ? `/strings/page/${this.coreInfo?.pageName}` : `/strings`,
-        disableCache ? this.reqHeaderNoCache : undefined,
-      ),
-    ).pipe(
-      map((response) => {
-        if (!response.success || !response.data) {
-          throw new Error("Failed to load CMS strings");
-        }
-        return response.data as ICMS[];
-      }),
-      tap((data) => {
-        this.allStrings = data;
-        // Update cache with loaded strings
-        this.updateCacheFromStrings(this.allStrings);
-      }),
-      catchError((error) => {
-        console.error("Failed to load CMS strings:", error);
-        // Clear the loading observable on error
-        this.stringsObservable = null;
-        return EMPTY;
-      }),
-      // Share the observable among multiple subscribers
-      share(),
-      tap({
-        complete: () => {
-          // Clear loading observable after completion
-          setTimeout(() => {
-            this.stringsObservable = null;
-          }, 0);
-        },
-      }),
+    // Create new loading promise — shared by concurrent callers
+    this.loadingPromise = this.fetchStrings(disableCache);
+
+    try {
+      return await this.loadingPromise;
+    }
+    finally {
+      this.loadingPromise = null;
+    }
+  }
+
+  private async fetchStrings(disableCache: boolean): Promise<ICMS[]> {
+    const response = await this.get(
+      this.coreInfo?.pageName ? `/strings/page/${this.coreInfo?.pageName}` : `/strings`,
+      disableCache ? this.reqHeaderNoCache : undefined,
     );
 
-    return this.stringsObservable;
+    if (!response.success || !response.data) {
+      throw new Error("Failed to load CMS strings");
+    }
+
+    const data = response.data as ICMS[];
+    this.allStrings = data;
+    this.updateCacheFromStrings(data);
+    return data;
   }
 
   /**
@@ -327,5 +307,4 @@ export class CMS extends BaseService {
   }
 }
 
-// Export singleton instance
 export const cms: CMS = new CMS();

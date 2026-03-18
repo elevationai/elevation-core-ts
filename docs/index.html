@@ -569,11 +569,11 @@
 <span class="variable">iot</span>.<span class="function">config</span>(<span class="variable">coreInfo</span>, <span class="variable">iotInfo</span>);
 
 <span class="comment">// Handle connection events</span>
-<span class="variable">iot</span>.<span class="variable">onConnected</span>.<span class="function">subscribe</span>(() => {
+<span class="variable">iot</span>.<span class="function">on</span>(<span class="string">"connected"</span>, () => {
   <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Connected to IOT service'</span>);
 });
 
-<span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>: <span class="variable">Commands</span>) => {
+<span class="variable">iot</span>.<span class="function">on</span>(<span class="string">"command"</span>, (<span class="variable">command</span>: <span class="variable">Commands</span>) => {
   <span class="keyword">if</span> (<span class="variable">command</span>.<span class="variable">restart</span>) {
     <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Restart command received'</span>);
   }
@@ -656,7 +656,6 @@
           <div class="code-content" id="cms">
             <pre>
 <code><span class="keyword">import</span> { <span class="variable">cms</span>, <span class="variable">CoreInfo</span> } <span class="keyword">from</span> <span class="string">'@jsr/eai__elevation-core-ts'</span>;
-<span class="keyword">import</span> { <span class="variable">firstValueFrom</span> } <span class="keyword">from</span> <span class="string">'rxjs'</span>;
 
 <span class="comment">// Configure CMS with version and draft mode</span>
 <span class="keyword">const</span> <span class="variable">coreInfo</span>: <span class="variable">CoreInfo</span> = {
@@ -685,7 +684,7 @@
 <span class="function">console</span>.<span class="function">log</span>(<span class="variable">themeConfig</span>.<span class="variable">primaryColor</span>); <span class="comment">// "#007bff"</span>
 
 <span class="comment">// Pre-load all CMS content</span>
-<span class="keyword">await</span> <span class="function">firstValueFrom</span>(<span class="variable">cms</span>.<span class="function">loadAllStrings</span>());
+<span class="keyword">await</span> <span class="variable">cms</span>.<span class="function">loadAllStrings</span>();
 
 <span class="comment">// Cache management</span>
 <span class="keyword">const</span> <span class="variable">stats</span> = <span class="variable">cms</span>.<span class="function">getCacheStats</span>();
@@ -729,7 +728,7 @@
     <!-- Footer -->
     <footer class="footer">
       <div class="container">
-        <p>&copy; 2024 Elevation Software. Built with ❤️ for developers.</p>
+        <p>&copy; 2026 Elevation Software. Built with ❤️ for developers.</p>
       </div>
     </footer>
 

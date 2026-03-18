@@ -1,0 +1,240 @@
+import { AwaitableEmitter } from "@eai/models/AwaitableEmitter";
+import { io, type Socket } from "socket.io-client";
+import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "../types/index.ts";
+
+interface WebSocketError {
+  message?: string;
+  reason?: string;
+}
+
+export class ElevatedIOT extends AwaitableEmitter {
+  private _socket: Socket | null = null;
+  private _connected = false;
+  private coreInfo: CoreInfo | null = null;
+
+  private reconnectTimer: number | null = null;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 10;
+  private reconnectDelay = 1000;
+  private iotInfo: IOTInfo = { appName: "ElevationDenoService" };
+
+  get socket(): Socket | null {
+    return this._socket;
+  }
+
+  get connected(): boolean {
+    return this._connected;
+  }
+
+  public config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
+    this.coreInfo = coreInfo;
+
+    if (iotInfo) {
+      this.iotInfo = iotInfo;
+    }
+
+    this.connect();
+  }
+
+  public refreshInfo(info: CoreInfo): void {
+    this.config(info);
+  }
+
+  private connect(): void {
+    if (!this.coreInfo || !this.coreInfo.iotEndpoint) {
+      console.error("IOT endpoint not configured");
+      return;
+    }
+
+    try {
+      this.disconnect(false);
+
+      const namespace = this.coreInfo.iotEvents ? "/events" : "/device";
+      const baseUrl = this.coreInfo.iotEndpoint.replace(/\/$/, "");
+      const socketUrl = `${baseUrl}${namespace}`;
+
+      console.log(`Connecting to Socket.io server at ${socketUrl}`);
+
+      this._socket = io(socketUrl, {
+        query: {
+          token: this.coreInfo.token,
+          key: this.coreInfo.fingerPrint,
+          app: this.iotInfo.appName,
+          version: this.iotInfo.appVersion || "1.0.0",
+          secondary: this.coreInfo.secondary || false,
+        },
+      });
+
+      this.emit("socket", this._socket);
+      this.setupSocketHandlers();
+    }
+    catch (error) {
+      console.error("Failed to create Socket.io connection:", error);
+      this.scheduleReconnect();
+    }
+  }
+
+  private setupSocketHandlers(): void {
+    if (!this._socket) return;
+
+    this._socket.on("connect", () => {
+      console.log("IOT Socket.io connected:", this._socket?.id);
+      this._connected = true;
+      this.emit("connected");
+      this.reconnectAttempts = 0;
+    });
+
+    this._socket.on("disconnect", (reason: string) => {
+      console.log("IOT Socket.io disconnected:", reason);
+      this._connected = false;
+      this.emit("disconnected");
+
+      if (reason === "io server disconnect") {
+        this._socket?.connect();
+      }
+    });
+
+    this._socket.on("connect_error", (error: Error) => {
+      console.error("IOT Socket.io connection error:", error.message);
+
+      if (
+        error.message?.includes("5000") || error.message?.includes("5001") ||
+        error.message?.includes("Configuration") || error.message?.includes("Unauthorized")
+      ) {
+        console.error("Configuration error received");
+        this.emit("configurationRequired");
+        this.disconnect(true);
+      }
+    });
+
+    this._socket.on("command", (data: Commands) => {
+      this.emit("command", data);
+    });
+
+    this._socket.on("flightinfo", (data: unknown) => {
+      this.emit("flightInfo", data);
+    });
+
+    this._socket.on("event", (data: EventData) => {
+      this.emit("event", data);
+    });
+
+    this._socket.on("toast", (data: unknown) => {
+      this.emit("toast", data);
+    });
+
+    this._socket.on("refresh", () => {
+      this.emit("refresh");
+    });
+
+    this._socket.on("onlineKiosks", (data: OnlineKiosk[]) => {
+      this.emit("onlineKiosks", data);
+    });
+
+    this._socket.on("print", (data: unknown) => {
+      this.emit("print", data);
+    });
+
+    this._socket.on("restart", () => {
+      this.emit("restart");
+    });
+
+    this._socket.on("error", (error: WebSocketError) => {
+      console.error("IOT Socket.io error:", error);
+
+      if (typeof error === "object" && error !== null) {
+        const errorMessage = error.message || error.reason || "";
+        if (errorMessage.includes("Configuration") || errorMessage.includes("5000") || errorMessage.includes("5001")) {
+          this.emit("configurationRequired");
+          this.disconnect(true);
+        }
+      }
+    });
+
+    this._socket.on("ping", () => {
+      this._socket?.emit("pong");
+    });
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+    }
+
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error("Max reconnection attempts reached");
+      return;
+    }
+
+    const delay = Math.min(
+      this.reconnectDelay * Math.pow(2, this.reconnectAttempts),
+      30000,
+    );
+
+    this.reconnectAttempts++;
+
+    console.log(`Scheduling reconnection attempt ${this.reconnectAttempts} in ${delay}ms`);
+
+    this.reconnectTimer = setTimeout(() => {
+      this.connect();
+    }, delay);
+  }
+
+  public send(data: { type: string; data: unknown }): void {
+    if (this._socket && this._socket.connected) {
+      if (data.type) {
+        this._socket.emit(data.type, data.data || data);
+      }
+      else {
+        this._socket.emit("message", data);
+      }
+    }
+    else {
+      console.warn("Cannot send data: Socket.io not connected");
+    }
+  }
+
+  public sendMessage(type: string, data: unknown): void {
+    if (this._socket && this._socket.connected) {
+      this._socket.emit(type, data);
+    }
+    else {
+      console.warn(`Cannot send ${type}: Socket.io not connected`);
+    }
+  }
+
+  public disconnect(_shouldReconnect = false): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
+    if (this._socket) {
+      this._socket.removeAllListeners();
+      this._socket.disconnect();
+      this._socket = null;
+    }
+
+    this._connected = false;
+  }
+
+  public reconnect(): void {
+    this.reconnectAttempts = 0;
+    this.connect();
+  }
+
+  public getConnectionStatus(): boolean {
+    return this._connected && this._socket?.connected === true;
+  }
+
+  public getSocketId(): string | undefined {
+    return this._socket?.id;
+  }
+
+  public destroy(): void {
+    this.disconnect(false);
+    this.removeAllListeners();
+  }
+}
+
+export const iot: ElevatedIOT = new ElevatedIOT();

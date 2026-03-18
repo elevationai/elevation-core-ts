@@ -815,25 +815,25 @@
               </p>
 
               <ul>
-                <li><strong>onConnected</strong> - Triggered when successfully connected and configured</li>
-                <li><strong>onDisconnected</strong> - Triggered when network connection is disrupted</li>
-                <li><strong>onConfigRequired</strong> - Triggered when device needs configuration</li>
-                <li><strong>onCommand</strong> - Handles incoming commands from Administrator UI</li>
+                <li><strong>connected</strong> - Triggered when successfully connected and configured</li>
+                <li><strong>disconnected</strong> - Triggered when network connection is disrupted</li>
+                <li><strong>configRequired</strong> - Triggered when device needs configuration</li>
+                <li><strong>command</strong> - Handles incoming commands from Administrator UI</li>
               </ul>
 
               <div class="emoji-header">💻 <strong>Command Management Interface</strong></div>
 
               <h4>IOT onCommand</h4>
               <p>
-                This rxjs subscription enables the communication between the developer's application and the EPS IOT services, by making
-                available a customizable set of device configuration values. Such configurations can be sent down to the applications from
-                either the Administrator UI or external API.
+                This event enables the communication between the developer's application and the EPS IOT services, by making available a
+                customizable set of device configuration values. Such configurations can be sent down to the applications from either the
+                Administrator UI or external API.
               </p>
 
               <pre>
 <code><span class="keyword">import</span> { <span class="variable">iot</span>, <span class="variable">CoreInfo</span>, <span class="variable">IOTInfo</span> } <span class="keyword">from</span> <span class="string">'@jsr/eai__elevation-core-ts'</span>;
 
-<span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>: <span class="variable">Commands</span>) => {
+<span class="variable">iot</span>.<span class="function">on</span>(<span class="string">"command"</span>, (<span class="variable">command</span>: <span class="variable">Commands</span>) => {
     <span class="keyword">if</span> (<span class="variable">command</span>.<span class="variable">showBagWaiver</span>) {
         <span class="function">console</span>.<span class="function">log</span>(<span class="string">'Display waiver to user'</span>);
     }
@@ -1374,12 +1374,12 @@
   }
 
   <span class="keyword">private</span> <span class="function">setupIOTListeners</span>() {
-    <span class="variable">iot</span>.<span class="variable">onConnected</span>.<span class="function">subscribe</span>(() => {
+    <span class="variable">iot</span>.<span class="function">on</span>(<span class="string">"connected"</span>, () => {
       <span class="variable">elogs</span>.<span class="function">information</span>({ <span class="variable">message</span>: <span class="string">'IOT Connected'</span> });
       <span class="variable">events</span>.<span class="function">success</span>({ <span class="variable">eventCode</span>: <span class="variable">EventCode</span>.<span class="variable">ONLINE</span> });
     });
 
-    <span class="variable">iot</span>.<span class="variable">onCommand</span>.<span class="function">subscribe</span>((<span class="variable">command</span>) => {
+    <span class="variable">iot</span>.<span class="function">on</span>(<span class="string">"command"</span>, (<span class="variable">command</span>) => {
       <span class="keyword">this</span>.<span class="function">handleCommand</span>(<span class="variable">command</span>);
     });
   }
@@ -1423,7 +1423,7 @@ npm run docs</code></pre>
               </ul>
 
               <h3>License</h3>
-              <p>Proprietary - Elevation Software © 2024</p>
+              <p>Proprietary - Elevation Software © 2026</p>
             </section>
           </div>
         </div>

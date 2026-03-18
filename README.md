@@ -693,12 +693,12 @@ const iotInfo: IOTInfo = {
 iot.config(coreInfo, iotInfo);
 
 // successfully connected to EPS IOT services
-iot.onConnected.subscribe(() => {
+iot.on("connected", () => {
   console.log("Connection succeeded");
 });
 
 // Device configuration is required
-iot.onConfigRequired.subscribe(() => {
+iot.on("configRequired", () => {
   console.log("App configuration must be completed to connect");
 });
 ```
@@ -739,18 +739,18 @@ const iot1 = new ElevatedIOT(coreInfo1);
 const iot2 = new ElevatedIOT(coreInfo2);
 
 // successfully connected to EPS IOT services
-iot1.onConnected.subscribe(() => {
+iot1.on("connected", () => {
   console.log("Connection 1 succeeded");
 });
-iot2.onConnected.subscribe(() => {
+iot2.on("connected", () => {
   console.log("Connection 2 succeeded");
 });
 
 // Device configuration is required
-iot1.onConfigRequired.subscribe(() => {
+iot1.on("configRequired", () => {
   console.log("App configuration 1 must be completed to connect");
 });
-iot2.onConfigRequired.subscribe(() => {
+iot2.on("configRequired", () => {
   console.log("App configuration 2 must be completed to connect");
 });
 ```
@@ -759,16 +759,16 @@ iot2.onConfigRequired.subscribe(() => {
 
 There are 4 major events in the IOT lifecycle; and it is important to understand how to deal with each one accordingly.
 
-- [onConnected](#iot-onconnected)
-- [onDisconnected](#iot-ondisconnected)
-- [onConfigRequired](#iot-onconfigrequired)
-- [onCommand](#iot-oncommand)
+- [connected](#iot-connected)
+- [disconnected](#iot-disconnected)
+- [configRequired](#iot-configrequired)
+- [command](#iot-command)
 
-### IOT onConnected
+### IOT connected
 
-This rxjs subscription gets triggered as soon as the application is able to validate that it is correctly configured on
+This event is emitted as soon as the application is able to validate that it is correctly configured on
 the Administrator UI and it has the correct credentials with the appropriate volume license. After you receive this
-subscription, your application is ready to start receiving communications from the outside world.
+event, your application is ready to start receiving communications from the outside world.
 
 ```typescript
 import { iot, CoreInfo, IOTInfo } from '@jsr/eai__elevation-core-ts';
@@ -776,14 +776,14 @@ import { iot, CoreInfo, IOTInfo } from '@jsr/eai__elevation-core-ts';
 ...
 
 // successfully connected to EPS IOT services
-iot.onConnected.subscribe(() => {
+iot.on("connected", () => {
     console.log('Connection succeeded, application is ready to receive commands');
 });
 ```
 
-### IOT onDisconnected
+### IOT disconnected
 
-This rxjs subscription gets triggered when the network connection between the application and the EPS IOT service gets
+This event is emitted when the network connection between the application and the EPS IOT service gets
 disrupted.
 
 ```typescript
@@ -792,14 +792,14 @@ import { iot, CoreInfo, IOTInfo } from '@jsr/eai__elevation-core-ts';
 ...
 
 // disconnected from EPS IOT services
-iot.onDisconnect.subscribe(() => {
+iot.on("disconnected", () => {
     console.log('Connection was disrupted, application cannot receive commands');
 });
 ```
 
-### IOT onConfigRequired
+### IOT configRequired
 
-This rxjs subscription gets triggered when the application connects with a fingerprint never seen before by the IOT
+This event is emitted when the application connects with a fingerprint never seen before by the IOT
 service. At this point, the application must go through a configuration process either from the Administrator UI or from
 the use of the subscription library.
 
@@ -809,7 +809,7 @@ import { iot, CoreInfo, IOTInfo } from '@jsr/eai__elevation-core-ts';
 ...
 
 // configuration required
-iot.onConfigRequired.subscribe(() => {
+iot.on("configRequired", () => {
     console.log('Connection did not succeed, application must go through the configuration process');
     // redirect app to the configuration page
     // or configure app in the Administrator UI
@@ -818,23 +818,23 @@ iot.onConfigRequired.subscribe(() => {
 
 🔧 **Device Configuration Interface**
 
-### IOT onCommand
+### IOT command
 
-This rxjs subscription enables the communication between the developer's application and the EPS IOT services, by making
+This event enables the communication between the developer's application and the EPS IOT services, by making
 available a customizable set of device configuration values. Such configurations can be sent down to the applications
 from either the Administrator UI or external API, as long as they get predefined by the developer on the Custom Device
 Configurations screen.
 
 💻 **Command Management Interface**
 
-To handle commands in code, just subscribe to onCommand subject.
+To handle commands in code, just listen for the command event.
 
 ```typescript
 import { iot, CoreInfo, IOTInfo } from '@jsr/eai__elevation-core-ts';
 
 ....
 
-iot.onCommand.subscribe((command: Commands) => {
+iot.on("command", (command: Commands) => {
     if (command.showBagWaiver) {
         console.log('Display waiver to user');
     }
@@ -1288,13 +1288,12 @@ Pre-load all CMS strings into memory:
 
 ```typescript
 import { cms } from "@jsr/eai__elevation-core-ts";
-import { firstValueFrom } from "rxjs";
 
 // Load all strings with caching
-await firstValueFrom(cms.loadAllStrings());
+await cms.loadAllStrings();
 
 // Force reload without cache
-await firstValueFrom(cms.loadAllStrings(true));
+await cms.loadAllStrings(true);
 ```
 
 ### Cache Statistics
@@ -1562,12 +1561,12 @@ class ElevatedService {
   }
 
   private setupIOTListeners() {
-    iot.onConnected.subscribe(() => {
+    iot.on("connected", () => {
       elogs.information({ message: "IOT Connected" });
       events.success({ eventCode: EventCode.ONLINE });
     });
 
-    iot.onCommand.subscribe((command) => {
+    iot.on("command", (command) => {
       this.handleCommand(command);
     });
   }
@@ -1632,12 +1631,12 @@ async function main() {
       appVersion: "1.0.0",
     });
 
-    iot.onConnected.subscribe(() => {
+    iot.on("connected", () => {
       console.log("IOT Connected");
       events.success({ eventCode: EventCode.ONLINE });
     });
 
-    iot.onCommand.subscribe((command) => {
+    iot.on("command", (command) => {
       console.log("Received command:", command);
       if (command.refresh) {
         // Handle refresh command
@@ -1752,13 +1751,14 @@ npm test
 elevation-core-ts/
 ├── lib/              # Core library modules
 │   ├── shared/       # Base classes & utilities
-│   ├── events/       # Event tracking
-│   ├── logs/         # Centralized logging
-│   ├── iot/          # WebSocket communication
-│   ├── enrollment/   # Device registration
-│   └── config/       # Configuration management
+│   ├── events.ts     # Event tracking
+│   ├── logs.ts       # Centralized logging
+│   ├── iot.ts        # WebSocket communication
+│   ├── enrollment.ts # Device registration
+│   ├── config.ts     # Configuration management
+│   ├── cms.ts        # Content management
+│   └── touchpoint.ts # Device service state
 ├── types/            # TypeScript definitions & enums
-├── examples/         # Usage examples
 ├── index.ts          # Main library exports
 └── deno.json         # Deno configuration
 ```
@@ -1796,7 +1796,7 @@ For support and questions:
 
 ## License
 
-Proprietary - Elevation Software © 2024
+Proprietary - Elevation Software © 2026
 
 ---
 

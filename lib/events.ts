@@ -1,6 +1,6 @@
-import { BaseService } from "../shared/base.ts";
-import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../../types/index.ts";
-import { type EventCode, StatusCode } from "../../types/index.ts";
+import { BaseService } from "./shared/base.ts";
+import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../types/index.ts";
+import { type EventCode, StatusCode } from "../types/index.ts";
 
 export class ElevatedEvents extends BaseService {
   private defaults: EventOptions = {};

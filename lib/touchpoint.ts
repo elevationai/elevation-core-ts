@@ -1,5 +1,5 @@
-import type { Device } from "../../types/index.ts";
-import { BaseService } from "../shared/base.ts";
+import type { Device } from "../types/index.ts";
+import { BaseService } from "./shared/base.ts";
 
 export class TouchPoint extends BaseService {
   private touchPointId: string | null = null;
