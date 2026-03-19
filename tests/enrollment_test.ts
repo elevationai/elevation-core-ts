@@ -9,14 +9,12 @@ import {
   createTerminal,
   MockFetch,
 } from "./_mock.ts";
-import { ElevatedEnrollment } from "../lib/enrollment.ts";
+import { EnrollmentClient } from "../lib/enrollment.ts";
 
-describe("ElevatedEnrollment", () => {
-  let svc: ElevatedEnrollment;
+describe("EnrollmentClient", () => {
   let mockFetch: MockFetch;
 
   beforeEach(() => {
-    svc = new ElevatedEnrollment();
     mockFetch = new MockFetch();
     mockFetch.install();
   });
@@ -25,32 +23,24 @@ describe("ElevatedEnrollment", () => {
     mockFetch.restore();
   });
 
-  describe("config()", () => {
+  describe("create()", () => {
     it("should throw without fingerPrint", () => {
       assertThrows(
-        () => svc.config(createCoreInfo({ fingerPrint: "" })),
+        () => EnrollmentClient.create(createCoreInfo({ fingerPrint: "" })),
         Error,
         "fingerPrint is required in CoreInfo for Enrollment service",
       );
     });
 
     it("should succeed with fingerPrint", () => {
-      svc.config(createCoreInfo({ fingerPrint: "fp-123" }));
+      EnrollmentClient.create(createCoreInfo({ fingerPrint: "fp-123" }));
       // No error thrown means success
     });
   });
 
   describe("start()", () => {
-    it("should throw when not configured", async () => {
-      await assertRejects(
-        () => svc.start(),
-        Error,
-        "Service not configured. Call config() first with CoreInfo",
-      );
-    });
-
     it("should return unconfigured device", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       const device = createDevice({ metadata: { configured: false } });
       mockFetch.queueResponse([device]);
 
@@ -61,7 +51,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw 'already enrolled' when metadata.configured is true", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       const device = createDevice({ metadata: { configured: true } });
       mockFetch.queueResponse([device]);
 
@@ -73,7 +63,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw on API failure", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse({ error: "server error" }, 500);
 
       await assertRejects(
@@ -85,7 +75,7 @@ describe("ElevatedEnrollment", () => {
 
   describe("getLocations()", () => {
     it("should GET /locations and return data", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       const locations = [createDeviceLocation()];
       mockFetch.queueResponse(locations);
 
@@ -99,7 +89,7 @@ describe("ElevatedEnrollment", () => {
 
   describe("getSpecification()", () => {
     it("should GET /specifications and return data", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       const specs = [createSpecification()];
       mockFetch.queueResponse(specs);
 
@@ -112,7 +102,7 @@ describe("ElevatedEnrollment", () => {
 
   describe("isLabelAvailable()", () => {
     it("should return true for empty array response", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([]);
 
       const result = await svc.isLabelAvailable("NEW-LABEL");
@@ -122,7 +112,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should return false for non-empty array response", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice()]);
 
       const result = await svc.isLabelAvailable("EXISTING-LABEL");
@@ -131,7 +121,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should return false for empty string without making a fetch", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
 
       const result = await svc.isLabelAvailable("");
 
@@ -142,7 +132,7 @@ describe("ElevatedEnrollment", () => {
 
   describe("enrollDevice()", () => {
     it("should throw 'start subscription first' if start() not called", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
 
       await assertRejects(
         () => svc.enrollDevice(createDeviceInfo()),
@@ -152,7 +142,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when label is missing", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -164,7 +154,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when device._id is missing", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -176,7 +166,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when location._id is missing", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -188,7 +178,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when terminal._id is missing", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -200,7 +190,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when specification.id is missing", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -212,7 +202,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should throw when label is unavailable", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
       // start() response
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
@@ -228,7 +218,7 @@ describe("ElevatedEnrollment", () => {
     });
 
     it("should PATCH /devices/{id} with correct data after full flow", async () => {
-      svc.config(createCoreInfo());
+      const svc = EnrollmentClient.create(createCoreInfo());
 
       const device = createDevice({ _id: "dev-99", metadata: { configured: false } });
       const location = createDeviceLocation({ _id: "loc-55", configurations: { kiosk: true } });

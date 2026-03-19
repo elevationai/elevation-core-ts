@@ -1,12 +1,20 @@
 import { BaseService } from "./shared/base.ts";
 import { Debouncer } from "./shared/utils.ts";
-import type { ApiResponse, LogData, LogOptions } from "../types/mod.ts";
+import type { ApiResponse, CoreInfo, LogData, LogOptions } from "../types/mod.ts";
 import { LogLevel } from "../types/mod.ts";
 
-export class ElevatedLogs extends BaseService {
+export class LogsClient extends BaseService {
   private defaults: LogOptions = {};
   private debouncer?: Debouncer<(data: LogData) => Promise<ApiResponse>>;
   private lastLogHash = new Map<string, number>();
+
+  private constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
+  }
+
+  static create(coreInfo: CoreInfo): LogsClient {
+    return new LogsClient(coreInfo);
+  }
 
   public setDefaults(options: LogOptions): void {
     this.defaults = { ...options };
@@ -43,8 +51,6 @@ export class ElevatedLogs extends BaseService {
   }
 
   public async message(logData: Partial<LogData>): Promise<ApiResponse> {
-    this.checkConfiguration();
-
     // Apply defaults
     const fullLogData: LogData = {
       deviceId: this.defaults.deviceId || "",
@@ -121,8 +127,6 @@ export class ElevatedLogs extends BaseService {
 
   // Send multiple logs individually (since no batch endpoint exists)
   public async batch(logs: Partial<LogData>[]): Promise<ApiResponse> {
-    this.checkConfiguration();
-
     try {
       const results = await Promise.all(
         logs.map((log) => this.message(log)),
@@ -182,6 +186,3 @@ export class ElevatedLogs extends BaseService {
     };
   }
 }
-
-// Export singleton instance
-export const elogs: ElevatedLogs = new ElevatedLogs();

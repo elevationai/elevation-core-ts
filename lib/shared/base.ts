@@ -1,47 +1,25 @@
 import type { ApiResponse, CoreInfo } from "../../types/mod.ts";
 
 export abstract class BaseService {
-  private _coreInfo: CoreInfo | null = null;
-  private configured = false;
-  private headers: Headers = new Headers();
+  private readonly _coreInfo: CoreInfo;
+  private readonly headers: Headers;
 
-  protected get coreInfo(): CoreInfo | null {
+  protected get coreInfo(): CoreInfo {
     return this._coreInfo;
   }
 
-  public config(coreInfo: CoreInfo): void {
-    this.validateCoreInfo(coreInfo);
-    this._coreInfo = coreInfo;
-    this.setupHeaders();
-    this.configured = true;
-  }
-
-  public refreshInfo(info: CoreInfo): void {
-    this.config(info);
-  }
-
-  protected validateCoreInfo(coreInfo: CoreInfo): void {
+  protected constructor(coreInfo: CoreInfo) {
     if (!coreInfo.token) {
       throw new Error("Token is required in CoreInfo");
     }
     if (!coreInfo.serviceEndpoint) {
       throw new Error("Service endpoint is required in CoreInfo");
     }
-  }
-
-  protected setupHeaders(): void {
-    if (!this._coreInfo) return;
-
+    this._coreInfo = coreInfo;
     this.headers = new Headers({
-      "Elevated-Auth": btoa(this._coreInfo.token),
+      "Elevated-Auth": btoa(coreInfo.token),
       "Content-Type": "application/json",
     });
-  }
-
-  protected checkConfiguration(): void {
-    if (!this.configured || !this._coreInfo) {
-      throw new Error("Service not configured. Call config() first with CoreInfo");
-    }
   }
 
   private getHeadersObject(headers: Headers): Record<string, string> {
@@ -57,10 +35,8 @@ export abstract class BaseService {
     path: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
-    this.checkConfiguration();
-
-    const url = `${this._coreInfo!.serviceEndpoint}${path}`;
-    const timeout = this._coreInfo!.timeout || 30000;
+    const url = `${this._coreInfo.serviceEndpoint}${path}`;
+    const timeout = this._coreInfo.timeout || 30000;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);

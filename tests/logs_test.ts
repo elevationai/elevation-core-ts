@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
-import { ElevatedLogs } from "../lib/logs.ts";
+import { LogsClient } from "../lib/logs.ts";
 import { LogLevel } from "../types/mod.ts";
 import { createCoreInfo, MockFetch } from "./_mock.ts";
 
-describe("ElevatedLogs", () => {
-  let logs: ElevatedLogs;
+describe("LogsClient", () => {
+  let logs: LogsClient;
   let mockFetch: MockFetch;
 
   beforeEach(() => {
-    logs = new ElevatedLogs();
     mockFetch = new MockFetch();
     mockFetch.install();
+    logs = LogsClient.create(createCoreInfo());
   });
 
   afterEach(() => {
@@ -22,17 +22,7 @@ describe("ElevatedLogs", () => {
   });
 
   describe("message()", () => {
-    it("should throw if not configured", async () => {
-      await assertRejects(
-        () => logs.message({ deviceId: "d1", message: "hello" }),
-        Error,
-        "Service not configured",
-      );
-    });
-
     it("should throw if deviceId is missing", async () => {
-      logs.config(createCoreInfo());
-
       await assertRejects(
         () => logs.message({ message: "hello" }),
         Error,
@@ -41,8 +31,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should throw if message is empty", async () => {
-      logs.config(createCoreInfo());
-
       await assertRejects(
         () => logs.message({ deviceId: "d1", message: "" }),
         Error,
@@ -51,7 +39,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should POST to /logs endpoint", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.message({ deviceId: "d1", message: "test log" });
@@ -61,7 +48,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should apply defaults from setDefaults", async () => {
-      logs.config(createCoreInfo());
       logs.setDefaults({
         deviceId: "default-device",
         applicationName: "TestApp",
@@ -76,7 +62,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should default level to INFO", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.message({ deviceId: "d1", message: "test log" });
@@ -90,7 +75,6 @@ describe("ElevatedLogs", () => {
     it("should debounce identical logs within the debounce window", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
         logs.setDefaults({ debounce: 5000 });
         mockFetch.queueResponse({ success: true });
 
@@ -111,7 +95,6 @@ describe("ElevatedLogs", () => {
     it("should allow different messages to pass through", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
         logs.setDefaults({ debounce: 5000 });
         mockFetch.queueResponse({ success: true });
         mockFetch.queueResponse({ success: true });
@@ -130,7 +113,6 @@ describe("ElevatedLogs", () => {
     it("should allow same message after debounce window elapses", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
         logs.setDefaults({ debounce: 5000 });
         mockFetch.queueResponse({ success: true });
 
@@ -152,7 +134,6 @@ describe("ElevatedLogs", () => {
 
   describe("helper methods", () => {
     it("should set level to INFO for information()", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.information({ deviceId: "d1", message: "info log" });
@@ -162,7 +143,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should set level to DELAYED for delayed()", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.delayed({ deviceId: "d1", message: "delayed log" });
@@ -172,7 +152,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should set level to ERROR for error()", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.error({ deviceId: "d1", message: "error log" });
@@ -182,7 +161,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should set level to CRITICAL for critical()", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await logs.critical({ deviceId: "d1", message: "critical log" });
@@ -194,7 +172,6 @@ describe("ElevatedLogs", () => {
 
   describe("batch()", () => {
     it("should send all logs and return success message", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
       mockFetch.queueResponse({ success: true });
       mockFetch.queueResponse({ success: true });
@@ -210,7 +187,6 @@ describe("ElevatedLogs", () => {
     });
 
     it("should report failures when some logs fail", async () => {
-      logs.config(createCoreInfo());
       mockFetch.queueResponse({ success: true }, 200);
       mockFetch.queueResponse({ error: "server error" }, 500);
       mockFetch.queueResponse({ success: true }, 200);
@@ -230,7 +206,6 @@ describe("ElevatedLogs", () => {
     it("should allow previously debounced logs to go through after clearing", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
         logs.setDefaults({ debounce: 5000 });
         mockFetch.queueResponse({ success: true });
 
@@ -259,7 +234,6 @@ describe("ElevatedLogs", () => {
     it("should clear debounce state and defaults", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
         logs.setDefaults({
           deviceId: "default-d",
           applicationName: "App",
@@ -289,8 +263,6 @@ describe("ElevatedLogs", () => {
     it("should report debounceActive and cacheSize", async () => {
       const time = new FakeTime();
       try {
-        logs.config(createCoreInfo());
-
         const initialStats = logs.getStats();
         assertEquals(initialStats.debounceActive, false);
         assertEquals(initialStats.cacheSize, 0);

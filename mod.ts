@@ -6,49 +6,11 @@ export * from "./types/mod.ts";
 // Export shared utilities
 export { Cache, Debouncer, uuid } from "./lib/shared/utils.ts";
 
-// Export service modules and classes
-export { ElevatedEvents, events } from "./lib/events.ts";
-export { ElevatedLogs, elogs } from "./lib/logs.ts";
-export { ElevatedIOT, iot } from "./lib/iot.ts";
-export { ElevatedEnrollment, enrollment } from "./lib/enrollment.ts";
-export { ElevatedConfigurations, elevatedConfigurations } from "./lib/config.ts";
-export { CMS, cms } from "./lib/cms.ts";
-export { TouchPoint, touchPoint } from "./lib/touchpoint.ts";
-
-// Import the singleton instances for the convenience class
-import { events } from "./lib/events.ts";
-import { elogs } from "./lib/logs.ts";
-import { iot } from "./lib/iot.ts";
-import { enrollment } from "./lib/enrollment.ts";
-import { elevatedConfigurations } from "./lib/config.ts";
-import { cms } from "./lib/cms.ts";
-import { touchPoint } from "./lib/touchpoint.ts";
-import type { CoreInfo } from "./types/mod.ts";
-
-// Export a convenience class that combines all services
-export class ElevationService {
-  public readonly events = events;
-  public readonly logs = elogs;
-  public readonly iot = iot;
-  public readonly enrollment = enrollment;
-  public readonly config = elevatedConfigurations;
-  public readonly cms = cms;
-  public readonly touchPoint = touchPoint;
-
-  public initialize(coreInfo: CoreInfo): void {
-    // Configure all services
-    this.events.config(coreInfo);
-    this.logs.config(coreInfo);
-    this.enrollment.config(coreInfo);
-    this.cms.config(coreInfo);
-    this.touchPoint.config(coreInfo);
-
-    // IOT requires additional setup
-    if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
-      this.iot.config(coreInfo);
-    }
-
-    // Config management requires additional info
-    // This should be set separately when needed
-  }
-}
+// Export service classes
+export { EventsClient } from "./lib/events.ts";
+export { LogsClient } from "./lib/logs.ts";
+export { IOTConnection } from "./lib/iot.ts";
+export { EnrollmentClient } from "./lib/enrollment.ts";
+export { ConfigClient } from "./lib/config.ts";
+export { CMSClient } from "./lib/cms.ts";
+export { TouchPointClient } from "./lib/touchpoint.ts";

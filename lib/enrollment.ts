@@ -1,21 +1,23 @@
 import { BaseService } from "./shared/base.ts";
 import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from "../types/mod.ts";
 
-export class ElevatedEnrollment extends BaseService {
+export class EnrollmentClient extends BaseService {
   private started = false;
 
-  public override config(coreInfo: CoreInfo): void {
-    super.config(coreInfo);
+  private constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
 
     if (!coreInfo.fingerPrint) {
       throw new Error("fingerPrint is required in CoreInfo for Enrollment service");
     }
   }
 
-  public async start(): Promise<Device> {
-    this.checkConfiguration();
+  static create(coreInfo: CoreInfo): EnrollmentClient {
+    return new EnrollmentClient(coreInfo);
+  }
 
-    const response = await this.get<Device[]>(`/devices/key/${this.coreInfo?.fingerPrint}`);
+  public async start(): Promise<Device> {
+    const response = await this.get<Device[]>(`/devices/key/${this.coreInfo.fingerPrint}`);
 
     if (response.success && response.data) {
       const device = response.data[0] as Device;
@@ -32,8 +34,6 @@ export class ElevatedEnrollment extends BaseService {
   }
 
   public async getLocations(): Promise<DeviceLocation[]> {
-    this.checkConfiguration();
-
     const response = await this.get<DeviceLocation[]>(`/locations`);
 
     if (response.success && response.data) {
@@ -44,8 +44,6 @@ export class ElevatedEnrollment extends BaseService {
   }
 
   public async getSpecification(): Promise<Specification[]> {
-    this.checkConfiguration();
-
     const response = await this.get<Specification[]>(`/specifications`);
 
     if (response.success && response.data) {
@@ -56,8 +54,6 @@ export class ElevatedEnrollment extends BaseService {
   }
 
   public async enrollDevice(info: DeviceInfo): Promise<ApiResponse> {
-    this.checkConfiguration();
-
     if (!this.started) {
       throw new Error("start subscription first");
     }
@@ -111,8 +107,6 @@ export class ElevatedEnrollment extends BaseService {
   }
 
   public async isLabelAvailable(label: string): Promise<boolean> {
-    this.checkConfiguration();
-
     if (!label) {
       return false;
     }
@@ -126,6 +120,3 @@ export class ElevatedEnrollment extends BaseService {
     return false;
   }
 }
-
-// Export singleton instance
-export const enrollment: ElevatedEnrollment = new ElevatedEnrollment();

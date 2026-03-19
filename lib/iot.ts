@@ -7,10 +7,10 @@ interface WebSocketError {
   reason?: string;
 }
 
-export class ElevatedIOT extends AwaitableEmitter {
+export class IOTConnection extends AwaitableEmitter {
   private _socket: Socket | null = null;
   private _connected = false;
-  private coreInfo: CoreInfo | null = null;
+  private readonly coreInfo: CoreInfo;
 
   private reconnectTimer: number | null = null;
   private reconnectAttempts = 0;
@@ -26,7 +26,8 @@ export class ElevatedIOT extends AwaitableEmitter {
     return this._connected;
   }
 
-  public config(coreInfo: CoreInfo, iotInfo?: IOTInfo): void {
+  private constructor(coreInfo: CoreInfo, iotInfo?: IOTInfo) {
+    super();
     this.coreInfo = coreInfo;
 
     if (iotInfo) {
@@ -36,12 +37,12 @@ export class ElevatedIOT extends AwaitableEmitter {
     this.connect();
   }
 
-  public refreshInfo(info: CoreInfo): void {
-    this.config(info);
+  static create(coreInfo: CoreInfo, iotInfo?: IOTInfo): IOTConnection {
+    return new IOTConnection(coreInfo, iotInfo);
   }
 
   private connect(): void {
-    if (!this.coreInfo || !this.coreInfo.iotEndpoint) {
+    if (!this.coreInfo.iotEndpoint) {
       console.error("IOT endpoint not configured");
       return;
     }
@@ -236,5 +237,3 @@ export class ElevatedIOT extends AwaitableEmitter {
     this.removeAllListeners();
   }
 }
-
-export const iot: ElevatedIOT = new ElevatedIOT();

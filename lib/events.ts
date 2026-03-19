@@ -1,10 +1,18 @@
 import { BaseService } from "./shared/base.ts";
-import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../types/mod.ts";
+import type { ApiResponse, CoreInfo, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../types/mod.ts";
 import { type EventCode, StatusCode } from "../types/mod.ts";
 
-export class ElevatedEvents extends BaseService {
+export class EventsClient extends BaseService {
   private defaults: EventOptions = {};
   private debouncedEvents = new Map<number, DebouncedEvent>();
+
+  private constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
+  }
+
+  static create(coreInfo: CoreInfo): EventsClient {
+    return new EventsClient(coreInfo);
+  }
 
   public setDefaults(options: EventOptions): void {
     this.defaults = { ...options };
@@ -59,8 +67,6 @@ export class ElevatedEvents extends BaseService {
   }
 
   public async send(eventData: Partial<EventData>, kiosk: Device | null = null): Promise<ApiResponse> {
-    this.checkConfiguration();
-
     // Apply defaults
     const fullEventData: EventData = {
       eventType: this.defaults.eventType,
@@ -199,6 +205,3 @@ export class ElevatedEvents extends BaseService {
     this.defaults = {};
   }
 }
-
-// Export singleton instance
-export const events: ElevatedEvents = new ElevatedEvents();

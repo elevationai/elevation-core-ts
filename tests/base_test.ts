@@ -2,9 +2,12 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertThrows } from "@std/assert";
 import { createCoreInfo, MockFetch } from "./_mock.ts";
 import { BaseService } from "../lib/shared/base.ts";
-import type { ApiResponse } from "../types/mod.ts";
+import type { ApiResponse, CoreInfo } from "../types/mod.ts";
 
 class TestService extends BaseService {
+  constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
+  }
   public testGet<T>(path: string, headers?: Record<string, string>): Promise<ApiResponse<T>> {
     return this.get<T>(path, headers);
   }
@@ -20,17 +23,12 @@ class TestService extends BaseService {
   public testDelete<T>(path: string): Promise<ApiResponse<T>> {
     return this.delete<T>(path);
   }
-  public testCheckConfiguration(): void {
-    this.checkConfiguration();
-  }
 }
 
 describe("BaseService", () => {
-  let service: TestService;
   let mockFetch: MockFetch;
 
   beforeEach(() => {
-    service = new TestService();
     mockFetch = new MockFetch();
     mockFetch.install();
   });
@@ -39,10 +37,10 @@ describe("BaseService", () => {
     mockFetch.restore();
   });
 
-  describe("config()", () => {
+  describe("constructor validation", () => {
     it("should throw when token is missing", () => {
       assertThrows(
-        () => service.config(createCoreInfo({ token: "" })),
+        () => new TestService(createCoreInfo({ token: "" })),
         Error,
         "Token is required in CoreInfo",
       );
@@ -50,37 +48,20 @@ describe("BaseService", () => {
 
     it("should throw when serviceEndpoint is missing", () => {
       assertThrows(
-        () => service.config(createCoreInfo({ serviceEndpoint: "" })),
+        () => new TestService(createCoreInfo({ serviceEndpoint: "" })),
         Error,
         "Service endpoint is required in CoreInfo",
       );
     });
 
     it("should succeed with valid CoreInfo", () => {
-      service.config(createCoreInfo());
-      // Should not throw; verify by calling checkConfiguration
-      service.testCheckConfiguration();
-    });
-  });
-
-  describe("checkConfiguration()", () => {
-    it("should throw before config is called", () => {
-      assertThrows(
-        () => service.testCheckConfiguration(),
-        Error,
-        "Service not configured. Call config() first with CoreInfo",
-      );
-    });
-
-    it("should pass after config is called", () => {
-      service.config(createCoreInfo());
-      service.testCheckConfiguration();
+      new TestService(createCoreInfo());
     });
   });
 
   describe("GET requests", () => {
     it("should call the correct URL", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ result: "ok" });
 
       await service.testGet("/api/test");
@@ -89,7 +70,7 @@ describe("BaseService", () => {
     });
 
     it("should use the GET method", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ result: "ok" });
 
       await service.testGet("/api/test");
@@ -98,7 +79,7 @@ describe("BaseService", () => {
     });
 
     it("should return a success response with data", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ items: [1, 2, 3] });
 
       const result = await service.testGet<{ items: number[] }>("/api/items");
@@ -108,8 +89,7 @@ describe("BaseService", () => {
     });
 
     it("should send the Elevated-Auth header as btoa of the token", async () => {
-      const info = createCoreInfo({ token: "my-secret-token" });
-      service.config(info);
+      const service = new TestService(createCoreInfo({ token: "my-secret-token" }));
       mockFetch.queueResponse({ ok: true });
 
       await service.testGet("/api/test");
@@ -121,7 +101,7 @@ describe("BaseService", () => {
 
   describe("POST requests", () => {
     it("should use the POST method", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ created: true });
 
       await service.testPost("/api/items", { name: "test" });
@@ -130,7 +110,7 @@ describe("BaseService", () => {
     });
 
     it("should send the body as JSON", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ created: true });
 
       const payload = { name: "test", value: 42 };
@@ -142,7 +122,7 @@ describe("BaseService", () => {
 
   describe("PUT requests", () => {
     it("should use the PUT method", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ updated: true });
 
       await service.testPut("/api/items/1", { name: "updated" });
@@ -153,7 +133,7 @@ describe("BaseService", () => {
 
   describe("PATCH requests", () => {
     it("should use the PATCH method", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ patched: true });
 
       await service.testPatch("/api/items/1", { name: "patched" });
@@ -164,7 +144,7 @@ describe("BaseService", () => {
 
   describe("DELETE requests", () => {
     it("should use the DELETE method", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ deleted: true });
 
       await service.testDelete("/api/items/1");
@@ -175,7 +155,7 @@ describe("BaseService", () => {
 
   describe("error handling", () => {
     it("should return success: false on HTTP error (404)", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       mockFetch.queueResponse({ error: "Not Found" }, 404);
 
       const result = await service.testGet("/api/missing");
@@ -185,7 +165,7 @@ describe("BaseService", () => {
     });
 
     it("should return success: false on network failure", async () => {
-      service.config(createCoreInfo());
+      const service = new TestService(createCoreInfo());
       // No response queued -- MockFetch will reject with "No response queued"
 
       const result = await service.testGet("/api/fail");

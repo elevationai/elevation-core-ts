@@ -184,10 +184,10 @@ export interface DeviceInfo {
 }
 
 export enum LogLevel {
-  INFO = "INFO",
-  DELAYED = "DELAYED",
-  ERROR = "ERROR",
-  CRITICAL = "CRITICAL",
+  INFO = 0,
+  DELAYED = 1,
+  ERROR = 2,
+  CRITICAL = 3,
 }
 
 // Options interfaces

@@ -1,13 +1,19 @@
-import type { Device } from "../types/mod.ts";
+import type { CoreInfo, Device } from "../types/mod.ts";
 import { BaseService } from "./shared/base.ts";
 
-export class TouchPoint extends BaseService {
+export class TouchPointClient extends BaseService {
   private touchPointId: string | null = null;
 
-  private getDeviceByFingerPrint(): Promise<Device | null> {
-    this.checkConfiguration();
+  private constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
+  }
 
-    if (!this.coreInfo?.fingerPrint) {
+  static create(coreInfo: CoreInfo): TouchPointClient {
+    return new TouchPointClient(coreInfo);
+  }
+
+  private getDeviceByFingerPrint(): Promise<Device | null> {
+    if (!this.coreInfo.fingerPrint) {
       throw new Error("Device fingerprint is required for TouchPoint service");
     }
 
@@ -39,9 +45,7 @@ export class TouchPoint extends BaseService {
    * @param reason - Reason for the state change
    */
   async inService(state: boolean, reason: string): Promise<void> {
-    this.checkConfiguration();
-
-    if (!this.coreInfo?.fingerPrint) {
+    if (!this.coreInfo.fingerPrint) {
       throw new Error("Device fingerprint is required for TouchPoint service");
     }
 
@@ -64,6 +68,3 @@ export class TouchPoint extends BaseService {
     }
   }
 }
-
-// Export singleton instance
-export const touchPoint: TouchPoint = new TouchPoint();

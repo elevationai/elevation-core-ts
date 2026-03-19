@@ -1,67 +1,50 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
-import { ElevatedIOT } from "../lib/iot.ts";
+import { IOTConnection } from "../lib/iot.ts";
 import { createCoreInfo, MockSocket } from "./_mock.ts";
 
-describe("ElevatedIOT", () => {
-  let iot: ElevatedIOT;
-
-  beforeEach(() => {
-    iot = new ElevatedIOT();
-  });
-
-  afterEach(() => {
-    iot.destroy();
-  });
-
-  describe("initial state", () => {
-    it("connected getter should return false initially", () => {
-      assertEquals(iot.connected, false);
-    });
-
-    it("socket getter should return null initially", () => {
-      assertEquals(iot.socket, null);
-    });
-
-    it("getConnectionStatus() should return false initially", () => {
-      assertEquals(iot.getConnectionStatus(), false);
-    });
-
-    it("getSocketId() should return undefined initially", () => {
-      assertEquals(iot.getSocketId(), undefined);
-    });
-  });
-
-  describe("send() when not connected", () => {
-    it("should not throw when socket is null", () => {
-      // send() logs a warning but does not throw
-      iot.send({ type: "test", data: { value: 1 } });
-    });
-
-    it("should not throw with empty type", () => {
-      iot.send({ type: "", data: { value: 1 } });
-    });
-  });
-
-  describe("sendMessage() when not connected", () => {
-    it("should not throw when socket is null", () => {
-      iot.sendMessage("test", { value: 1 });
-    });
-  });
+describe("IOTConnection", () => {
+  // IOTConnection.create() calls connect() which tries real socket.io,
+  // so we test with a manually constructed instance using mock injection.
 
   describe("with injected MockSocket", () => {
+    let iot: IOTConnection;
     let mockSocket: MockSocket;
 
     beforeEach(() => {
-      // Inject mock socket without calling config() (which tries real socket.io)
+      // Create a bare IOTConnection by bypassing the private constructor
+      // using Object.create + manual field setup (avoids socket.io connect)
+      iot = Object.create(IOTConnection.prototype);
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._socket = null;
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._connected = false;
+      // deno-lint-ignore no-explicit-any
+      (iot as any).coreInfo = createCoreInfo();
+      // deno-lint-ignore no-explicit-any
+      (iot as any).reconnectTimer = null;
+      // deno-lint-ignore no-explicit-any
+      (iot as any).reconnectAttempts = 0;
+      // deno-lint-ignore no-explicit-any
+      (iot as any).maxReconnectAttempts = 10;
+      // deno-lint-ignore no-explicit-any
+      (iot as any).reconnectDelay = 1000;
+      // deno-lint-ignore no-explicit-any
+      (iot as any).iotInfo = { appName: "ElevationDenoService" };
+      // Initialize AwaitableEmitter internals
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._events = new Map();
+
       mockSocket = new MockSocket();
       mockSocket.connected = true;
       // deno-lint-ignore no-explicit-any
       (iot as any)._socket = mockSocket;
       // deno-lint-ignore no-explicit-any
       (iot as any)._connected = true;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).coreInfo = createCoreInfo();
+    });
+
+    afterEach(() => {
+      iot.destroy();
     });
 
     it("connected getter should return true after injection", () => {
@@ -109,19 +92,36 @@ describe("ElevatedIOT", () => {
     });
 
     it("disconnect() should call removeAllListeners on the socket", () => {
-      // After disconnect, the mock socket's handlers should be cleared
       mockSocket.on("test", () => {});
       iot.disconnect();
 
-      // MockSocket.removeAllListeners clears the handlers map
-      // We can verify by checking the socket was nullified (disconnect cleans up)
       assertEquals(iot.socket, null);
       assertEquals(iot.connected, false);
     });
   });
 
+  describe("send() when not connected", () => {
+    it("should not throw when socket is null", () => {
+      const iot = Object.create(IOTConnection.prototype);
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._socket = null;
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._connected = false;
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._events = new Map();
+
+      iot.send({ type: "test", data: { value: 1 } });
+    });
+  });
+
   describe("destroy()", () => {
     it("should disconnect and remove all listeners", () => {
+      const iot = Object.create(IOTConnection.prototype);
+      // deno-lint-ignore no-explicit-any
+      (iot as any)._events = new Map();
+      // deno-lint-ignore no-explicit-any
+      (iot as any).reconnectTimer = null;
+
       const mockSocket = new MockSocket();
       mockSocket.connected = true;
       // deno-lint-ignore no-explicit-any
@@ -145,11 +145,4 @@ describe("ElevatedIOT", () => {
       assertEquals(called, false);
     });
   });
-
-  // Note: Event forwarding tests (e.g., socket "command" -> IOT "command")
-  // require setupSocketHandlers() to have been called, which happens inside
-  // connect(). Since connect() invokes socket.io's io() function that requires
-  // a real server, these tests would need integration testing with a live
-  // socket.io server. The public API (send, sendMessage, disconnect, destroy,
-  // getters) is fully covered above.
 });

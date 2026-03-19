@@ -2,18 +2,12 @@ import { parse as parseJsonc } from "@std/jsonc";
 import { BaseService } from "./shared/base.ts";
 import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "../types/mod.ts";
 
-export class ElevatedConfigurations extends BaseService {
-  private configInfo: ElevatedConfigurationsInfo | null = null;
+export class ConfigClient extends BaseService {
+  private readonly configInfo: ElevatedConfigurationsInfo;
 
-  public override config(coreInfo: CoreInfo, configInfo?: ElevatedConfigurationsInfo): void {
-    super.config(coreInfo);
+  private constructor(coreInfo: CoreInfo, configInfo: ElevatedConfigurationsInfo) {
+    super(coreInfo);
 
-    if (configInfo) {
-      this.setConfigInfo(configInfo);
-    }
-  }
-
-  public setConfigInfo(configInfo: ElevatedConfigurationsInfo): void {
     if (!configInfo.deviceId || !configInfo.locationId) {
       throw new Error("Both deviceId and locationId are required in ElevatedConfigurationsInfo");
     }
@@ -21,19 +15,14 @@ export class ElevatedConfigurations extends BaseService {
     this.configInfo = configInfo;
   }
 
-  private checkConfigInfo(): void {
-    if (!this.configInfo) {
-      throw new Error("ElevatedConfigurationsInfo not set. Call setConfigInfo() first");
-    }
+  static create(coreInfo: CoreInfo, configInfo: ElevatedConfigurationsInfo): ConfigClient {
+    return new ConfigClient(coreInfo, configInfo);
   }
 
   public getConfig(label: string): Promise<unknown> {
-    this.checkConfiguration();
-    this.checkConfigInfo();
-
     return this.get<unknown>(
-      `/configurations/${label}/${this.configInfo?.locationId}/${this.configInfo?.deviceId}${
-        this.configInfo?.version ? `?version=${this.configInfo?.version}` : ""
+      `/configurations/${label}/${this.configInfo.locationId}/${this.configInfo.deviceId}${
+        this.configInfo.version ? `?version=${this.configInfo.version}` : ""
       }`,
       { "Cache-Control": "no-cache" },
     )
@@ -127,6 +116,3 @@ export class ElevatedConfigurations extends BaseService {
     }
   }
 }
-
-// Export singleton instance
-export const elevatedConfigurations: ElevatedConfigurations = new ElevatedConfigurations();

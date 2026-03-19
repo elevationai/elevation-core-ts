@@ -1,14 +1,12 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects } from "@std/assert";
 import { createCoreInfo, createDevice, MockFetch } from "./_mock.ts";
-import { TouchPoint } from "../lib/touchpoint.ts";
+import { TouchPointClient } from "../lib/touchpoint.ts";
 
-describe("TouchPoint", () => {
-  let svc: TouchPoint;
+describe("TouchPointClient", () => {
   let mockFetch: MockFetch;
 
   beforeEach(() => {
-    svc = new TouchPoint();
     mockFetch = new MockFetch();
     mockFetch.install();
   });
@@ -19,7 +17,7 @@ describe("TouchPoint", () => {
 
   describe("getInfo()", () => {
     it("should fetch the correct URL using fingerPrint", async () => {
-      svc.config(createCoreInfo({ fingerPrint: "fp-abc" }));
+      const svc = TouchPointClient.create(createCoreInfo({ fingerPrint: "fp-abc" }));
       mockFetch.queueResponse([createDevice()]);
 
       await svc.getInfo();
@@ -29,7 +27,7 @@ describe("TouchPoint", () => {
     });
 
     it("should return the device when found", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       const device = createDevice({ _id: "dev-42", label: "Kiosk-42" });
       mockFetch.queueResponse([device]);
 
@@ -40,7 +38,7 @@ describe("TouchPoint", () => {
     });
 
     it("should return null when data is empty", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       mockFetch.queueResponse([]);
 
       const result = await svc.getInfo();
@@ -49,7 +47,7 @@ describe("TouchPoint", () => {
     });
 
     it("should return null on API error", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       mockFetch.queueResponse({ error: "server error" }, 500);
 
       const result = await svc.getInfo();
@@ -60,7 +58,7 @@ describe("TouchPoint", () => {
 
   describe("inService()", () => {
     it("should throw when fingerPrint is missing", async () => {
-      svc.config(createCoreInfo({ fingerPrint: "" }));
+      const svc = TouchPointClient.create(createCoreInfo({ fingerPrint: "" }));
 
       await assertRejects(
         () => svc.inService(true, "starting up"),
@@ -70,7 +68,7 @@ describe("TouchPoint", () => {
     });
 
     it("should fetch device first if touchPointId not cached", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       const device = createDevice({ _id: "dev-77" });
       // First request: getDeviceByFingerPrint
       mockFetch.queueResponse([device]);
@@ -85,7 +83,7 @@ describe("TouchPoint", () => {
     });
 
     it("should POST /devices/service with correct payload", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       const device = createDevice({ _id: "dev-77" });
       // Pre-cache the touchPointId via getInfo
       mockFetch.queueResponse([device]);
@@ -105,7 +103,7 @@ describe("TouchPoint", () => {
     });
 
     it("should silently return if device not found", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       // getDeviceByFingerPrint returns empty array
       mockFetch.queueResponse([]);
 
@@ -116,7 +114,7 @@ describe("TouchPoint", () => {
     });
 
     it("should silently catch POST errors", async () => {
-      svc.config(createCoreInfo());
+      const svc = TouchPointClient.create(createCoreInfo());
       const device = createDevice({ _id: "dev-77" });
       // Pre-cache
       mockFetch.queueResponse([device]);

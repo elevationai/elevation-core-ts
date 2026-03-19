@@ -1,4 +1,5 @@
 import { BaseService } from "./shared/base.ts";
+import type { CoreInfo } from "../types/mod.ts";
 
 // CMS Interfaces matching the reference library
 export interface ICMS {
@@ -38,11 +39,19 @@ export interface DisplayDate {
   endDate: Date | null;
 }
 
-export class CMS extends BaseService {
+export class CMSClient extends BaseService {
   private loadingPromise: Promise<ICMS[]> | null = null;
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
   private readonly reqHeaderNoCache = { "Cache-Control": "no-cache" };
+
+  private constructor(coreInfo: CoreInfo) {
+    super(coreInfo);
+  }
+
+  static create(coreInfo: CoreInfo): CMSClient {
+    return new CMSClient(coreInfo);
+  }
 
   /**
    * Get a specific key from CMS
@@ -52,8 +61,6 @@ export class CMS extends BaseService {
    * @returns The CMS string or null if not found
    */
   async getKey(key: string, lan: string, isConfig: boolean = false, allowCache = true): Promise<string | null> {
-    this.checkConfiguration();
-
     // If cache is allowed and cache exists, return from cache
     if (allowCache && this.allStrings?.length) {
       const cached = this.cmsCache.get(`${key}-${lan}`);
@@ -89,8 +96,6 @@ export class CMS extends BaseService {
    * @returns Array of CMS strings or null for each key if not found
    */
   async getKeys(keys: string[], lan: string, allowCache = true): Promise<(string | null)[]> {
-    this.checkConfiguration();
-
     // If cache is allowed and cache exists, return from cache
     if (allowCache && this.allStrings?.length) {
       return keys.map((key) => {
@@ -140,8 +145,6 @@ export class CMS extends BaseService {
    * @returns Array of unique language codes
    */
   async getLangs(allowCache = true): Promise<string[]> {
-    this.checkConfiguration();
-
     if (!allowCache || !this.allStrings?.length) {
       try {
         await this.loadAllStrings(!allowCache);
@@ -170,8 +173,6 @@ export class CMS extends BaseService {
    * callers share the same in-flight request.
    */
   async loadAllStrings(disableCache = false): Promise<ICMS[]> {
-    this.checkConfiguration();
-
     // If already loading and not forcing refresh, return the existing promise
     if (!disableCache && this.loadingPromise) {
       return this.loadingPromise;
@@ -195,7 +196,7 @@ export class CMS extends BaseService {
 
   private async fetchStrings(disableCache: boolean): Promise<ICMS[]> {
     const response = await this.get(
-      this.coreInfo?.pageName ? `/strings/page/${this.coreInfo?.pageName}` : `/strings`,
+      this.coreInfo.pageName ? `/strings/page/${this.coreInfo.pageName}` : `/strings`,
       disableCache ? this.reqHeaderNoCache : undefined,
     );
 
@@ -244,7 +245,7 @@ export class CMS extends BaseService {
         try {
           // Get the base and selected version
           const baseVersion = langData.versions.find((v) => v.name === "base");
-          let selectedVersion = this.coreInfo?.version ? langData.versions.find((v) => v.name === this.coreInfo?.version) : undefined;
+          let selectedVersion = this.coreInfo.version ? langData.versions.find((v) => v.name === this.coreInfo.version) : undefined;
           if (selectedVersion && selectedVersion.displayDates?.length) {
             // if the version has schedule, then check it's in range
             const match = selectedVersion.displayDates.find((range) =>
@@ -256,11 +257,11 @@ export class CMS extends BaseService {
             if (!match) selectedVersion = undefined;
           }
 
-          if (this.coreInfo?.isDraft) {
+          if (this.coreInfo.isDraft) {
             const draft = selectedVersion || baseVersion;
             if (draft) {
               let value = draft.string;
-              if (this.coreInfo?.textReplaces?.length) {
+              if (this.coreInfo.textReplaces?.length) {
                 for (const { find, replace } of this.coreInfo.textReplaces) {
                   try {
                     value = value.replace(new RegExp(find, "g"), replace);
@@ -277,7 +278,7 @@ export class CMS extends BaseService {
             const lastPublish = selectedVersion?.publishes?.[0] || baseVersion?.publishes?.[0];
             if (lastPublish) {
               let value = lastPublish.string;
-              if (this.coreInfo?.textReplaces?.length) {
+              if (this.coreInfo.textReplaces?.length) {
                 for (const { find, replace } of this.coreInfo.textReplaces) {
                   try {
                     value = value.replace(new RegExp(find, "g"), replace);
@@ -306,5 +307,3 @@ export class CMS extends BaseService {
     this.allStrings = null;
   }
 }
-
-export const cms: CMS = new CMS();

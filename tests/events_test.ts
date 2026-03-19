@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { assertEquals, assertRejects } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
-import { ElevatedEvents } from "../lib/events.ts";
+import { EventsClient } from "../lib/events.ts";
 import { EventMode, EventType, StatusCode } from "../types/mod.ts";
 import { createCoreInfo, createDevice, MockFetch } from "./_mock.ts";
 
-describe("ElevatedEvents", () => {
-  let events: ElevatedEvents;
+describe("EventsClient", () => {
+  let events: EventsClient;
   let mockFetch: MockFetch;
 
   beforeEach(() => {
-    events = new ElevatedEvents();
     mockFetch = new MockFetch();
     mockFetch.install();
+    events = EventsClient.create(createCoreInfo());
   });
 
   afterEach(() => {
@@ -22,16 +22,7 @@ describe("ElevatedEvents", () => {
   });
 
   describe("send()", () => {
-    it("should throw if not configured", async () => {
-      await assertRejects(
-        () => events.send({ eventCode: 100 }),
-        Error,
-        "Service not configured",
-      );
-    });
-
     it("should POST to /events endpoint", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.send({ eventCode: 100, eventData: {} });
@@ -41,7 +32,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should apply defaults from setDefaults", async () => {
-      events.config(createCoreInfo());
       events.setDefaults({
         eventType: EventType.CHECKIN_KIOSK,
         eventMode: EventMode.CUSS,
@@ -58,7 +48,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should auto-populate metaData.eventCode from eventData", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.send({ eventCode: 42, eventData: {} });
@@ -69,7 +58,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should auto-populate metaData.airline from eventData.eventData.airline", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.send({ eventCode: 100, eventData: { airline: "UA" } });
@@ -80,7 +68,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should auto-populate metaData from kiosk Device", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       const device = createDevice({
@@ -103,7 +90,6 @@ describe("ElevatedEvents", () => {
     it("should pass through the first event and debounce the second rapid event", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounce([{ eventCode: 100, debounce: 5000 }]);
         mockFetch.queueResponse({ success: true });
 
@@ -124,7 +110,6 @@ describe("ElevatedEvents", () => {
     it("should allow event through after debounce window elapses", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounce([{ eventCode: 100, debounce: 5000 }]);
         mockFetch.queueResponse({ success: true });
 
@@ -145,7 +130,6 @@ describe("ElevatedEvents", () => {
     it("should remove debounceOnce entry after first send", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounceOnce([{ eventCode: 200, debounce: 5000 }]);
         mockFetch.queueResponse({ success: true });
 
@@ -170,7 +154,6 @@ describe("ElevatedEvents", () => {
     it("should clear all debounce rules with clearDebounce()", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounce([{ eventCode: 100, debounce: 5000 }]);
         mockFetch.queueResponse({ success: true });
 
@@ -195,7 +178,6 @@ describe("ElevatedEvents", () => {
     it("should register debounce rules via addDebounce", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounce([
           { eventCode: 10, debounce: 3000 },
           { eventCode: 20, debounce: 6000 },
@@ -214,7 +196,6 @@ describe("ElevatedEvents", () => {
     it("should register once rules via addDebounceOnce", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.addDebounceOnce([{ eventCode: 50, debounce: 3000 }]);
         mockFetch.queueResponse({ success: true });
 
@@ -236,7 +217,6 @@ describe("ElevatedEvents", () => {
 
   describe("helper methods", () => {
     it("should set statusCode to SUCCESS (200) for success()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.success({ eventCode: 1, eventData: {} });
@@ -246,7 +226,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to FAILURE (400) for failure()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.failure({ eventCode: 1, eventData: {} });
@@ -256,7 +235,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to FAILURE (400) for error()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.error({ eventCode: 1, eventData: {} });
@@ -266,7 +244,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to CRITICAL_FAILURE (500) for critical()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.critical({ eventCode: 1, eventData: {} });
@@ -276,7 +253,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to INFRACTION (501) for infraction()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.infraction({ eventCode: 1, eventData: {} });
@@ -286,7 +262,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to TIMEOUT (502) for timeout()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.timeout({ eventCode: 1, eventData: {} });
@@ -296,7 +271,6 @@ describe("ElevatedEvents", () => {
     });
 
     it("should set statusCode to MODE_CHANGE (300) for modeChange()", async () => {
-      events.config(createCoreInfo());
       mockFetch.queueResponse({ success: true });
 
       await events.modeChange({ eventCode: 1, eventData: {} });
@@ -310,7 +284,6 @@ describe("ElevatedEvents", () => {
     it("should clear debounce rules and defaults", async () => {
       const time = new FakeTime();
       try {
-        events.config(createCoreInfo());
         events.setDefaults({
           eventType: EventType.CHECKIN_KIOSK,
           ownerID: "owner-xyz",
