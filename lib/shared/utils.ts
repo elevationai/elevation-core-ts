@@ -8,10 +8,7 @@ export class Debouncer<A extends unknown[], R> {
   private timeoutId: number | null = null;
   private lastCall = 0;
 
-  constructor(
-    private fn: (...args: A) => R,
-    private delay: number,
-  ) {}
+  constructor(private fn: (...args: A) => R, private delay: number) {}
 
   call(...args: A): void {
     const now = Date.now();
@@ -57,10 +54,7 @@ export class Cache<T> {
   private cache = new Map<string, { value: T; expires: number }>();
   private cleanupInterval: number | null = null;
 
-  constructor(
-    private ttl = 60000, // Default 1 minute
-    autoCleanup = true,
-  ) {
+  constructor(private ttl = 60000, autoCleanup = true) {
     if (autoCleanup) {
       this.startAutoCleanup();
     }

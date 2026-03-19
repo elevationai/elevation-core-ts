@@ -17,10 +17,7 @@ export class LogsClient extends BaseService {
 
     // Setup debouncer if specified
     if (options.debounce) {
-      this.debouncer = new Debouncer(
-        async (data: LogData) => await this.sendLog(data),
-        options.debounce,
-      );
+      this.debouncer = new Debouncer(async (data: LogData) => await this.sendLog(data), options.debounce);
     }
   }
 
@@ -170,11 +167,7 @@ export class LogsClient extends BaseService {
   }
 
   // Get log statistics
-  public getStats(): {
-    debounceActive: boolean;
-    cacheSize: number;
-    defaults: LogOptions;
-  } {
+  public getStats(): { debounceActive: boolean; cacheSize: number; defaults: LogOptions } {
     return {
       debounceActive: !!this.debouncer,
       cacheSize: this.lastLogHash.size,

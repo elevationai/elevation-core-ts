@@ -157,10 +157,7 @@ export class IOTConnection extends AwaitableEmitter {
       return;
     }
 
-    const delay = Math.min(
-      this.reconnectDelay * Math.pow(2, this.reconnectAttempts),
-      30000,
-    );
+    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000);
 
     this.reconnectAttempts++;
 

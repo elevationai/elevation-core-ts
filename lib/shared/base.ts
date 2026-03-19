@@ -29,10 +29,7 @@ export abstract class BaseService {
     return headersObj;
   }
 
-  protected async makeRequest<T = unknown>(
-    path: string,
-    options: RequestInit = {},
-  ): Promise<ApiResponse<T>> {
+  protected async makeRequest<T = unknown>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${path}`;
     const timeout = this.requestTimeout;
 
