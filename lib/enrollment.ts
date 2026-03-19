@@ -1,23 +1,20 @@
 import { BaseService } from "./shared/base.ts";
-import type { ApiResponse, CoreInfo, Device, DeviceInfo, DeviceLocation, Specification } from "../types/mod.ts";
+import type { ApiResponse, Device, DeviceInfo, DeviceLocation, Specification } from "../types/mod.ts";
 
 export class EnrollmentClient extends BaseService {
+  private readonly fingerPrint: string;
   private started = false;
 
-  private constructor(coreInfo: CoreInfo) {
-    super(coreInfo);
-
-    if (!coreInfo.fingerPrint) {
-      throw new Error("fingerPrint is required in CoreInfo for Enrollment service");
+  constructor(url: string, token: string, fingerPrint: string, timeout?: number) {
+    super(url, token, timeout);
+    if (!fingerPrint) {
+      throw new Error("fingerPrint is required for Enrollment service");
     }
-  }
-
-  static create(coreInfo: CoreInfo): EnrollmentClient {
-    return new EnrollmentClient(coreInfo);
+    this.fingerPrint = fingerPrint;
   }
 
   public async start(): Promise<Device> {
-    const response = await this.get<Device[]>(`/devices/key/${this.coreInfo.fingerPrint}`);
+    const response = await this.get<Device[]>(`/devices/key/${this.fingerPrint}`);
 
     if (response.success && response.data) {
       const device = response.data[0] as Device;

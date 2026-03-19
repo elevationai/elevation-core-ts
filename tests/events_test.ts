@@ -3,7 +3,7 @@ import { assertEquals } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { EventsClient } from "../lib/events.ts";
 import { EventMode, EventType, StatusCode } from "../types/mod.ts";
-import { createCoreInfo, createDevice, MockFetch } from "./_mock.ts";
+import { createDevice, MockFetch } from "./_mock.ts";
 
 describe("EventsClient", () => {
   let events: EventsClient;
@@ -12,7 +12,7 @@ describe("EventsClient", () => {
   beforeEach(() => {
     mockFetch = new MockFetch();
     mockFetch.install();
-    events = EventsClient.create(createCoreInfo());
+    events = new EventsClient("https://api.test.com", "test-token-abc123");
   });
 
   afterEach(() => {

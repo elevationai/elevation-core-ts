@@ -4,17 +4,16 @@ export function uuid(): string {
 }
 
 // Debounce helper
-// deno-lint-ignore no-explicit-any
-export class Debouncer<T extends (...args: any[]) => any> {
+export class Debouncer<A extends unknown[], R> {
   private timeoutId: number | null = null;
   private lastCall = 0;
 
   constructor(
-    private fn: T,
+    private fn: (...args: A) => R,
     private delay: number,
   ) {}
 
-  call(...args: Parameters<T>): void {
+  call(...args: A): void {
     const now = Date.now();
 
     if (now - this.lastCall < this.delay) {
@@ -29,7 +28,7 @@ export class Debouncer<T extends (...args: any[]) => any> {
     this.fn(...args);
   }
 
-  async callAsync(...args: Parameters<T>): Promise<ReturnType<T> | void> {
+  async callAsync(...args: A): Promise<Awaited<R> | void> {
     const now = Date.now();
 
     if (now - this.lastCall < this.delay) {

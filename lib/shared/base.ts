@@ -1,23 +1,21 @@
-import type { ApiResponse, CoreInfo } from "../../types/mod.ts";
+import type { ApiResponse } from "../../types/mod.ts";
 
 export abstract class BaseService {
-  private readonly _coreInfo: CoreInfo;
+  private readonly baseUrl: string;
+  private readonly requestTimeout: number;
   private readonly headers: Headers;
 
-  protected get coreInfo(): CoreInfo {
-    return this._coreInfo;
-  }
-
-  protected constructor(coreInfo: CoreInfo) {
-    if (!coreInfo.token) {
-      throw new Error("Token is required in CoreInfo");
+  protected constructor(baseUrl: string, token: string, timeout?: number) {
+    if (!token) {
+      throw new Error("Token is required");
     }
-    if (!coreInfo.serviceEndpoint) {
-      throw new Error("Service endpoint is required in CoreInfo");
+    if (!baseUrl) {
+      throw new Error("URL is required");
     }
-    this._coreInfo = coreInfo;
+    this.baseUrl = baseUrl;
+    this.requestTimeout = timeout || 30000;
     this.headers = new Headers({
-      "Elevated-Auth": btoa(coreInfo.token),
+      "Elevated-Auth": btoa(token),
       "Content-Type": "application/json",
     });
   }
@@ -35,8 +33,8 @@ export abstract class BaseService {
     path: string,
     options: RequestInit = {},
   ): Promise<ApiResponse<T>> {
-    const url = `${this._coreInfo.serviceEndpoint}${path}`;
-    const timeout = this._coreInfo.timeout || 30000;
+    const url = `${this.baseUrl}${path}`;
+    const timeout = this.requestTimeout;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);

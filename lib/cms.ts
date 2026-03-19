@@ -1,5 +1,4 @@
 import { BaseService } from "./shared/base.ts";
-import type { CoreInfo } from "../types/mod.ts";
 
 // CMS Interfaces matching the reference library
 export interface ICMS {
@@ -40,17 +39,18 @@ export interface DisplayDate {
 }
 
 export class CMSClient extends BaseService {
+  public version?: string;
+  public pageName?: string;
+  public textReplaces?: { find: string; replace: string }[];
+  public isDraft?: boolean;
+
   private loadingPromise: Promise<ICMS[]> | null = null;
   private cmsCache: Map<string, string> = new Map();
   private allStrings: ICMS[] | null = null;
   private readonly reqHeaderNoCache = { "Cache-Control": "no-cache" };
 
-  private constructor(coreInfo: CoreInfo) {
-    super(coreInfo);
-  }
-
-  static create(coreInfo: CoreInfo): CMSClient {
-    return new CMSClient(coreInfo);
+  constructor(url: string, token: string, timeout?: number) {
+    super(url, token, timeout);
   }
 
   /**
@@ -196,7 +196,7 @@ export class CMSClient extends BaseService {
 
   private async fetchStrings(disableCache: boolean): Promise<ICMS[]> {
     const response = await this.get(
-      this.coreInfo.pageName ? `/strings/page/${this.coreInfo.pageName}` : `/strings`,
+      this.pageName ? `/strings/page/${this.pageName}` : `/strings`,
       disableCache ? this.reqHeaderNoCache : undefined,
     );
 
@@ -245,7 +245,7 @@ export class CMSClient extends BaseService {
         try {
           // Get the base and selected version
           const baseVersion = langData.versions.find((v) => v.name === "base");
-          let selectedVersion = this.coreInfo.version ? langData.versions.find((v) => v.name === this.coreInfo.version) : undefined;
+          let selectedVersion = this.version ? langData.versions.find((v) => v.name === this.version) : undefined;
           if (selectedVersion && selectedVersion.displayDates?.length) {
             // if the version has schedule, then check it's in range
             const match = selectedVersion.displayDates.find((range) =>
@@ -257,12 +257,12 @@ export class CMSClient extends BaseService {
             if (!match) selectedVersion = undefined;
           }
 
-          if (this.coreInfo.isDraft) {
+          if (this.isDraft) {
             const draft = selectedVersion || baseVersion;
             if (draft) {
               let value = draft.string;
-              if (this.coreInfo.textReplaces?.length) {
-                for (const { find, replace } of this.coreInfo.textReplaces) {
+              if (this.textReplaces?.length) {
+                for (const { find, replace } of this.textReplaces) {
                   try {
                     value = value.replace(new RegExp(find, "g"), replace);
                   }
@@ -278,8 +278,8 @@ export class CMSClient extends BaseService {
             const lastPublish = selectedVersion?.publishes?.[0] || baseVersion?.publishes?.[0];
             if (lastPublish) {
               let value = lastPublish.string;
-              if (this.coreInfo.textReplaces?.length) {
-                for (const { find, replace } of this.coreInfo.textReplaces) {
+              if (this.textReplaces?.length) {
+                for (const { find, replace } of this.textReplaces) {
                   try {
                     value = value.replace(new RegExp(find, "g"), replace);
                   }

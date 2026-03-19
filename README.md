@@ -75,16 +75,14 @@ npm i @jsr/eai__elevation-core-ts
 #### Quick Start
 
 ```typescript
-import { CoreInfo, EventCode, EventsClient, LogsClient } from "@jsr/eai__elevation-core-ts";
+import { EventCode, EventsClient, LogsClient } from "@jsr/eai__elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
+const url = "https://api-kiosk-elevation.herokuapp.com";
+const token = "<Tenant_Access_Token>";
 
 // Create service instances
-const events = EventsClient.create(coreInfo);
-const logs = LogsClient.create(coreInfo);
+const events = new EventsClient(url, token);
+const logs = new LogsClient(url, token);
 
 // Send a log
 await logs.information({ message: "Application started", deviceId: "<Device-GUID>" });
@@ -98,17 +96,14 @@ await events.success({ eventCode: EventCode.APP_START });
 #### Quick Start
 
 ```typescript
-import { CoreInfo, EventCode, EventsClient, LogsClient } from "@eai/elevation-core-ts";
+import { EventCode, EventsClient, LogsClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "your-token",
-  serviceEndpoint: "https://api-endpoint",
-  fingerPrint: "device-id",
-};
+const url = "https://api-endpoint";
+const token = "your-token";
 
 // Create service instances
-const events = EventsClient.create(coreInfo);
-const logs = LogsClient.create(coreInfo);
+const events = new EventsClient(url, token);
+const logs = new LogsClient(url, token);
 
 // Send an event
 await events.success({
@@ -135,38 +130,33 @@ deno task build
 deno task test
 ```
 
-## Core Communication
+## Constructor Signatures
 
-Every service requires specific information needed to communicate with EPS. Each EPS tenant has a unique
-access token and endpoint service which are used when creating each service instance. The
-interface for the core communication is called CoreInfo.
+Each service is instantiated directly with `new`. All accept simple positional arguments — no config objects required.
 
-```typescript
-interface CoreInfo {
-  token: string;
-  serviceEndpoint: string;
-  iotEndpoint?: string; // Required for IOT
-  iotEvents?: boolean; // Connect to /events namespace instead of /device
-  fingerPrint?: string; // Required for IOT/Enrollment/TouchPoint
-  secondary?: boolean; // Optional for secondary apps
-  timeout?: number; // Request timeout in milliseconds
-  version?: string; // CMS content version
-  pageName?: string; // CMS page filter
-  textReplaces?: { find: string; replace: string }[]; // CMS text replacements
-  isDraft?: boolean; // Use draft content (CMS)
-}
-```
+| Class              | Constructor                                                    |
+| ------------------ | -------------------------------------------------------------- |
+| `LogsClient`       | `new LogsClient(url, token, timeout?)`                         |
+| `EventsClient`     | `new EventsClient(url, token, timeout?)`                       |
+| `CMSClient`        | `new CMSClient(url, token, timeout?)`                          |
+| `ConfigClient`     | `new ConfigClient(url, token, deviceId, locationId, timeout?)` |
+| `EnrollmentClient` | `new EnrollmentClient(url, token, fingerPrint, timeout?)`      |
+| `TouchPointClient` | `new TouchPointClient(url, token, fingerPrint, timeout?)`      |
+| `IOTConnection`    | `new IOTConnection(url, token, fingerPrint, secondary?)`       |
 
-### Defining CoreInfo in code
+### Settable Properties
 
-```typescript
-import { CoreInfo } from "@eai/elevation-core-ts";
+Some classes expose optional properties that can be set after construction:
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-```
+| Class           | Property       | Type                                   | Description                                          |
+| --------------- | -------------- | -------------------------------------- | ---------------------------------------------------- |
+| `CMSClient`     | `version`      | `string?`                              | CMS content version                                  |
+| `CMSClient`     | `pageName`     | `string?`                              | CMS page filter                                      |
+| `CMSClient`     | `textReplaces` | `{ find: string; replace: string }[]?` | CMS text replacements                                |
+| `CMSClient`     | `isDraft`      | `boolean?`                             | Use draft content                                    |
+| `ConfigClient`  | `version`      | `string?`                              | Configuration version                                |
+| `IOTConnection` | `appName`      | `string`                               | Application name (default: `"ElevationDenoService"`) |
+| `IOTConnection` | `appVersion`   | `string`                               | Application version (default: `"1.0.0"`)             |
 
 ---
 
@@ -189,17 +179,10 @@ order and can be filtered based on the available log levels.
 
 ## Creating a LogsClient
 
-Create a `LogsClient` instance using the static `create` factory method with your `CoreInfo`.
-
 ```typescript
-import { CoreInfo, LogsClient } from "@eai/elevation-core-ts";
+import { LogsClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const logs = LogsClient.create(coreInfo);
+const logs = new LogsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 ```
 
 ### Log Multiple Instances
@@ -208,20 +191,10 @@ In rare occasions, a developer could have multiple service endpoints and want to
 send logs to all available environments. For that case, create multiple instances.
 
 ```typescript
-import { CoreInfo, LogsClient } from "@eai/elevation-core-ts";
+import { LogsClient } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<prod-url>",
-};
-
-const logs1 = LogsClient.create(coreInfo1);
-const logs2 = LogsClient.create(coreInfo2);
+const logs1 = new LogsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
+const logs2 = new LogsClient("https://<prod-url>", "<Tenant_Access_Token>");
 ```
 
 ## Sending logs
@@ -246,14 +219,9 @@ export interface LogData {
 Now in order to send logs, use the `message` method.
 
 ```typescript
-import { CoreInfo, LogLevel, LogsClient } from "@eai/elevation-core-ts";
+import { LogLevel, LogsClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const logs = LogsClient.create(coreInfo);
+const logs = new LogsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 
 await logs.message({
   applicationName: "MyAwesomeApp",
@@ -285,12 +253,7 @@ To improve productivity, you can set default values for properties that don't ch
 often when sending log messages to EPS.
 
 ```typescript
-import { CoreInfo, LogLevel, LogOptions, LogsClient } from "@eai/elevation-core-ts";
-
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
+import { LogLevel, LogOptions, LogsClient } from "@eai/elevation-core-ts";
 
 const logDefaults: LogOptions = {
   debounce: 1000 * 10, // 10 seconds debounce time
@@ -299,7 +262,7 @@ const logDefaults: LogOptions = {
   statusCode: 0,
 };
 
-const logs = LogsClient.create(coreInfo);
+const logs = new LogsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 
 // setting default values
 logs.setDefaults(logDefaults);
@@ -334,12 +297,7 @@ You can define a debounce value in milliseconds. By setting a debounce value, yo
 from sending multiple identical log messages within the debounce time window.
 
 ```typescript
-import { CoreInfo, LogOptions, LogsClient } from "@eai/elevation-core-ts";
-
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
+import { LogOptions, LogsClient } from "@eai/elevation-core-ts";
 
 const logDefaults: LogOptions = {
   debounce: 1000 * 10, // 10 seconds debounce time
@@ -348,7 +306,7 @@ const logDefaults: LogOptions = {
   statusCode: 0,
 };
 
-const logs = LogsClient.create(coreInfo);
+const logs = new LogsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 logs.setDefaults(logDefaults);
 
 // This is going to be sent
@@ -379,17 +337,10 @@ dashboard UI. There are predefined events ready to use in a custom application.
 
 ## Creating an EventsClient
 
-Create an `EventsClient` instance using the static `create` factory method with your `CoreInfo`.
-
 ```typescript
-import { CoreInfo, EventsClient } from "@eai/elevation-core-ts";
+import { EventsClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const events = EventsClient.create(coreInfo);
+const events = new EventsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 ```
 
 ### Events Multiple Instances
@@ -397,20 +348,10 @@ const events = EventsClient.create(coreInfo);
 For sending events to multiple environments simultaneously, create multiple instances.
 
 ```typescript
-import { CoreInfo, EventsClient } from "@eai/elevation-core-ts";
+import { EventsClient } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<prod-url>",
-};
-
-const events1 = EventsClient.create(coreInfo1);
-const events2 = EventsClient.create(coreInfo2);
+const events1 = new EventsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
+const events2 = new EventsClient("https://<prod-url>", "<Tenant_Access_Token>");
 ```
 
 ## Sending events
@@ -437,14 +378,9 @@ export interface EventData {
 Now you are ready to send an event to EPS.
 
 ```typescript
-import { CoreInfo, EventCode, EventMode, EventsClient, EventType, StatusCode } from "@eai/elevation-core-ts";
+import { EventCode, EventMode, EventsClient, EventType, StatusCode } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const events = EventsClient.create(coreInfo);
+const events = new EventsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 
 await events.send({
   eventCode: EventCode.BAGTAG_PRINT,
@@ -482,12 +418,7 @@ You can define default values that are not likely to change when sending events.
 Most of the time the values that rarely change are `eventMode`, `eventType`, and `ownerID`.
 
 ```typescript
-import { CoreInfo, EventMode, EventOptions, EventsClient, EventType } from "@eai/elevation-core-ts";
-
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
+import { EventMode, EventOptions, EventsClient, EventType } from "@eai/elevation-core-ts";
 
 const defaultValues: EventOptions = {
   eventType: EventType.CHECKIN_KIOSK,
@@ -495,7 +426,7 @@ const defaultValues: EventOptions = {
   ownerID: "xxxx-xxxx-xxxx-xxxx", // Device GUID
 };
 
-const events = EventsClient.create(coreInfo);
+const events = new EventsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 events.setDefaults(defaultValues);
 
 // Now just pass what is not in the default values
@@ -532,12 +463,7 @@ You can define a debounce value in milliseconds on a per `eventCode` basis. This
 the event library from sending multiple events of the specified event-code within the debounce time window.
 
 ```typescript
-import { CoreInfo, EventCode, EventMode, EventOptions, EventsClient, EventType } from "@eai/elevation-core-ts";
-
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
+import { EventCode, EventMode, EventOptions, EventsClient, EventType } from "@eai/elevation-core-ts";
 
 // Debouncing all paper jams to 1 minute
 const defaultValues: EventOptions = {
@@ -547,7 +473,7 @@ const defaultValues: EventOptions = {
   ownerID: "xxxx-xxxx-xxxx-xxxx",
 };
 
-const events = EventsClient.create(coreInfo);
+const events = new EventsClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 events.setDefaults(defaultValues);
 
 // This event will be sent
@@ -602,17 +528,8 @@ communication with the Administrator UI. This enables the end user to command th
 
 ### Important notice
 
-Unlike the other services, IOT requires the `iotEndpoint` and a `fingerPrint` to be defined within the CoreInfo Object.
+IOT requires a `url` (the full IOT endpoint including namespace), a `token`, and a `fingerPrint`.
 Without them, the communication between the device and EPS won't be possible.
-
-```typescript
-interface CoreInfo {
-  token: string;
-  serviceEndpoint: string;
-  iotEndpoint?: string;
-  fingerPrint?: string;
-}
-```
 
 ### FingerPrint
 
@@ -629,27 +546,21 @@ console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 
 ## Creating an IOTConnection
 
-Create an `IOTConnection` instance using the static `create` factory method. The connection is established automatically
-upon creation. You can optionally specify the application name and version.
+Create an `IOTConnection` instance with `new`. The connection is established automatically
+upon creation. You can optionally set the application name and version properties.
 
 ```typescript
-import { CoreInfo, IOTConnection, IOTInfo } from "@eai/elevation-core-ts";
+import { IOTConnection } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  iotEndpoint: "https://<app-iot-endpoint>",
-  fingerPrint: "<App-GUID>", // unique per touchpoint
-  secondary: false, // Optional
-};
+const iot = new IOTConnection(
+  "https://<app-iot-endpoint>/device", // full URL including namespace
+  "<Tenant_Access_Token>",
+  "<App-GUID>", // unique per touchpoint
+);
 
-// optional information
-const iotInfo: IOTInfo = {
-  appName: "airlineCheckinApp",
-  appVersion: "0.1.0",
-};
-
-const iot = IOTConnection.create(coreInfo, iotInfo);
+// Optionally set app info (defaults: "ElevationDenoService" / "1.0.0")
+iot.appName = "airlineCheckinApp";
+iot.appVersion = "0.1.0";
 
 // successfully connected to EPS IOT services
 iot.on("connected", () => {
@@ -667,24 +578,10 @@ iot.on("configurationRequired", () => {
 For connecting to multiple IOT environments simultaneously, create multiple instances.
 
 ```typescript
-import { CoreInfo, IOTConnection, IOTInfo } from "@eai/elevation-core-ts";
+import { IOTConnection } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  iotEndpoint: "https://<app-iot-endpoint>",
-  fingerPrint: "<App-GUID>",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<api-2-endpoint>",
-  iotEndpoint: "https://<app-iot-endpoint2>",
-  fingerPrint: "<App-GUID>",
-};
-
-const iot1 = IOTConnection.create(coreInfo1);
-const iot2 = IOTConnection.create(coreInfo2);
+const iot1 = new IOTConnection("https://<app-iot-endpoint>/device", "<Tenant_Access_Token>", "<App-GUID>");
+const iot2 = new IOTConnection("https://<app-iot-endpoint2>/device", "<Tenant_Access_Token>", "<App-GUID>");
 
 iot1.on("connected", () => console.log("Connection 1 succeeded"));
 iot2.on("connected", () => console.log("Connection 2 succeeded"));
@@ -881,18 +778,14 @@ console.log(uuid()); // example response: e91f29b3-3559-491c-ab43-05c63ddc08f9
 
 ## Creating an EnrollmentClient
 
-Create an `EnrollmentClient` instance using the static `create` factory method. A `fingerPrint` is required in the `CoreInfo`.
-
 ```typescript
-import { CoreInfo, EnrollmentClient } from "@eai/elevation-core-ts";
+import { EnrollmentClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>", // unique per touchpoint
-};
-
-const enrollment = EnrollmentClient.create(coreInfo);
+const enrollment = new EnrollmentClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<App-GUID>", // fingerPrint — unique per touchpoint
+);
 ```
 
 ### Enrollment Multiple Instances
@@ -900,22 +793,10 @@ const enrollment = EnrollmentClient.create(coreInfo);
 For enrolling devices to multiple environments simultaneously, create multiple instances.
 
 ```typescript
-import { CoreInfo, EnrollmentClient } from "@eai/elevation-core-ts";
+import { EnrollmentClient } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<api2-url>",
-  fingerPrint: "<App-GUID>",
-};
-
-const enroll1 = EnrollmentClient.create(coreInfo1);
-const enroll2 = EnrollmentClient.create(coreInfo2);
+const enroll1 = new EnrollmentClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>", "<App-GUID>");
+const enroll2 = new EnrollmentClient("https://<api2-url>", "<Tenant_Access_Token>", "<App-GUID>");
 ```
 
 ## Starting Enrollment
@@ -924,15 +805,13 @@ To start the enrollment process, you will receive the current device object refe
 enrollment. You also need to retrieve available locations and device specifications.
 
 ```typescript
-import { CoreInfo, Device, DeviceInfo, DeviceLocation, EnrollmentClient, Specification } from "@eai/elevation-core-ts";
+import { Device, DeviceInfo, DeviceLocation, EnrollmentClient, Specification } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const enrollment = EnrollmentClient.create(coreInfo);
+const enrollment = new EnrollmentClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<App-GUID>",
+);
 
 // Starting enrollment process
 const [device, locations, specs] = await Promise.all([
@@ -959,15 +838,13 @@ The library enforces that each enrolled device has a unique name/label. You can 
 if a label is available for use before enrolling.
 
 ```typescript
-import { CoreInfo, EnrollmentClient } from "@eai/elevation-core-ts";
+import { EnrollmentClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const enrollment = EnrollmentClient.create(coreInfo);
+const enrollment = new EnrollmentClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<App-GUID>",
+);
 
 const isAvailable = await enrollment.isLabelAvailable("DENKIOSK001");
 if (isAvailable) {
@@ -999,24 +876,18 @@ These configurations can be set up as global, location, or device specific throu
 
 ## Creating a ConfigClient
 
-Create a `ConfigClient` instance using the static `create` factory method with your `CoreInfo` and
-`ElevatedConfigurationsInfo`.
-
 ```typescript
-import { ConfigClient, CoreInfo, ElevatedConfigurationsInfo } from "@eai/elevation-core-ts";
+import { ConfigClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
+const config = new ConfigClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<Device-GUID>", // deviceId
+  "<Location-GUID>", // locationId
+);
 
-const configInfo: ElevatedConfigurationsInfo = {
-  deviceId: "<Device-GUID>",
-  locationId: "<Location-GUID>",
-};
-
-const config = ConfigClient.create(coreInfo, configInfo);
+// Optionally set a configuration version
+config.version = "2.0";
 ```
 
 ### Config Multiple Instances
@@ -1024,27 +895,10 @@ const config = ConfigClient.create(coreInfo, configInfo);
 For connecting to multiple configuration management environments, create multiple instances.
 
 ```typescript
-import { ConfigClient, CoreInfo, ElevatedConfigurationsInfo } from "@eai/elevation-core-ts";
+import { ConfigClient } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<api2-url>",
-  fingerPrint: "<App-GUID>",
-};
-
-const configInfo: ElevatedConfigurationsInfo = {
-  deviceId: "<Device-GUID>",
-  locationId: "<Location-GUID>",
-};
-
-const config1 = ConfigClient.create(coreInfo1, configInfo);
-const config2 = ConfigClient.create(coreInfo2, configInfo);
+const config1 = new ConfigClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>", "<Device-GUID>", "<Location-GUID>");
+const config2 = new ConfigClient("https://<api2-url>", "<Tenant_Access_Token>", "<Device-GUID>", "<Location-GUID>");
 ```
 
 ## Retrieving Configurations
@@ -1053,20 +907,14 @@ To retrieve configurations, provide the configuration label. The configurations 
 priority: device > location > global.
 
 ```typescript
-import { ConfigClient, CoreInfo, ElevatedConfigurationsInfo } from "@eai/elevation-core-ts";
+import { ConfigClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const configInfo: ElevatedConfigurationsInfo = {
-  deviceId: "<Device-GUID>",
-  locationId: "<Location-GUID>",
-};
-
-const config = ConfigClient.create(coreInfo, configInfo);
+const config = new ConfigClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<Device-GUID>",
+  "<Location-GUID>",
+);
 
 // Retrieve a single configuration
 const value = await config.getConfig("config-key");
@@ -1122,23 +970,18 @@ The CMS module enables applications to:
 - **Intelligent Caching**: In-memory caching with cache control
 - **Draft/Published States**: Support for draft and published content workflows
 - **Scheduled Content**: Display content based on date ranges
-- **Text Replacements**: Automatic find/replace on CMS strings via `coreInfo.textReplaces`
+- **Text Replacements**: Automatic find/replace on CMS strings via `textReplaces` property
 
 ## Creating a CMSClient
 
-Create a `CMSClient` instance using the static `create` factory method.
-
 ```typescript
-import { CMSClient, CoreInfo } from "@eai/elevation-core-ts";
+import { CMSClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  version: "v2.0", // Optional: specify content version
-  isDraft: false, // Optional: use draft or published content
-};
+const cms = new CMSClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
 
-const cms = CMSClient.create(coreInfo);
+// Optionally set CMS properties
+cms.version = "v2.0";
+cms.isDraft = false;
 ```
 
 ### CMS Multiple Instances
@@ -1146,20 +989,10 @@ const cms = CMSClient.create(coreInfo);
 For applications that need to access multiple CMS environments simultaneously:
 
 ```typescript
-import { CMSClient, CoreInfo } from "@eai/elevation-core-ts";
+import { CMSClient } from "@eai/elevation-core-ts";
 
-const coreInfo1: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-};
-
-const coreInfo2: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://<prod-url>",
-};
-
-const cms1 = CMSClient.create(coreInfo1);
-const cms2 = CMSClient.create(coreInfo2);
+const cms1 = new CMSClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
+const cms2 = new CMSClient("https://<prod-url>", "<Tenant_Access_Token>");
 ```
 
 ## Getting Content
@@ -1283,20 +1116,15 @@ if (allStrings) {
 
 ## Version Support
 
-The CMS supports content versioning. By default, the CMS uses the "base" version, but you can specify a different version using `coreInfo.version`.
+The CMS supports content versioning. By default, the CMS uses the "base" version, but you can specify a different version using the `version` property.
 
 ### Configuring a Specific Version
 
 ```typescript
-import { CMSClient, CoreInfo } from "@eai/elevation-core-ts";
+import { CMSClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  version: "holiday-2024",
-};
-
-const cms = CMSClient.create(coreInfo);
+const cms = new CMSClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
+cms.version = "holiday-2024";
 
 // Content will be retrieved from "holiday-2024" version
 const holidayMsg = await cms.getString("welcome_message", "en-US");
@@ -1320,21 +1148,16 @@ Versions can have display date ranges. Content is automatically selected based o
 
 ## Draft Mode
 
-Support for draft content allows testing changes before publishing. Set `coreInfo.isDraft` to `true` to retrieve draft (unpublished) content.
+Support for draft content allows testing changes before publishing. Set `isDraft` to `true` to retrieve draft (unpublished) content.
 
 ### Configuring Draft Mode
 
 ```typescript
-import { CMSClient, CoreInfo } from "@eai/elevation-core-ts";
+import { CMSClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  version: "v2.0",
-  isDraft: true,
-};
-
-const cms = CMSClient.create(coreInfo);
+const cms = new CMSClient("https://api-kiosk-elevation.herokuapp.com", "<Tenant_Access_Token>");
+cms.version = "v2.0";
+cms.isDraft = true;
 
 // Retrieves draft content from the specified version
 const draftContent = await cms.getString("welcome_message", "en-US");
@@ -1368,19 +1191,14 @@ and retrieving device information by fingerprint.
 
 ## Creating a TouchPointClient
 
-Create a `TouchPointClient` instance using the static `create` factory method.
-A `fingerPrint` is required in the `CoreInfo`.
-
 ```typescript
-import { CoreInfo, TouchPointClient } from "@eai/elevation-core-ts";
+import { TouchPointClient } from "@eai/elevation-core-ts";
 
-const coreInfo: CoreInfo = {
-  token: "<Tenant_Access_Token>",
-  serviceEndpoint: "https://api-kiosk-elevation.herokuapp.com",
-  fingerPrint: "<App-GUID>",
-};
-
-const touchpoint = TouchPointClient.create(coreInfo);
+const touchpoint = new TouchPointClient(
+  "https://api-kiosk-elevation.herokuapp.com",
+  "<Tenant_Access_Token>",
+  "<App-GUID>", // fingerPrint
+);
 ```
 
 ## Getting Device Info
@@ -1413,24 +1231,6 @@ await touchpoint.inService(false, "Maintenance required");
 
 ### Core Interfaces
 
-#### CoreInfo
-
-```typescript
-interface CoreInfo {
-  token: string; // Tenant access token
-  serviceEndpoint: string; // API endpoint
-  iotEndpoint?: string; // IOT service endpoint
-  iotEvents?: boolean; // Connect to /events namespace
-  fingerPrint?: string; // Unique device identifier
-  secondary?: boolean; // Secondary app flag
-  timeout?: number; // Request timeout in milliseconds
-  version?: string; // CMS content version
-  pageName?: string; // CMS page filter
-  textReplaces?: { find: string; replace: string }[]; // CMS text replacements
-  isDraft?: boolean; // Use draft content (CMS)
-}
-```
-
 #### EventData
 
 ```typescript
@@ -1462,15 +1262,6 @@ interface LogData {
 }
 ```
 
-#### IOTInfo
-
-```typescript
-interface IOTInfo {
-  appName: string;
-  appVersion?: string;
-}
-```
-
 #### DeviceInfo
 
 ```typescript
@@ -1484,16 +1275,6 @@ interface DeviceInfo {
 }
 ```
 
-#### ElevatedConfigurationsInfo
-
-```typescript
-interface ElevatedConfigurationsInfo {
-  deviceId: string;
-  locationId: string;
-  version?: string;
-}
-```
-
 ---
 
 ## Examples
@@ -1504,64 +1285,54 @@ interface ElevatedConfigurationsInfo {
 import {
   CMSClient,
   ConfigClient,
-  CoreInfo,
-  ElevatedConfigurationsInfo,
   EnrollmentClient,
   EventCode,
   EventMode,
   EventsClient,
   EventType,
   IOTConnection,
-  IOTInfo,
   LogsClient,
   TouchPointClient,
 } from "@eai/elevation-core-ts";
 
 async function main() {
-  const coreInfo: CoreInfo = {
-    token: Deno.env.get("ELEVATION_TOKEN")!,
-    serviceEndpoint: Deno.env.get("ELEVATION_SERVICE_ENDPOINT")!,
-    iotEndpoint: Deno.env.get("ELEVATION_IOT_ENDPOINT"),
-    fingerPrint: Deno.env.get("ELEVATION_FINGERPRINT"),
-  };
+  const url = Deno.env.get("ELEVATION_SERVICE_ENDPOINT")!;
+  const token = Deno.env.get("ELEVATION_TOKEN")!;
+  const fingerPrint = Deno.env.get("ELEVATION_FINGERPRINT")!;
+  const iotUrl = Deno.env.get("ELEVATION_IOT_ENDPOINT")!;
 
   // Create service instances
-  const events = EventsClient.create(coreInfo);
-  const logs = LogsClient.create(coreInfo);
+  const events = new EventsClient(url, token);
+  const logs = new LogsClient(url, token);
 
   // Set defaults
   events.setDefaults({
     eventType: EventType.CHECKIN_KIOSK,
     eventMode: EventMode.NATIVE,
-    ownerID: coreInfo.fingerPrint,
+    ownerID: fingerPrint,
   });
 
   logs.setDefaults({
-    deviceId: coreInfo.fingerPrint!,
+    deviceId: fingerPrint,
     applicationName: "MyKioskApp",
   });
 
-  // Configure IOT if available
-  if (coreInfo.iotEndpoint && coreInfo.fingerPrint) {
-    const iotInfo: IOTInfo = {
-      appName: "MyKioskApp",
-      appVersion: "1.0.0",
-    };
+  // Configure IOT
+  const iot = new IOTConnection(iotUrl, token, fingerPrint);
+  iot.appName = "MyKioskApp";
+  iot.appVersion = "1.0.0";
 
-    const iot = IOTConnection.create(coreInfo, iotInfo);
+  iot.on("connected", () => {
+    console.log("IOT Connected");
+    events.success({ eventCode: EventCode.ONLINE });
+  });
 
-    iot.on("connected", () => {
-      console.log("IOT Connected");
-      events.success({ eventCode: EventCode.ONLINE });
-    });
-
-    iot.on("command", (command) => {
-      console.log("Received command:", command);
-      if (command.refresh) {
-        console.log("Refreshing application...");
-      }
-    });
-  }
+  iot.on("command", (command) => {
+    console.log("Received command:", command);
+    if (command.refresh) {
+      console.log("Refreshing application...");
+    }
+  });
 
   // Send startup events and logs
   await events.success({
@@ -1574,10 +1345,8 @@ async function main() {
   });
 
   // TouchPoint service state
-  if (coreInfo.fingerPrint) {
-    const touchpoint = TouchPointClient.create(coreInfo);
-    await touchpoint.inService(true, "Application started");
-  }
+  const touchpoint = new TouchPointClient(url, token, fingerPrint);
+  await touchpoint.inService(true, "Application started");
 
   console.log("Elevation library initialized successfully!");
 }
@@ -1588,7 +1357,7 @@ main().catch(console.error);
 ### Event Debouncing
 
 ```typescript
-const events = EventsClient.create(coreInfo);
+const events = new EventsClient(url, token);
 
 events.setDefaults({
   debounceEvent: [
@@ -1604,12 +1373,7 @@ events.setDefaults({
 ### Configuration Management
 
 ```typescript
-const configInfo: ElevatedConfigurationsInfo = {
-  deviceId: "<Device-GUID>",
-  locationId: "<Location-GUID>",
-};
-
-const config = ConfigClient.create(coreInfo, configInfo);
+const config = new ConfigClient(url, token, "<Device-GUID>", "<Location-GUID>");
 
 // Retrieve a configuration
 const settings = await config.getConfig("theme_settings");

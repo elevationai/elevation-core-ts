@@ -1,4 +1,4 @@
-import type { CoreInfo, Device, DeviceInfo, DeviceLocation, Specification, Terminal } from "../types/mod.ts";
+import type { Device, DeviceInfo, DeviceLocation, Specification, Terminal } from "../types/mod.ts";
 
 // --- MockFetch ---
 
@@ -11,6 +11,10 @@ interface QueuedResponse {
 interface RecordedRequest {
   url: string;
   init: RequestInit;
+}
+
+interface GlobalWithFetch {
+  fetch: typeof globalThis.fetch;
 }
 
 export class MockFetch {
@@ -27,8 +31,7 @@ export class MockFetch {
   }
 
   install(): void {
-    // deno-lint-ignore no-explicit-any
-    (globalThis as any).fetch = (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
+    (globalThis as unknown as GlobalWithFetch).fetch = (input: string | URL | Request, init?: RequestInit): Promise<Response> => {
       const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
       this.requests.push({ url, init: init || {} });
       const queued = this.responses.shift();
@@ -84,16 +87,6 @@ export class MockFetch {
 
 // --- Factory helpers ---
 
-export function createCoreInfo(overrides?: Partial<CoreInfo>): CoreInfo {
-  return {
-    token: "test-token-abc123",
-    serviceEndpoint: "https://api.test.com",
-    fingerPrint: "device-fp-001",
-    iotEndpoint: "https://iot.test.com",
-    ...overrides,
-  };
-}
-
 export function createDevice(overrides?: Partial<Device>): Device {
   return {
     _id: "device-001",
@@ -147,8 +140,7 @@ export function createDeviceInfo(overrides?: Partial<DeviceInfo>): DeviceInfo {
 
 // --- MockSocket ---
 
-// deno-lint-ignore no-explicit-any
-type HandlerFn = (...args: any[]) => void;
+type HandlerFn = (...args: unknown[]) => void;
 
 export class MockSocket {
   private handlers = new Map<string, HandlerFn[]>();
@@ -188,6 +180,13 @@ export class MockSocket {
 
 // --- DenoFsStub ---
 
+interface DenoFs {
+  readTextFile: typeof Deno.readTextFile;
+  writeTextFile: typeof Deno.writeTextFile;
+  rename: typeof Deno.rename;
+  remove: typeof Deno.remove;
+}
+
 export class DenoFsStub {
   public files = new Map<string, string>();
   public writtenFiles: { path: string; content: string }[] = [];
@@ -205,8 +204,9 @@ export class DenoFsStub {
     this.origRename = Deno.rename;
     this.origRemove = Deno.remove;
 
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).readTextFile = (path: string | URL): Promise<string> => {
+    const deno = Deno as unknown as DenoFs;
+
+    deno.readTextFile = (path: string | URL): Promise<string> => {
       const p = path.toString();
       if (this.files.has(p)) {
         return Promise.resolve(this.files.get(p)!);
@@ -214,16 +214,15 @@ export class DenoFsStub {
       return Promise.reject(new Deno.errors.NotFound(`File not found: ${p}`));
     };
 
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).writeTextFile = (path: string | URL, content: string): Promise<void> => {
+    deno.writeTextFile = (path: string | URL, content: string | ReadableStream<string>): Promise<void> => {
       const p = path.toString();
-      this.files.set(p, content);
-      this.writtenFiles.push({ path: p, content });
+      const str = typeof content === "string" ? content : "";
+      this.files.set(p, str);
+      this.writtenFiles.push({ path: p, content: str });
       return Promise.resolve();
     };
 
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).rename = (from: string | URL, to: string | URL): Promise<void> => {
+    deno.rename = (from: string | URL, to: string | URL): Promise<void> => {
       const f = from.toString();
       const t = to.toString();
       if (!this.files.has(f)) {
@@ -235,8 +234,7 @@ export class DenoFsStub {
       return Promise.resolve();
     };
 
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).remove = (path: string | URL): Promise<void> => {
+    deno.remove = (path: string | URL): Promise<void> => {
       const p = path.toString();
       if (!this.files.has(p)) {
         return Promise.reject(new Deno.errors.NotFound(`File not found: ${p}`));
@@ -248,14 +246,11 @@ export class DenoFsStub {
   }
 
   restore(): void {
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).readTextFile = this.origReadTextFile;
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).writeTextFile = this.origWriteTextFile;
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).rename = this.origRename;
-    // deno-lint-ignore no-explicit-any
-    (Deno as any).remove = this.origRemove;
+    const deno = Deno as unknown as DenoFs;
+    deno.readTextFile = this.origReadTextFile;
+    deno.writeTextFile = this.origWriteTextFile;
+    deno.rename = this.origRename;
+    deno.remove = this.origRemove;
   }
 
   setFile(path: string, content: string): void {

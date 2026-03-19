@@ -1,11 +1,10 @@
-# Migration Guide: v0.x → v1.0.0
+# Migration Guide: v0.x → v1.1.0
 
 ## Breaking Changes
 
-### Singletons removed — factory pattern
+### Singletons removed — direct instantiation
 
-All services now use a static `create()` factory method instead of singletons with `.config()`. You instantiate each
-service by passing `CoreInfo` directly to `create()`.
+All services now use `new` with simple positional arguments instead of singletons with `.config()`.
 
 ```ts
 // Before
@@ -19,12 +18,70 @@ cms.config(coreInfo);
 
 // After
 import { CMSClient, ConfigClient, EnrollmentClient, EventsClient, IOTConnection, LogsClient } from "@eai/elevation-core-ts";
-const events = EventsClient.create(coreInfo);
-const logs = LogsClient.create(coreInfo);
-const iot = IOTConnection.create(coreInfo, iotInfo);
-const enrollment = EnrollmentClient.create(coreInfo);
+const events = new EventsClient(url, token);
+const logs = new LogsClient(url, token);
+const iot = new IOTConnection(iotUrl, token, fingerPrint);
+const enrollment = new EnrollmentClient(url, token, fingerPrint);
+const config = new ConfigClient(url, token, deviceId, locationId);
+const cms = new CMSClient(url, token);
+```
+
+### CoreInfo removed
+
+The `CoreInfo` interface has been removed. Each class now accepts only the arguments it needs as simple positional parameters.
+
+| Class              | Constructor                                                    |
+| ------------------ | -------------------------------------------------------------- |
+| `LogsClient`       | `new LogsClient(url, token, timeout?)`                         |
+| `EventsClient`     | `new EventsClient(url, token, timeout?)`                       |
+| `CMSClient`        | `new CMSClient(url, token, timeout?)`                          |
+| `ConfigClient`     | `new ConfigClient(url, token, deviceId, locationId, timeout?)` |
+| `EnrollmentClient` | `new EnrollmentClient(url, token, fingerPrint, timeout?)`      |
+| `TouchPointClient` | `new TouchPointClient(url, token, fingerPrint, timeout?)`      |
+| `IOTConnection`    | `new IOTConnection(url, token, fingerPrint, secondary?)`       |
+
+### ElevatedConfigurationsInfo removed
+
+The `ElevatedConfigurationsInfo` interface has been removed. `ConfigClient` now takes `deviceId` and `locationId` as direct constructor arguments. The optional `version` is a settable property.
+
+```ts
+// Before
+const configInfo: ElevatedConfigurationsInfo = { deviceId: "dev-1", locationId: "loc-1", version: "2.0" };
 const config = ConfigClient.create(coreInfo, configInfo);
+
+// After
+const config = new ConfigClient(url, token, "dev-1", "loc-1");
+config.version = "2.0";
+```
+
+### IOTInfo removed
+
+The `IOTInfo` interface has been removed. `IOTConnection` exposes `appName` and `appVersion` as settable properties.
+
+```ts
+// Before
+const iotInfo: IOTInfo = { appName: "myApp", appVersion: "1.0.0" };
+const iot = IOTConnection.create(coreInfo, iotInfo);
+
+// After
+const iot = new IOTConnection(iotUrl, token, fingerPrint);
+iot.appName = "myApp";
+iot.appVersion = "1.0.0";
+```
+
+### CMS optional properties
+
+`version`, `pageName`, `textReplaces`, and `isDraft` are now settable properties on `CMSClient`.
+
+```ts
+// Before
+const coreInfo: CoreInfo = { token, serviceEndpoint, version: "v2", isDraft: true };
 const cms = CMSClient.create(coreInfo);
+
+// After
+const cms = new CMSClient(url, token);
+cms.version = "v2";
+cms.isDraft = true;
 ```
 
 ### Class renames
@@ -41,23 +98,22 @@ const cms = CMSClient.create(coreInfo);
 
 ### Singleton export renames
 
-| Old singleton            | New factory call                          |
-| ------------------------ | ----------------------------------------- |
-| `elogs`                  | `LogsClient.create(coreInfo)`             |
-| `events`                 | `EventsClient.create(coreInfo)`           |
-| `iot`                    | `IOTConnection.create(coreInfo, iotInfo)` |
-| `enrollment`             | `EnrollmentClient.create(coreInfo)`       |
-| `configMgmt`             | `ConfigClient.create(coreInfo, info)`     |
-| `cms`                    | `CMSClient.create(coreInfo)`              |
-| `touchPoint`             | `TouchPointClient.create(coreInfo)`       |
-| `elevatedConfigurations` | `ConfigClient.create(coreInfo, info)`     |
+| Old singleton | New instantiation                                    |
+| ------------- | ---------------------------------------------------- |
+| `elogs`       | `new LogsClient(url, token)`                         |
+| `events`      | `new EventsClient(url, token)`                       |
+| `iot`         | `new IOTConnection(iotUrl, token, fingerPrint)`      |
+| `enrollment`  | `new EnrollmentClient(url, token, fingerPrint)`      |
+| `configMgmt`  | `new ConfigClient(url, token, deviceId, locationId)` |
+| `cms`         | `new CMSClient(url, token)`                          |
+| `touchPoint`  | `new TouchPointClient(url, token, fingerPrint)`      |
 
 ### Type renames
 
-| Old name         | New name                     |
-| ---------------- | ---------------------------- |
-| `ConfigMgmtInfo` | `ElevatedConfigurationsInfo` |
-| `DeviceUpdate`   | `Device`                     |
+| Old name         | New name |
+| ---------------- | -------- |
+| `ConfigMgmtInfo` | Removed  |
+| `DeviceUpdate`   | `Device` |
 
 ### RxJS removed
 
@@ -79,7 +135,7 @@ const sub = iot.onEvent.subscribe((data) => { ... });
 sub.unsubscribe();
 
 // After
-const iot = IOTConnection.create(coreInfo, iotInfo);
+const iot = new IOTConnection(iotUrl, token, fingerPrint);
 iot.on("connected", () => { ... });
 iot.on("command", (data) => { ... });
 const handler = (data) => { ... };
@@ -148,7 +204,7 @@ import { firstValueFrom } from "rxjs";
 const strings = await firstValueFrom(cms.loadAllStrings());
 
 // After
-const cms = CMSClient.create(coreInfo);
+const cms = new CMSClient(url, token);
 const strings = await cms.loadAllStrings();
 ```
 
@@ -179,23 +235,6 @@ import { Cache, Debouncer, uuid } from "@eai/elevation-core-ts/utils";
 import { CMSClient, EventCode, IOTConnection } from "@eai/elevation-core-ts";
 ```
 
-### fetchAndCacheConfig
-
-`ConfigClient` has a new `fetchAndCacheConfig()` method that fetches a configuration from the server, compares it
-against a local `.jsonc` file, and writes to disk if changed. Supports backup rotation.
-
-```ts
-const config = ConfigClient.create(coreInfo, configInfo);
-const result = await config.fetchAndCacheConfig({
-  label: "app-settings",
-  filePath: "./config/app-settings.jsonc",
-  maxBackups: 3,
-});
-// result.updated — true if file was written
-// result.firstFetch — true if no prior local file existed
-// result.data — the configuration data
-```
-
 ## Per-project migration
 
 ### Portal (Angular)
@@ -217,7 +256,7 @@ onToast = iot.onToast;
 // After
 import { IOTConnection } from "@jsr/eai__elevation-core-ts";
 
-const iot = IOTConnection.create(coreInfo, iotInfo);
+const iot = new IOTConnection(iotUrl, token, fingerPrint);
 
 iot.on("socket", (socket) => {
   this.socket = socket || undefined;
@@ -263,7 +302,7 @@ sub.unsubscribe();
 
 // After
 import { IOTConnection } from "@eai/elevation-core-ts";
-const iot = IOTConnection.create(coreInfo, iotInfo);
+const iot = new IOTConnection(iotUrl, token, fingerPrint);
 iot.connected;
 iot.on("connected", () => { ... });
 iot.on("command", (data) => { ... });
@@ -281,12 +320,12 @@ import { EventCode, StatusCode, touchPoint } from "@eai/elevation-core-ts";
 // After (optional, reduces resolved dependencies)
 import { EventCode, StatusCode } from "@eai/elevation-core-ts/types";
 import { TouchPointClient } from "@eai/elevation-core-ts/touchpoint";
-const touchPoint = TouchPointClient.create(coreInfo);
+const touchPoint = new TouchPointClient(url, token, fingerPrint);
 ```
 
 ### Checkin-connect (React)
 
-Apply the same IOT and singleton → factory patterns as portal. For CMS usage, update to the factory pattern:
+Apply the same IOT and singleton → direct instantiation patterns as portal. For CMS usage:
 
 ```ts
 // Before
@@ -295,7 +334,7 @@ cms.config(coreInfo);
 
 // After
 import { CMSClient } from "@eai/elevation-core-ts";
-const cms = CMSClient.create(coreInfo);
+const cms = new CMSClient(url, token);
 ```
 
 `getKey()`, `getString()`, `getConfig()` method signatures are unchanged.

@@ -6,34 +6,9 @@ export * from "./enums/event-mode.ts";
 export * from "./enums/event-type.ts";
 export * from "./enums/status-codes.ts";
 
-export interface CoreInfo {
-  token: string;
-  serviceEndpoint: string;
-  iotEndpoint?: string;
-  iotEvents?: boolean;
-  fingerPrint?: string;
-  secondary?: boolean;
-  timeout?: number;
-  version?: string;
-  pageName?: string;
-  textReplaces?: { find: string; replace: string }[];
-  isDraft?: boolean;
-}
-
-export interface IOTInfo {
-  appName: string;
-  appVersion?: string;
-}
-
 export interface OnlineKiosk {
   socketID: string;
   kioskID: string;
-}
-
-export interface ElevatedConfigurationsInfo {
-  deviceId: string;
-  locationId: string;
-  version?: string;
 }
 
 export interface Software {

@@ -1,29 +1,26 @@
 import { parse as parseJsonc } from "@std/jsonc";
 import { BaseService } from "./shared/base.ts";
-import type { ConfigFetchOptions, ConfigFetchResult, CoreInfo, ElevatedConfigurationsInfo } from "../types/mod.ts";
+import type { ConfigFetchOptions, ConfigFetchResult } from "../types/mod.ts";
 
 export class ConfigClient extends BaseService {
-  private readonly configInfo: ElevatedConfigurationsInfo;
+  private readonly deviceId: string;
+  private readonly locationId: string;
+  public version?: string;
 
-  private constructor(coreInfo: CoreInfo, configInfo: ElevatedConfigurationsInfo) {
-    super(coreInfo);
+  constructor(url: string, token: string, deviceId: string, locationId: string, timeout?: number) {
+    super(url, token, timeout);
 
-    if (!configInfo.deviceId || !configInfo.locationId) {
-      throw new Error("Both deviceId and locationId are required in ElevatedConfigurationsInfo");
+    if (!deviceId || !locationId) {
+      throw new Error("Both deviceId and locationId are required");
     }
 
-    this.configInfo = configInfo;
-  }
-
-  static create(coreInfo: CoreInfo, configInfo: ElevatedConfigurationsInfo): ConfigClient {
-    return new ConfigClient(coreInfo, configInfo);
+    this.deviceId = deviceId;
+    this.locationId = locationId;
   }
 
   public getConfig(label: string): Promise<unknown> {
     return this.get<unknown>(
-      `/configurations/${label}/${this.configInfo.locationId}/${this.configInfo.deviceId}${
-        this.configInfo.version ? `?version=${this.configInfo.version}` : ""
-      }`,
+      `/configurations/${label}/${this.locationId}/${this.deviceId}${this.version ? `?version=${this.version}` : ""}`,
       { "Cache-Control": "no-cache" },
     )
       .then((res) => {

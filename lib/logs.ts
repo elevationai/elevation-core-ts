@@ -1,19 +1,15 @@
 import { BaseService } from "./shared/base.ts";
 import { Debouncer } from "./shared/utils.ts";
-import type { ApiResponse, CoreInfo, LogData, LogOptions } from "../types/mod.ts";
+import type { ApiResponse, LogData, LogOptions } from "../types/mod.ts";
 import { LogLevel } from "../types/mod.ts";
 
 export class LogsClient extends BaseService {
   private defaults: LogOptions = {};
-  private debouncer?: Debouncer<(data: LogData) => Promise<ApiResponse>>;
+  private debouncer?: Debouncer<[data: LogData], Promise<ApiResponse>>;
   private lastLogHash = new Map<string, number>();
 
-  private constructor(coreInfo: CoreInfo) {
-    super(coreInfo);
-  }
-
-  static create(coreInfo: CoreInfo): LogsClient {
-    return new LogsClient(coreInfo);
+  constructor(url: string, token: string, timeout?: number) {
+    super(url, token, timeout);
   }
 
   public setDefaults(options: LogOptions): void {

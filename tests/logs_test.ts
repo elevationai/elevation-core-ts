@@ -3,7 +3,7 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { FakeTime } from "@std/testing/time";
 import { LogsClient } from "../lib/logs.ts";
 import { LogLevel } from "../types/mod.ts";
-import { createCoreInfo, MockFetch } from "./_mock.ts";
+import { MockFetch } from "./_mock.ts";
 
 describe("LogsClient", () => {
   let logs: LogsClient;
@@ -12,7 +12,7 @@ describe("LogsClient", () => {
   beforeEach(() => {
     mockFetch = new MockFetch();
     mockFetch.install();
-    logs = LogsClient.create(createCoreInfo());
+    logs = new LogsClient("https://api.test.com", "test-token-abc123");
   });
 
   afterEach(() => {

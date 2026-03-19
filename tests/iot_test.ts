@@ -1,10 +1,52 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
 import { IOTConnection } from "../lib/iot.ts";
-import { createCoreInfo, MockSocket } from "./_mock.ts";
+import { MockSocket } from "./_mock.ts";
+
+interface IOTInternals {
+  _socket: unknown;
+  _connected: boolean;
+  url: string;
+  token: string;
+  fingerPrint: string;
+  secondary: boolean;
+  reconnectTimer: number | null;
+  reconnectAttempts: number;
+  maxReconnectAttempts: number;
+  reconnectDelay: number;
+  appName: string;
+  appVersion: string;
+  _events: Map<string, unknown>;
+}
+
+function createTestIOT(mockSocket?: MockSocket): [IOTConnection, IOTInternals] {
+  const iot: IOTConnection = Object.create(IOTConnection.prototype);
+  const internals = iot as unknown as IOTInternals;
+
+  internals._events = new Map();
+  internals._socket = null;
+  internals._connected = false;
+  internals.url = "https://iot.test.com/device";
+  internals.token = "test-token-abc123";
+  internals.fingerPrint = "device-fp-001";
+  internals.secondary = false;
+  internals.reconnectTimer = null;
+  internals.reconnectAttempts = 0;
+  internals.maxReconnectAttempts = 10;
+  internals.reconnectDelay = 1000;
+  internals.appName = "ElevationDenoService";
+  internals.appVersion = "1.0.0";
+
+  if (mockSocket) {
+    internals._socket = mockSocket;
+    internals._connected = true;
+  }
+
+  return [iot, internals];
+}
 
 describe("IOTConnection", () => {
-  // IOTConnection.create() calls connect() which tries real socket.io,
+  // new IOTConnection() calls connect() which tries real socket.io,
   // so we test with a manually constructed instance using mock injection.
 
   describe("with injected MockSocket", () => {
@@ -12,35 +54,9 @@ describe("IOTConnection", () => {
     let mockSocket: MockSocket;
 
     beforeEach(() => {
-      // Create a bare IOTConnection by bypassing the private constructor
-      // using Object.create + manual field setup (avoids socket.io connect)
-      iot = Object.create(IOTConnection.prototype);
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._socket = null;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._connected = false;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).coreInfo = createCoreInfo();
-      // deno-lint-ignore no-explicit-any
-      (iot as any).reconnectTimer = null;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).reconnectAttempts = 0;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).maxReconnectAttempts = 10;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).reconnectDelay = 1000;
-      // deno-lint-ignore no-explicit-any
-      (iot as any).iotInfo = { appName: "ElevationDenoService" };
-      // Initialize AwaitableEmitter internals
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._events = new Map();
-
       mockSocket = new MockSocket();
       mockSocket.connected = true;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._socket = mockSocket;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._connected = true;
+      [iot] = createTestIOT(mockSocket);
     });
 
     afterEach(() => {
@@ -102,13 +118,7 @@ describe("IOTConnection", () => {
 
   describe("send() when not connected", () => {
     it("should not throw when socket is null", () => {
-      const iot = Object.create(IOTConnection.prototype);
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._socket = null;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._connected = false;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._events = new Map();
+      const [iot] = createTestIOT();
 
       iot.send({ type: "test", data: { value: 1 } });
     });
@@ -116,18 +126,9 @@ describe("IOTConnection", () => {
 
   describe("destroy()", () => {
     it("should disconnect and remove all listeners", () => {
-      const iot = Object.create(IOTConnection.prototype);
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._events = new Map();
-      // deno-lint-ignore no-explicit-any
-      (iot as any).reconnectTimer = null;
-
       const mockSocket = new MockSocket();
       mockSocket.connected = true;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._socket = mockSocket;
-      // deno-lint-ignore no-explicit-any
-      (iot as any)._connected = true;
+      const [iot] = createTestIOT(mockSocket);
 
       // Add a listener on the IOT emitter itself
       let called = false;

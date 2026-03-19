@@ -1,23 +1,20 @@
-import type { CoreInfo, Device } from "../types/mod.ts";
+import type { Device } from "../types/mod.ts";
 import { BaseService } from "./shared/base.ts";
 
 export class TouchPointClient extends BaseService {
+  private readonly fingerPrint: string;
   private touchPointId: string | null = null;
 
-  private constructor(coreInfo: CoreInfo) {
-    super(coreInfo);
-  }
-
-  static create(coreInfo: CoreInfo): TouchPointClient {
-    return new TouchPointClient(coreInfo);
+  constructor(url: string, token: string, fingerPrint: string, timeout?: number) {
+    super(url, token, timeout);
+    if (!fingerPrint) {
+      throw new Error("Device fingerprint is required for TouchPoint service");
+    }
+    this.fingerPrint = fingerPrint;
   }
 
   private getDeviceByFingerPrint(): Promise<Device | null> {
-    if (!this.coreInfo.fingerPrint) {
-      throw new Error("Device fingerprint is required for TouchPoint service");
-    }
-
-    return this.get<Device[]>(`/devices/key/${this.coreInfo.fingerPrint}`)
+    return this.get<Device[]>(`/devices/key/${this.fingerPrint}`)
       .then((res) => {
         if (res.data?.length) {
           const tp = res.data[0] as Device;
@@ -45,10 +42,6 @@ export class TouchPointClient extends BaseService {
    * @param reason - Reason for the state change
    */
   async inService(state: boolean, reason: string): Promise<void> {
-    if (!this.coreInfo.fingerPrint) {
-      throw new Error("Device fingerprint is required for TouchPoint service");
-    }
-
     try {
       if (!this.touchPointId) {
         await this.getDeviceByFingerPrint();

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
-import { createCoreInfo, DenoFsStub, MockFetch } from "./_mock.ts";
+import { DenoFsStub, MockFetch } from "./_mock.ts";
 import { ConfigClient } from "../lib/config.ts";
 
 describe("ConfigClient", () => {
@@ -22,7 +22,7 @@ describe("ConfigClient", () => {
   describe("create()", () => {
     it("should throw without deviceId", () => {
       assertThrows(
-        () => ConfigClient.create(createCoreInfo(), { deviceId: "", locationId: "loc-1" }),
+        () => new ConfigClient("https://api.test.com", "test-token-abc123", "", "loc-1"),
         Error,
         "Both deviceId and locationId are required",
       );
@@ -30,7 +30,7 @@ describe("ConfigClient", () => {
 
     it("should throw without locationId", () => {
       assertThrows(
-        () => ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "" }),
+        () => new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", ""),
         Error,
         "Both deviceId and locationId are required",
       );
@@ -39,7 +39,7 @@ describe("ConfigClient", () => {
 
   describe("getConfig()", () => {
     it("should construct the correct URL", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       mockFetch.queueResponse({ setting: "value" });
 
       await svc.getConfig("app-settings");
@@ -51,7 +51,8 @@ describe("ConfigClient", () => {
     });
 
     it("should append version query param when set", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1", version: "2.0" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
+      svc.version = "2.0";
       mockFetch.queueResponse({ setting: "value" });
 
       await svc.getConfig("app-settings");
@@ -63,7 +64,7 @@ describe("ConfigClient", () => {
     });
 
     it("should send Cache-Control: no-cache header", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       mockFetch.queueResponse({ setting: "value" });
 
       await svc.getConfig("app-settings");
@@ -73,7 +74,7 @@ describe("ConfigClient", () => {
     });
 
     it("should return null on error", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       mockFetch.queueResponse({ error: "fail" }, 500);
 
       const result = await svc.getConfig("bad-label");
@@ -86,7 +87,7 @@ describe("ConfigClient", () => {
     const filePath = "/tmp/test-config.jsonc";
 
     it("should throw when remote returns null", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       mockFetch.queueResponse({ error: "not found" }, 404);
 
       await assertRejects(
@@ -97,7 +98,7 @@ describe("ConfigClient", () => {
     });
 
     it("should write file on first fetch and return firstFetch=true", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const configData = { theme: "dark", timeout: 30 };
       mockFetch.queueResponse(configData);
       // No existing file in fs stub -> NotFound
@@ -113,7 +114,7 @@ describe("ConfigClient", () => {
     });
 
     it("should return updated=false when content matches", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const configData = { theme: "dark" };
       mockFetch.queueResponse(configData);
       // Existing local file with same content
@@ -128,7 +129,7 @@ describe("ConfigClient", () => {
     });
 
     it("should return updated=true and write when content changed", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const newData = { theme: "light" };
       mockFetch.queueResponse(newData);
       // Existing local file with different content
@@ -143,7 +144,7 @@ describe("ConfigClient", () => {
     });
 
     it("should strip JSONC comments when comparing", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const configData = { mode: "production" };
       mockFetch.queueResponse(configData);
       // Local file has JSONC comments but same data
@@ -159,7 +160,7 @@ describe("ConfigClient", () => {
     });
 
     it("should create backups on non-first updates", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const newData = { version: 2 };
       mockFetch.queueResponse(newData);
       // Existing file with old data
@@ -173,7 +174,7 @@ describe("ConfigClient", () => {
     });
 
     it("should respect maxBackups=0 and skip backups", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const newData = { version: 2 };
       mockFetch.queueResponse(newData);
       fs.setFile(filePath, JSON.stringify({ version: 1 }, null, 2));
@@ -187,7 +188,7 @@ describe("ConfigClient", () => {
     });
 
     it("should respect force=true even when content matches", async () => {
-      const svc = ConfigClient.create(createCoreInfo(), { deviceId: "dev-1", locationId: "loc-1" });
+      const svc = new ConfigClient("https://api.test.com", "test-token-abc123", "dev-1", "loc-1");
       const configData = { same: true };
       mockFetch.queueResponse(configData);
       fs.setFile(filePath, JSON.stringify(configData, null, 2));

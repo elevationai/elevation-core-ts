@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { assertEquals, assertRejects } from "@std/assert";
-import { createCoreInfo, createDevice, MockFetch } from "./_mock.ts";
+import { assertEquals, assertThrows } from "@std/assert";
+import { createDevice, MockFetch } from "./_mock.ts";
 import { TouchPointClient } from "../lib/touchpoint.ts";
 
 describe("TouchPointClient", () => {
@@ -15,9 +15,19 @@ describe("TouchPointClient", () => {
     mockFetch.restore();
   });
 
+  describe("create()", () => {
+    it("should throw when fingerPrint is missing", () => {
+      assertThrows(
+        () => new TouchPointClient("https://api.test.com", "test-token", ""),
+        Error,
+        "Device fingerprint is required for TouchPoint service",
+      );
+    });
+  });
+
   describe("getInfo()", () => {
     it("should fetch the correct URL using fingerPrint", async () => {
-      const svc = TouchPointClient.create(createCoreInfo({ fingerPrint: "fp-abc" }));
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "fp-abc");
       mockFetch.queueResponse([createDevice()]);
 
       await svc.getInfo();
@@ -27,7 +37,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should return the device when found", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ _id: "dev-42", label: "Kiosk-42" });
       mockFetch.queueResponse([device]);
 
@@ -38,7 +48,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should return null when data is empty", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([]);
 
       const result = await svc.getInfo();
@@ -47,7 +57,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should return null on API error", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse({ error: "server error" }, 500);
 
       const result = await svc.getInfo();
@@ -57,18 +67,8 @@ describe("TouchPointClient", () => {
   });
 
   describe("inService()", () => {
-    it("should throw when fingerPrint is missing", async () => {
-      const svc = TouchPointClient.create(createCoreInfo({ fingerPrint: "" }));
-
-      await assertRejects(
-        () => svc.inService(true, "starting up"),
-        Error,
-        "Device fingerprint is required for TouchPoint service",
-      );
-    });
-
     it("should fetch device first if touchPointId not cached", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ _id: "dev-77" });
       // First request: getDeviceByFingerPrint
       mockFetch.queueResponse([device]);
@@ -83,7 +83,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should POST /devices/service with correct payload", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ _id: "dev-77" });
       // Pre-cache the touchPointId via getInfo
       mockFetch.queueResponse([device]);
@@ -103,7 +103,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should silently return if device not found", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       // getDeviceByFingerPrint returns empty array
       mockFetch.queueResponse([]);
 
@@ -114,7 +114,7 @@ describe("TouchPointClient", () => {
     });
 
     it("should silently catch POST errors", async () => {
-      const svc = TouchPointClient.create(createCoreInfo());
+      const svc = new TouchPointClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ _id: "dev-77" });
       // Pre-cache
       mockFetch.queueResponse([device]);

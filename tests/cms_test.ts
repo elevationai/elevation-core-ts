@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertNotEquals } from "@std/assert";
 import { CMSClient, type ICMS, type Language } from "../lib/cms.ts";
-import { createCoreInfo, MockFetch } from "./_mock.ts";
+import { MockFetch } from "./_mock.ts";
 
 function createCmsData(element: string, langs: Record<string, string>): ICMS {
   const languages: Record<string, Language> = {};
@@ -28,7 +28,7 @@ describe("CMSClient", () => {
   beforeEach(() => {
     mockFetch = new MockFetch();
     mockFetch.install();
-    cms = CMSClient.create(createCoreInfo());
+    cms = new CMSClient("https://api.test.com", "test-token-abc123");
   });
 
   afterEach(() => {
@@ -49,7 +49,8 @@ describe("CMSClient", () => {
     });
 
     it("should GET /strings/page/{pageName} when pageName is set", async () => {
-      cms = CMSClient.create(createCoreInfo({ pageName: "home" }));
+      cms = new CMSClient("https://api.test.com", "test-token-abc123");
+      cms.pageName = "home";
       mockFetch.queueResponse([createCmsData("greeting", { "en-US": "Hello" })]);
 
       await cms.loadAllStrings();
@@ -208,8 +209,9 @@ describe("CMSClient", () => {
   });
 
   describe("version selection", () => {
-    it("should use named version when coreInfo.version matches", async () => {
-      cms = CMSClient.create(createCoreInfo({ version: "v2" }));
+    it("should use named version when version matches", async () => {
+      cms = new CMSClient("https://api.test.com", "test-token-abc123");
+      cms.version = "v2";
 
       const cmsData = createCmsData("title", { "en-US": "base-value" });
       // Add a named version "v2" alongside the base version
@@ -232,7 +234,8 @@ describe("CMSClient", () => {
 
   describe("isDraft", () => {
     it("should use draft string (version.string) instead of published", async () => {
-      cms = CMSClient.create(createCoreInfo({ isDraft: true }));
+      cms = new CMSClient("https://api.test.com", "test-token-abc123");
+      cms.isDraft = true;
 
       const cmsData: ICMS = {
         _id: "cms-draft-test",
@@ -266,7 +269,8 @@ describe("CMSClient", () => {
 
   describe("textReplaces", () => {
     it("should apply find/replace substitutions", async () => {
-      cms = CMSClient.create(createCoreInfo({ textReplaces: [{ find: "World", replace: "Deno" }] }));
+      cms = new CMSClient("https://api.test.com", "test-token-abc123");
+      cms.textReplaces = [{ find: "World", replace: "Deno" }];
 
       mockFetch.queueResponse([createCmsData("greeting", { "en-US": "Hello World" })]);
 
@@ -276,12 +280,11 @@ describe("CMSClient", () => {
     });
 
     it("should apply multiple textReplaces in sequence", async () => {
-      cms = CMSClient.create(createCoreInfo({
-        textReplaces: [
-          { find: "Hello", replace: "Hi" },
-          { find: "World", replace: "Earth" },
-        ],
-      }));
+      cms = new CMSClient("https://api.test.com", "test-token-abc123");
+      cms.textReplaces = [
+        { find: "Hello", replace: "Hi" },
+        { find: "World", replace: "Earth" },
+      ];
 
       mockFetch.queueResponse([createCmsData("greeting", { "en-US": "Hello World" })]);
 

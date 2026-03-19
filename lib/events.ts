@@ -1,17 +1,13 @@
 import { BaseService } from "./shared/base.ts";
-import type { ApiResponse, CoreInfo, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../types/mod.ts";
+import type { ApiResponse, DebouncedEvent, Device, EventData, EventMetadata, EventOptions } from "../types/mod.ts";
 import { type EventCode, StatusCode } from "../types/mod.ts";
 
 export class EventsClient extends BaseService {
   private defaults: EventOptions = {};
   private debouncedEvents = new Map<number, DebouncedEvent>();
 
-  private constructor(coreInfo: CoreInfo) {
-    super(coreInfo);
-  }
-
-  static create(coreInfo: CoreInfo): EventsClient {
-    return new EventsClient(coreInfo);
+  constructor(url: string, token: string, timeout?: number) {
+    super(url, token, timeout);
   }
 
   public setDefaults(options: EventOptions): void {

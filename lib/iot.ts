@@ -1,6 +1,6 @@
 import { AwaitableEmitter } from "@eai/models/AwaitableEmitter";
 import { io, type Socket } from "socket.io-client";
-import type { Commands, CoreInfo, EventData, IOTInfo, OnlineKiosk } from "../types/mod.ts";
+import type { Commands, EventData, OnlineKiosk } from "../types/mod.ts";
 
 interface WebSocketError {
   message?: string;
@@ -10,13 +10,17 @@ interface WebSocketError {
 export class IOTConnection extends AwaitableEmitter {
   private _socket: Socket | null = null;
   private _connected = false;
-  private readonly coreInfo: CoreInfo;
+  private readonly url: string;
+  private readonly token: string;
+  private readonly fingerPrint: string;
+  private readonly secondary: boolean;
 
   private reconnectTimer: number | null = null;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 10;
   private readonly reconnectDelay = 1000;
-  private iotInfo: IOTInfo = { appName: "ElevationDenoService" };
+  public appName = "ElevationDenoService";
+  public appVersion = "1.0.0";
 
   get socket(): Socket | null {
     return this._socket;
@@ -26,43 +30,29 @@ export class IOTConnection extends AwaitableEmitter {
     return this._connected;
   }
 
-  private constructor(coreInfo: CoreInfo, iotInfo?: IOTInfo) {
+  constructor(url: string, token: string, fingerPrint: string, secondary?: boolean) {
     super();
-    this.coreInfo = coreInfo;
-
-    if (iotInfo) {
-      this.iotInfo = iotInfo;
-    }
+    this.url = url;
+    this.token = token;
+    this.fingerPrint = fingerPrint;
+    this.secondary = secondary || false;
 
     this.connect();
   }
 
-  static create(coreInfo: CoreInfo, iotInfo?: IOTInfo): IOTConnection {
-    return new IOTConnection(coreInfo, iotInfo);
-  }
-
   private connect(): void {
-    if (!this.coreInfo.iotEndpoint) {
-      console.error("IOT endpoint not configured");
-      return;
-    }
-
     try {
       this.disconnect(false);
 
-      const namespace = this.coreInfo.iotEvents ? "/events" : "/device";
-      const baseUrl = this.coreInfo.iotEndpoint.replace(/\/$/, "");
-      const socketUrl = `${baseUrl}${namespace}`;
+      console.log(`Connecting to Socket.io server at ${this.url}`);
 
-      console.log(`Connecting to Socket.io server at ${socketUrl}`);
-
-      this._socket = io(socketUrl, {
+      this._socket = io(this.url, {
         query: {
-          token: this.coreInfo.token,
-          key: this.coreInfo.fingerPrint,
-          app: this.iotInfo.appName,
-          version: this.iotInfo.appVersion || "1.0.0",
-          secondary: this.coreInfo.secondary || false,
+          token: this.token,
+          key: this.fingerPrint,
+          app: this.appName,
+          version: this.appVersion,
+          secondary: this.secondary,
         },
       });
 

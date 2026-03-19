@@ -1,14 +1,6 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals, assertRejects, assertThrows } from "@std/assert";
-import {
-  createCoreInfo,
-  createDevice,
-  createDeviceInfo,
-  createDeviceLocation,
-  createSpecification,
-  createTerminal,
-  MockFetch,
-} from "./_mock.ts";
+import { createDevice, createDeviceInfo, createDeviceLocation, createSpecification, createTerminal, MockFetch } from "./_mock.ts";
 import { EnrollmentClient } from "../lib/enrollment.ts";
 
 describe("EnrollmentClient", () => {
@@ -26,21 +18,20 @@ describe("EnrollmentClient", () => {
   describe("create()", () => {
     it("should throw without fingerPrint", () => {
       assertThrows(
-        () => EnrollmentClient.create(createCoreInfo({ fingerPrint: "" })),
+        () => new EnrollmentClient("https://api.test.com", "test-token", ""),
         Error,
-        "fingerPrint is required in CoreInfo for Enrollment service",
+        "fingerPrint is required for Enrollment service",
       );
     });
 
     it("should succeed with fingerPrint", () => {
-      EnrollmentClient.create(createCoreInfo({ fingerPrint: "fp-123" }));
-      // No error thrown means success
+      new EnrollmentClient("https://api.test.com", "test-token", "fp-123");
     });
   });
 
   describe("start()", () => {
     it("should return unconfigured device", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ metadata: { configured: false } });
       mockFetch.queueResponse([device]);
 
@@ -51,7 +42,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw 'already enrolled' when metadata.configured is true", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       const device = createDevice({ metadata: { configured: true } });
       mockFetch.queueResponse([device]);
 
@@ -63,7 +54,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw on API failure", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse({ error: "server error" }, 500);
 
       await assertRejects(
@@ -75,7 +66,7 @@ describe("EnrollmentClient", () => {
 
   describe("getLocations()", () => {
     it("should GET /locations and return data", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       const locations = [createDeviceLocation()];
       mockFetch.queueResponse(locations);
 
@@ -89,7 +80,7 @@ describe("EnrollmentClient", () => {
 
   describe("getSpecification()", () => {
     it("should GET /specifications and return data", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       const specs = [createSpecification()];
       mockFetch.queueResponse(specs);
 
@@ -102,7 +93,7 @@ describe("EnrollmentClient", () => {
 
   describe("isLabelAvailable()", () => {
     it("should return true for empty array response", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([]);
 
       const result = await svc.isLabelAvailable("NEW-LABEL");
@@ -112,7 +103,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should return false for non-empty array response", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice()]);
 
       const result = await svc.isLabelAvailable("EXISTING-LABEL");
@@ -121,7 +112,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should return false for empty string without making a fetch", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
 
       const result = await svc.isLabelAvailable("");
 
@@ -132,7 +123,7 @@ describe("EnrollmentClient", () => {
 
   describe("enrollDevice()", () => {
     it("should throw 'start subscription first' if start() not called", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
 
       await assertRejects(
         () => svc.enrollDevice(createDeviceInfo()),
@@ -142,7 +133,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when label is missing", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -154,7 +145,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when device._id is missing", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -166,7 +157,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when location._id is missing", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -178,7 +169,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when terminal._id is missing", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -190,7 +181,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when specification.id is missing", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
 
@@ -202,7 +193,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should throw when label is unavailable", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
       // start() response
       mockFetch.queueResponse([createDevice({ metadata: { configured: false } })]);
       await svc.start();
@@ -218,7 +209,7 @@ describe("EnrollmentClient", () => {
     });
 
     it("should PATCH /devices/{id} with correct data after full flow", async () => {
-      const svc = EnrollmentClient.create(createCoreInfo());
+      const svc = new EnrollmentClient("https://api.test.com", "test-token", "device-fp-001");
 
       const device = createDevice({ _id: "dev-99", metadata: { configured: false } });
       const location = createDeviceLocation({ _id: "loc-55", configurations: { kiosk: true } });
