@@ -11,7 +11,7 @@ export class IOTConnection extends AwaitableEmitter {
   private _socket: Socket | null = null;
   private _connected = false;
   private readonly url: string;
-  private readonly token: string;
+  private token: string;
   private readonly fingerPrint: string;
   private readonly secondary: boolean;
 
@@ -37,6 +37,12 @@ export class IOTConnection extends AwaitableEmitter {
     this.fingerPrint = fingerPrint;
     this.secondary = secondary || false;
 
+    this.connect();
+  }
+
+  refreshToken(token: string): void {
+    console.log('Refresh Token');
+    this.token = token;
     this.connect();
   }
 
