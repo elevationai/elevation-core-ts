@@ -30,11 +30,13 @@ export class IOTConnection extends AwaitableEmitter {
     return this._connected;
   }
 
-  constructor(url: string, token: string, fingerPrint: string, secondary?: boolean) {
+  constructor(url: string, token: string, fingerPrint: string, appName?: string, appVersion?: string, secondary?: boolean) {
     super();
     this.url = url;
     this.token = token;
     this.fingerPrint = fingerPrint;
+    this.appName = appName || this.appName;
+    this.appVersion = appVersion || this.appVersion;
     this.secondary = secondary || false;
 
     this.connect();
@@ -85,7 +87,7 @@ export class IOTConnection extends AwaitableEmitter {
     this._socket.on("disconnect", (reason: string) => {
       console.log("IOT Socket.io disconnected:", reason);
       this._connected = false;
-      this.emit("disconnected");
+      this.emit("disconnected", reason);
 
       if (reason === "io server disconnect") {
         this._socket?.connect();
@@ -125,8 +127,8 @@ export class IOTConnection extends AwaitableEmitter {
       this.emit("refresh");
     });
 
-    this._socket.on("onlineKiosks", (data: OnlineKiosk[]) => {
-      this.emit("onlineKiosks", data);
+    this._socket.on("onlineDevices", (data: OnlineKiosk[]) => {
+      this.emit("onlineDevices", data);
     });
 
     this._socket.on("print", (data: unknown) => {
