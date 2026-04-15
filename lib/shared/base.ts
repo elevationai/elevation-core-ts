@@ -5,7 +5,7 @@ export abstract class BaseService {
   private readonly requestTimeout: number;
   private readonly headers: Headers;
 
-  protected constructor(baseUrl: string, token: string, timeout?: number) {
+  protected constructor(baseUrl: string, token: string, timeout?: number, encodeToken: boolean = true) {
     if (!token) {
       throw new Error("Token is required");
     }
@@ -15,7 +15,7 @@ export abstract class BaseService {
     this.baseUrl = baseUrl;
     this.requestTimeout = timeout || 30000;
     this.headers = new Headers({
-      "Elevated-Auth": btoa(token),
+      "Elevated-Auth": encodeToken ? btoa(token) : token,
       "Content-Type": "application/json",
     });
   }

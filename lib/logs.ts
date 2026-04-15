@@ -8,8 +8,8 @@ export class LogsClient extends BaseService {
   private debouncer?: Debouncer<[data: LogData], Promise<ApiResponse>>;
   private lastLogHash = new Map<string, number>();
 
-  constructor(url: string, token: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
   }
 
   public setDefaults(options: LogOptions): void {

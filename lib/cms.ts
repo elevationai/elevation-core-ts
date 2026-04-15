@@ -49,8 +49,8 @@ export class CMSClient extends BaseService {
   private allStrings: ICMS[] | null = null;
   private readonly reqHeaderNoCache = { "Cache-Control": "no-cache" };
 
-  constructor(url: string, token: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
   }
 
   /**
