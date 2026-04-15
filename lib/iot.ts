@@ -43,7 +43,7 @@ export class IOTConnection extends AwaitableEmitter {
   }
 
   refreshToken(token: string): void {
-    console.log('Refresh Token');
+    console.log("Refresh Token");
     this.token = token;
     this.connect();
   }
