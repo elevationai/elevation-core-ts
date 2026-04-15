@@ -5,6 +5,7 @@ export abstract class BaseService {
   private readonly requestTimeout: number;
   private readonly headers: Headers;
 
+	// encodeToken: boolean = true is for backwards compatibility until auth is standardized on the provisioning token
   protected constructor(baseUrl: string, token: string, timeout?: number, encodeToken: boolean = true) {
     if (!token) {
       throw new Error("Token is required");
