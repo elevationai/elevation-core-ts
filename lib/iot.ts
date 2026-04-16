@@ -43,7 +43,7 @@ export class IOTConnection extends AwaitableEmitter {
   }
 
   refreshToken(token: string): void {
-    console.log('Refresh Token');
+    console.log("Refresh Token");
     this.token = token;
     this.connect();
   }
@@ -55,7 +55,7 @@ export class IOTConnection extends AwaitableEmitter {
       console.log(`Connecting to Socket.io server at ${this.url}`);
 
       this._socket = io(this.url, {
-        transports: ['websocket'],
+        transports: ["websocket"],
         query: {
           token: this.token,
           key: this.fingerPrint,

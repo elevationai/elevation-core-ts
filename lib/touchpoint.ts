@@ -5,8 +5,8 @@ export class TouchPointClient extends BaseService {
   private readonly fingerPrint: string;
   private touchPointId: string | null = null;
 
-  constructor(url: string, token: string, fingerPrint: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, fingerPrint: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
     if (!fingerPrint) {
       throw new Error("Device fingerprint is required for TouchPoint service");
     }

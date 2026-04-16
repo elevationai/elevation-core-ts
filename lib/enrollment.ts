@@ -5,8 +5,8 @@ export class EnrollmentClient extends BaseService {
   private readonly fingerPrint: string;
   private started = false;
 
-  constructor(url: string, token: string, fingerPrint: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, fingerPrint: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
     if (!fingerPrint) {
       throw new Error("fingerPrint is required for Enrollment service");
     }

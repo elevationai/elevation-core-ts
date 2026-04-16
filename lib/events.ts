@@ -6,8 +6,8 @@ export class EventsClient extends BaseService {
   private defaults: EventOptions = {};
   private debouncedEvents = new Map<number, DebouncedEvent>();
 
-  constructor(url: string, token: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
   }
 
   public setDefaults(options: EventOptions): void {

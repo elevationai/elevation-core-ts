@@ -7,8 +7,8 @@ export class ConfigClient extends BaseService {
   private readonly locationId: string;
   public version?: string;
 
-  constructor(url: string, token: string, deviceId: string, locationId: string, timeout?: number) {
-    super(url, token, timeout);
+  constructor(url: string, token: string, deviceId: string, locationId: string, timeout?: number, encodeToken: boolean = true) {
+    super(url, token, timeout, encodeToken);
 
     if (!deviceId || !locationId) {
       throw new Error("Both deviceId and locationId are required");
