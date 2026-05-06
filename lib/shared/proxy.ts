@@ -30,12 +30,16 @@ export function resolveProxy(targetUrl: string): URL | null {
   if (!proxyVar) return null;
   if (noProxyVar && matchesNoProxy(target.hostname, noProxyVar)) return null;
 
+  let proxyUrl: URL;
   try {
-    return new URL(proxyVar);
+    proxyUrl = new URL(proxyVar);
   }
   catch {
     return null;
   }
+  // HttpsProxyAgent only speaks HTTP CONNECT; reject other schemes (e.g. socks5://) so misconfiguration fails clearly.
+  if (proxyUrl.protocol !== "http:" && proxyUrl.protocol !== "https:") return null;
+  return proxyUrl;
 }
 
 export function envProxyAgent(url: string): HttpsProxyAgent | undefined {
@@ -66,6 +70,8 @@ function matchesNoProxy(hostname: string, noProxy: string): boolean {
   }
   return false;
 }
+
+const MAX_CONNECT_HEADER_BYTES = 8 * 1024;
 
 export class HttpsProxyAgent extends HttpsAgent {
   private readonly proxy: URL;
@@ -101,7 +107,12 @@ export class HttpsProxyAgent extends HttpsAgent {
     const onData = (chunk: Buffer): void => {
       buffer = Buffer.concat([buffer, chunk]);
       const headerEnd = buffer.indexOf("\r\n\r\n");
-      if (headerEnd === -1) return;
+      if (headerEnd === -1) {
+        if (buffer.length > MAX_CONNECT_HEADER_BYTES) {
+          settle(new Error(`Proxy CONNECT response exceeded ${MAX_CONNECT_HEADER_BYTES} bytes without header terminator`));
+        }
+        return;
+      }
 
       const headers = buffer.subarray(0, headerEnd).toString("ascii");
       const statusLine = headers.split("\r\n")[0];
@@ -131,7 +142,9 @@ export class HttpsProxyAgent extends HttpsAgent {
     const sendConnect = (): void => {
       const target = `${options.host}:${options.port}`;
       const auth = this.proxy.username
-        ? `Proxy-Authorization: Basic ${btoa(`${decodeURIComponent(this.proxy.username)}:${decodeURIComponent(this.proxy.password)}`)}\r\n`
+        ? `Proxy-Authorization: Basic ${
+          Buffer.from(`${decodeURIComponent(this.proxy.username)}:${decodeURIComponent(this.proxy.password)}`, "utf-8").toString("base64")
+        }\r\n`
         : "";
       proxySocket.write(
         `CONNECT ${target} HTTP/1.1\r\n` +

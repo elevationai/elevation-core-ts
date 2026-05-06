@@ -1,7 +1,11 @@
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { assertEquals } from "@std/assert";
-import { IOTConnection } from "../lib/iot.ts";
+import { IOTConnection, setIOTAgentFactory } from "../lib/iot.ts";
 import { MockSocket } from "./_mock.ts";
+
+interface IOTOptionsBuilder {
+  buildIoOptions(): { agent?: unknown; query?: Record<string, unknown>; transports?: string[] };
+}
 
 interface IOTInternals {
   _socket: unknown;
@@ -144,6 +148,40 @@ describe("IOTConnection", () => {
       // After destroy, emitting should not trigger the listener
       iot.emit("test");
       assertEquals(called, false);
+    });
+  });
+
+  describe("setIOTAgentFactory", () => {
+    afterEach(() => setIOTAgentFactory(null));
+
+    it("agent is undefined when no factory is set", () => {
+      const [iot] = createTestIOT();
+      const opts = (iot as unknown as IOTOptionsBuilder).buildIoOptions();
+      assertEquals(opts.agent, undefined);
+    });
+
+    it("invokes the factory with the connection url and forwards the returned agent", () => {
+      const sentinel = { __id: "fake-agent" };
+      let receivedUrl: string | undefined;
+      setIOTAgentFactory((url) => {
+        receivedUrl = url;
+        return sentinel;
+      });
+
+      const [iot] = createTestIOT();
+      const opts = (iot as unknown as IOTOptionsBuilder).buildIoOptions();
+
+      assertEquals(receivedUrl, "https://iot.test.com/device");
+      assertEquals(opts.agent, sentinel);
+    });
+
+    it("clearing the factory restores undefined agent", () => {
+      setIOTAgentFactory(() => ({ __id: "x" }));
+      setIOTAgentFactory(null);
+
+      const [iot] = createTestIOT();
+      const opts = (iot as unknown as IOTOptionsBuilder).buildIoOptions();
+      assertEquals(opts.agent, undefined);
     });
   });
 });

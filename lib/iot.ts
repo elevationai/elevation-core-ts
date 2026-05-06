@@ -58,29 +58,29 @@ export class IOTConnection extends AwaitableEmitter {
     this.connect();
   }
 
+  private buildIoOptions(): Parameters<typeof io>[1] {
+    const agent = _agentFactory ? _agentFactory(this.url) : undefined;
+    // engine.io-client narrows `agent` to string|boolean in its typings, but forwards http.Agent instances to the ws transport at runtime.
+    return {
+      transports: ["websocket"],
+      query: {
+        token: this.token,
+        key: this.fingerPrint,
+        app: this.appName,
+        version: this.appVersion,
+        secondary: this.secondary,
+      },
+      agent,
+    } as Parameters<typeof io>[1];
+  }
+
   private connect(): void {
     try {
       this.disconnect(false);
 
       console.log(`Connecting to Socket.io server at ${this.url}`);
 
-      const agent = _agentFactory ? _agentFactory(this.url) : undefined;
-
-      // engine.io-client narrows `agent` to string|boolean in its typings, but forwards http.Agent instances to the ws transport at runtime.
-      this._socket = io(
-        this.url,
-        {
-          transports: ["websocket"],
-          query: {
-            token: this.token,
-            key: this.fingerPrint,
-            app: this.appName,
-            version: this.appVersion,
-            secondary: this.secondary,
-          },
-          agent,
-        } as Parameters<typeof io>[1],
-      );
+      this._socket = io(this.url, this.buildIoOptions());
 
       this.emit("socket", this._socket);
       this.setupSocketHandlers();
