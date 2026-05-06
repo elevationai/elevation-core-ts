@@ -39,6 +39,16 @@ export function resolveProxy(targetUrl: string): URL | null {
 }
 
 export function envProxyAgent(url: string): HttpsProxyAgent | undefined {
+  // HttpsProxyAgent always TLS-upgrades after CONNECT, so it's only valid for wss/https targets.
+  let target: URL;
+  try {
+    target = new URL(url);
+  }
+  catch {
+    return undefined;
+  }
+  if (target.protocol !== "https:" && target.protocol !== "wss:") return undefined;
+
   const proxyUrl = resolveProxy(url);
   if (!proxyUrl) return undefined;
   console.log(`Using HTTP proxy ${proxyUrl.protocol}//${proxyUrl.host}`);
