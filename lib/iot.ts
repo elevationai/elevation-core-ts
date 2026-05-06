@@ -2,6 +2,16 @@ import { AwaitableEmitter } from "@eai/models/AwaitableEmitter";
 import { io, type Socket } from "socket.io-client";
 import type { Commands, EventData, OnlineKiosk } from "../types/mod.ts";
 
+export type IOTAgentFactory = (url: string) => unknown;
+
+let _agentFactory: IOTAgentFactory | null = null;
+
+// Set or clear a factory that produces a transport-level agent (e.g. an HTTP proxy agent) for new IOTConnection sockets.
+// Kept out of the constructor so consumers in browser bundles never pull node-only proxy code into their build.
+export function setIOTAgentFactory(factory: IOTAgentFactory | null): void {
+  _agentFactory = factory;
+}
+
 interface WebSocketError {
   message?: string;
   reason?: string;
@@ -48,22 +58,29 @@ export class IOTConnection extends AwaitableEmitter {
     this.connect();
   }
 
+  private buildIoOptions(): Parameters<typeof io>[1] {
+    const agent = _agentFactory ? _agentFactory(this.url) : undefined;
+    // engine.io-client narrows `agent` to string|boolean in its typings, but forwards http.Agent instances to the ws transport at runtime.
+    return {
+      transports: ["websocket"],
+      query: {
+        token: this.token,
+        key: this.fingerPrint,
+        app: this.appName,
+        version: this.appVersion,
+        secondary: this.secondary,
+      },
+      agent,
+    } as Parameters<typeof io>[1];
+  }
+
   private connect(): void {
     try {
       this.disconnect(false);
 
       console.log(`Connecting to Socket.io server at ${this.url}`);
 
-      this._socket = io(this.url, {
-        transports: ["websocket"],
-        query: {
-          token: this.token,
-          key: this.fingerPrint,
-          app: this.appName,
-          version: this.appVersion,
-          secondary: this.secondary,
-        },
-      });
+      this._socket = io(this.url, this.buildIoOptions());
 
       this.emit("socket", this._socket);
       this.setupSocketHandlers();

@@ -749,6 +749,17 @@ iot.disconnect();
 iot.destroy();
 ```
 
+### Proxy support
+
+Deno services behind an HTTP proxy can opt in once at startup. The factory reads `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` (and lowercase variants) and tunnels the socket.io traffic via HTTP `CONNECT`.
+
+```typescript
+import { setIOTAgentFactory } from "@eai/elevation-core-ts/iot";
+import { envProxyAgent } from "@eai/elevation-core-ts/proxy";
+
+setIOTAgentFactory(envProxyAgent);
+```
+
 ---
 
 # Device Enrollment

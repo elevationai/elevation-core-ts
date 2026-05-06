@@ -1,6 +1,6 @@
 {
   "name": "@eai/elevation-core-ts",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "license": "BUSL-1.1",
   "exports": {
     ".": "./mod.ts",
@@ -12,7 +12,8 @@
     "./enrollment": "./lib/enrollment.ts",
     "./config": "./lib/config.ts",
     "./touchpoint": "./lib/touchpoint.ts",
-    "./utils": "./lib/shared/utils.ts"
+    "./utils": "./lib/shared/utils.ts",
+    "./proxy": "./lib/shared/proxy.ts"
   },
   "tasks": {
     "test": "deno test --allow-net --allow-env --allow-read"
